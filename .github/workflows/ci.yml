@@ -1,0 +1,230 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Cache frontend dependencies
+        id: cache-frontend
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Install dependencies for frontend
+        if: steps.cache-frontend.outputs.cache-hit != 'true'
+        working-directory: Frontend/itmo_board_frontend
+        run: npm install
+
+      - name: Cache backend dependencies
+        id: cache-backend
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Install dependencies for backend
+        if: steps.cache-backend.outputs.cache-hit != 'true'
+        working-directory: Backend
+        run: npm install
+
+  lint-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Lint frontend
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run lint
+
+  lint-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Lint backend
+        working-directory: Backend
+        run: npm run lint
+
+  format-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Check formatting with Prettier (Frontend)
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run format
+
+  format-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Check formatting with Prettier (Backend)
+        working-directory: Backend
+        run: npm run format
+
+  unit-tests-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Run Jest tests with coverage (Frontend)
+        working-directory: Frontend/itmo_board_frontend
+        run: |
+          npm install jest-environment-jsdom --save-dev
+          npm test
+      - name: Save coverage report (Frontend)
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: Frontend/itmo_board_frontend/coverage/
+
+  unit-tests-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Run Jest tests with coverage (Backend)
+        working-directory: Backend
+        run: |
+          npm install jest-environment-jsdom --save-dev
+          npm test
+
+      - name: Save coverage report (Backend)
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage-report
+          path: Backend/coverage/
+
+  e2e:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Run Playwright tests
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run test:e2e
+
+  check-coverage:
+    needs: [unit-tests-frontend, unit-tests-backend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: Frontend/itmo_board_frontend/coverage/
+      - uses: actions/download-artifact@v3
+        with:
+          name: backend-coverage-report
+          path: Backend/coverage/
+
+      - name: Check frontend coverage
+        run: |
+          FRONTEND_COVERAGE=$(grep -oP '(?<=All files\s*\|\s*)\d+(?=%)' Frontend/itmo_board_frontend/coverage/lcov-report/index.html)
+          if [ "$FRONTEND_COVERAGE" -lt 80 ]; then
+            echo "Frontend coverage below 80%: $FRONTEND_COVERAGE%"
+            exit 1
+          fi
+
+      - name: Check backend coverage
+        run: |
+          BACKEND_COVERAGE=$(grep -oP '(?<=All files\s*\|\s*)\d+(?=%)' Backend/coverage/lcov-report/index.html)
+          if [ "$BACKEND_COVERAGE" -lt 80 ]; then
+            echo "Backend coverage below 80%: $BACKEND_COVERAGE%"
+            exit 1
+          fi
