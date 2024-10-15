@@ -1,6 +1,6 @@
-import {useTranslations } from 'next-intl';
-import {BoardChooser} from "@/app/[locale]/components/BoardChooser";
-import {ThemeToggleButton} from "@/app/[locale]/components/ThemeToggleButton";
+import { useTranslations } from 'next-intl';
+import { BoardChooser } from '@/app/[locale]/components/BoardChooser';
+import { ThemeToggleButton } from '@/app/[locale]/components/ThemeToggleButton';
 
 export default function Main() {
     const t = useTranslations('Main');
