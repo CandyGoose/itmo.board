@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --check './**/*.{js,jsx,ts,tsx}'",
+    "format": "prettier --check ./**/*.{js,jsx,ts,tsx}",
     "test": "jest --verbose --coverage",
     "test:e2e": "npx playwright test"
   },
