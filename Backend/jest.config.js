@@ -1,6 +1,18 @@
 module.exports = {
     preset: 'ts-jest',
-    testEnvironment: 'node',
+    testEnvironment: 'jest-environment-jsdom',
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
+    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+    collectCoverage: true,
+    coverageThreshold: {
+      global: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80
+      }
+    },
+    coverageDirectory: 'coverage',
+    coverageReporters: ['json', 'lcov', 'text', 'clover'],
 };
