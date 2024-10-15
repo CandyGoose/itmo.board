@@ -28,7 +28,7 @@ const getInitialTheme = (): ThemeState['theme'] => {
 /**
  * Пустое хранилище, которое ничего не делает, используется при SSR
  */
-const noopStorage: PersistStorage<any> = {
+const noopStorage: PersistStorage<unknown> = {
     getItem: () => Promise.resolve(null),
     setItem: () => Promise.resolve(),
     removeItem: () => Promise.resolve(),
