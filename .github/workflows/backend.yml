@@ -1,0 +1,93 @@
+name: Backend CI
+on: [push, pull_request]
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Cache backend dependencies
+        id: cache-backend
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Install dependencies for backend
+        if: steps.cache-backend.outputs.cache-hit != 'true'
+        working-directory: Backend
+        run: npm install
+
+  lint-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Lint backend
+        working-directory: Backend
+        run: npm run lint
+
+  format-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Check formatting with Prettier (Backend)
+        working-directory: Backend
+        run: npm run format
+
+  unit-tests-backend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore backend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('Backend/package-lock.json') }}
+
+      - name: Run Jest tests with coverage (Backend)
+        working-directory: Backend
+        run: npm test
+
+      - name: Save coverage report (Backend)
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage-report
+          path: Backend/coverage/

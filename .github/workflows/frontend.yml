@@ -1,0 +1,93 @@
+name: Frontend CI
+on: [push, pull_request]
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Cache frontend dependencies
+        id: cache-frontend
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Install dependencies for frontend
+        if: steps.cache-frontend.outputs.cache-hit != 'true'
+        working-directory: Frontend/itmo_board_frontend
+        run: npm install
+
+  lint-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Lint frontend
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run lint
+
+  format-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Check formatting with Prettier (Frontend)
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run format
+
+  unit-tests-frontend:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Restore frontend dependencies from cache
+        uses: actions/cache@v3
+        with:
+          path: Frontend/itmo_board_frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('Frontend/itmo_board_frontend/package-lock.json') }}
+
+      - name: Run Jest tests with coverage (Frontend)
+        working-directory: Frontend/itmo_board_frontend
+        run: npm test
+
+      - name: Save coverage report (Frontend)
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: Frontend/itmo_board_frontend/coverage/
