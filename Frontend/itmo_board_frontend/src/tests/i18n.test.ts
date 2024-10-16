@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { loadLocale } from './i18n';
+import { loadLocale } from '@/i18n';
 
 jest.mock('next/navigation', () => ({
     notFound: jest.fn(),
