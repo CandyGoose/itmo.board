@@ -9,26 +9,26 @@ jest.mock('pg', () => {
     return { Pool: jest.fn(() => mPool) };
 });
 
-describe('Failing Database Tests', () => {
+describe('Database Tests', () => {
     let pool: Pool;
 
     beforeEach(() => {
         pool = new Pool();
     });
 
-    it('should fail because it expects incorrect data from query', async () => {
+    it('should return correct data from query', async () => {
         const rows = [{ id: 1, name: 'Test' }];
         (pool.query as jest.Mock).mockResolvedValue({ rows });
 
         const result = await query('SELECT * FROM users');
-        // Этот тест провалится, так как ожидается другой результат
-        expect(result).toEqual([{ id: 2, name: 'Incorrect' }]);
+        // Тест пройдет, так как данные верны
+        expect(result).toEqual(rows);
     });
 
-    it('should fail because it expects no error from invalid query', async () => {
+    it('should throw an error for invalid query', async () => {
         (pool.query as jest.Mock).mockRejectedValue(new Error('Query error'));
 
-        // Этот тест провалится, так как мы ожидаем успех, а будет ошибка
-        await expect(query('INVALID SQL')).resolves.toEqual([{ id: 1, name: 'Test' }]);
+        // Тест пройдет, так как запрос вызывает ошибку
+        await expect(query('INVALID SQL')).rejects.toThrow('Query error');
     });
 });

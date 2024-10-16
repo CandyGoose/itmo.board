@@ -12,3 +12,17 @@ export const query = async (text: string, params?: any[]) => {
     const res = await pool.query(text, params);
     return res.rows;
 };
+
+// Дополнительная не покрытая функция
+export function untestedFunction() {
+    console.log('This function is not covered by tests');
+}
+
+// Ещё один не покрытый код
+export function untestedCondition(condition: boolean): string {
+    if (condition) {
+        return "Condition is true";
+    } else {
+        return "Condition is false";
+    }
+}
