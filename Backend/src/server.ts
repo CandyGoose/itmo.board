@@ -1,5 +1,5 @@
 export function a(): void {
-    console.log("It works!");
+    console.log('It works!');
 }
 a();
 
@@ -10,8 +10,8 @@ export function b(): void {
 
 export function c(condition: boolean): string {
     if (condition) {
-        return "Condition is true";
+        return 'Condition is true';
     } else {
-        return "Condition is false";
+        return 'Condition is false';
     }
 }

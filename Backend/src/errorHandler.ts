@@ -1,10 +1,6 @@
 import { Request, Response } from 'express';
 
-export const errorHandler = (
-    err: Error,
-    req: Request,
-    res: Response
-) => {
+export const errorHandler = (err: Error, req: Request, res: Response) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Internal server error' });
 };
@@ -17,8 +13,8 @@ export function untestedFunction() {
 // Дополнительная не покрытая ветвь
 export function untestedCondition(condition: boolean): string {
     if (condition) {
-        return "Condition is true";
+        return 'Condition is true';
     } else {
-        return "Condition is false";
+        return 'Condition is false';
     }
 }

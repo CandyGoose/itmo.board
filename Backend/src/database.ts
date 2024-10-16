@@ -21,8 +21,8 @@ export function untestedFunction() {
 // Ещё один не покрытый код
 export function untestedCondition(condition: boolean): string {
     if (condition) {
-        return "Condition is true";
+        return 'Condition is true';
     } else {
-        return "Condition is false";
+        return 'Condition is false';
     }
 }

@@ -23,9 +23,7 @@ describe('Successful Routes Tests', () => {
     });
 
     it('should return 400 when data is not provided', async () => {
-        const response = await request(app)
-            .post('/data')
-            .send({}); // Отправляем пустой запрос
+        const response = await request(app).post('/data').send({}); // Отправляем пустой запрос
         expect(response.status).toBe(400); // Ожидаем 400
         expect(response.body.message).toBe('Invalid data'); // Проверяем сообщение об ошибке
     });

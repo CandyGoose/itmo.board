@@ -7,3 +7,6 @@ node_modules
 *.DS_Store
 .AppleDouble
 .LSOverride
+/Backend/coverage/
+/Backend/combined.log
+/Backend/package-lock.json

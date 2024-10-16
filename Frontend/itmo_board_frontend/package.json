@@ -9,7 +9,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --check ./src/**/*.{js,jsx,ts,tsx}",
-    "format:write": "prettier --write ./src/**/*.{js,jsx,ts,tsx}",
+    "format:fix": "prettier --write ./src/**/*.{js,jsx,ts,tsx}",
     "test": "jest --verbose",
     "test:coverage": "jest --verbose --coverage",
     "test:e2e": "npx playwright test"
