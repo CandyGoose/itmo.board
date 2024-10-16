@@ -9,4 +9,3 @@ node_modules
 .LSOverride
 /Backend/coverage/
 /Backend/combined.log
-/Backend/package-lock.json
