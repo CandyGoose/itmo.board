@@ -1,35 +1,32 @@
 import request from 'supertest';
 import express from 'express';
-import routes from '../routes';
+import routes from '../routes'; // Маршруты, которые вы тестируете
 
 const app = express();
 app.use(express.json()); // Middleware для обработки JSON
 app.use('/', routes);
 
-describe('Failing Routes Tests', () => {
-    it('should fail because it expects the wrong status for GET /data', async () => {
+describe('Successful Routes Tests', () => {
+    it('should return 200 and correct message for GET /data', async () => {
         const response = await request(app).get('/data');
-        expect(response.status).toBe(404); // Этот тест провалится, так как статус будет 200
+        expect(response.status).toBe(200); // Ожидаем 200
+        expect(response.body.message).toBe('Here is some data'); // Проверяем корректное сообщение
     });
 
-    it('should fail because it expects incorrect response body for POST /data', async () => {
+    it('should return 201 and correct message for POST /data', async () => {
         const response = await request(app)
             .post('/data')
             .send({ data: 'Some data' });
-        expect(response.body.message).toBe('Wrong message'); // Этот тест провалится, так как сообщение другое
+        expect(response.status).toBe(201); // Ожидаем 201
+        expect(response.body.message).toBe('Data added'); // Проверяем сообщение
+        expect(response.body.data).toBe('Some data'); // Проверяем переданные данные
     });
 
-    it('should fail because it expects invalid status for POST /data', async () => {
+    it('should return 400 when data is not provided', async () => {
         const response = await request(app)
             .post('/data')
-            .send({ data: 'Some data' });
-        expect(response.status).toBe(400); // Этот тест провалится, так как статус 201
-    });
-
-    it('should fail because it expects 200 when data is not provided', async () => {
-        const response = await request(app)
-            .post('/data')
-            .send({}); // Отправляем пустой запрос без данных
-        expect(response.status).toBe(200); // Этот тест провалится, так как сервер вернет 400
+            .send({}); // Отправляем пустой запрос
+        expect(response.status).toBe(400); // Ожидаем 400
+        expect(response.body.message).toBe('Invalid data'); // Проверяем сообщение об ошибке
     });
 });

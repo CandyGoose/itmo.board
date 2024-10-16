@@ -1,7 +1,7 @@
 import { errorHandler } from '../errorHandler';
 import { Request, Response } from 'express';
 
-describe('Failing Error Handler Tests', () => {
+describe('Error Handler Tests', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let jsonMock: jest.Mock;
@@ -15,13 +15,19 @@ describe('Failing Error Handler Tests', () => {
         };
     });
 
-    it('should fail because it expects wrong status and message', () => {
+    it('should return 500 status and correct error message', () => {
         const error = new Error('Test error');
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {}); // Мокаем console.error
 
-        errorHandler(error, req as Request, res as Response); // Убираем next
+        errorHandler(error, req as Request, res as Response); // Вызов функции errorHandler
 
-        // Заведомо неправильные ожидания, чтобы тест провалился
-        expect(res.status).toHaveBeenCalledWith(404); // Ожидаем статус 500, тест провалится
-        expect(jsonMock).toHaveBeenCalledWith({ message: 'Wrong error message' }); // Ожидаем неверное сообщение
+        // Проверяем, что функция вызовет статус 500 и вернет сообщение 'Internal server error'
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(jsonMock).toHaveBeenCalledWith({ message: 'Internal server error' });
+
+        // Проверяем, что console.error был вызван с выводом ошибки
+        expect(consoleSpy).toHaveBeenCalledWith(error.stack);
+
+        consoleSpy.mockRestore(); // Восстанавливаем console.error после теста
     });
 });
