@@ -60,9 +60,4 @@ describe('untestedCondition', () => {
         const result = untestedCondition(false);
         expect(result).toBe('Condition is false');
     });
-
-    it('this test will fail', () => {
-        const result = untestedCondition(true);
-        expect(result).toBe('Condition is false');
-    });
 });

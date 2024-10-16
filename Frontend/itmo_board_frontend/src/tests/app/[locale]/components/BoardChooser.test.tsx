@@ -61,6 +61,6 @@ describe('BoardChooser component', () => {
 
     it('this test fails', () => {
         render(<BoardChooser recentBoards={[]} />);
-        expect(screen.getByText('create_a_board')).not.toBeInTheDocument();
+        expect(screen.getByText('create_a_board')).toBeInTheDocument();
     });
 });
