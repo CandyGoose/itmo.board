@@ -1,4 +1,8 @@
-import { errorHandler, untestedFunction, untestedCondition } from '../errorHandler';
+import {
+    errorHandler,
+    untestedFunction,
+    untestedCondition,
+} from '../errorHandler';
 import { Request, Response } from 'express';
 
 describe('Error Handler Tests', () => {
@@ -40,7 +44,9 @@ describe('untestedFunction', () => {
     it('logs the correct message', () => {
         console.log = jest.fn();
         untestedFunction();
-        expect(console.log).toHaveBeenCalledWith('This function is not covered by tests');
+        expect(console.log).toHaveBeenCalledWith(
+            'This function is not covered by tests',
+        );
     });
 });
 

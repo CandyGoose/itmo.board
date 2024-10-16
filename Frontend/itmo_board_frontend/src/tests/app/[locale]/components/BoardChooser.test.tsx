@@ -58,4 +58,9 @@ describe('BoardChooser component', () => {
         const links = screen.getAllByRole('link');
         expect(links).toHaveLength(boards.length);
     });
+
+    it('this test fails', () => {
+        render(<BoardChooser recentBoards={[]} />);
+        expect(screen.getByText('create_a_board')).not.toBeInTheDocument();
+    });
 });
