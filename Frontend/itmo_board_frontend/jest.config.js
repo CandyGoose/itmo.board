@@ -1,7 +1,7 @@
 module.exports = {
     preset: 'ts-jest',
-    testEnvironment: 'node',
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    testEnvironment: 'jsdom',
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
     testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
     moduleNameMapper: {
@@ -9,6 +9,12 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
     },
     collectCoverage: true,
+    collectCoverageFrom: [
+        'src/**/*.{ts,tsx}',
+        '!src/**/*.d.ts',
+        '!src/navigation.ts', // эти файлы сделаны по требованиям next-intl
+        '!src/middleware.ts',
+    ],
     coverageThreshold: {
         global: {
             branches: 80,
@@ -16,6 +22,15 @@ module.exports = {
             lines: 80,
             statements: 80,
         },
+    },
+    transform: {
+        '^.+\\.(ts|tsx)$': [
+            'ts-jest',
+            {
+                tsconfig: './tsconfig.json',
+                babelConfig: true,
+            },
+        ],
     },
     coverageDirectory: 'coverage',
     coverageReporters: ['json', 'lcov', 'text', 'clover'],

@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ./**/*.{js,jsx,ts,tsx}",
-    "format:check": "prettier --check ./**/*.{js,jsx,ts,tsx}",
-    "test": "jest --verbose --coverage",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --check ./src/**/*.{js,jsx,ts,tsx}",
+    "format:fix": "prettier --write ./src/**/*.{js,jsx,ts,tsx}",
+    "test": "jest --verbose",
+    "test:coverage": "jest --verbose --coverage",
     "test:e2e": "npx playwright test"
   },
   "dependencies": {
@@ -20,21 +22,26 @@
     "radix-ui": "^1.0.1",
     "react": "^18",
     "react-dom": "^18",
-    "zustand": "^4.5.5",
-    "stitches": "^1.2.11"
+    "stitches": "^1.2.11",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.8",
+    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-typescript": "^7.25.7",
+    "@babel/preset-react": "^7.25.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "babel-jest": "^29.7.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.14",
     "jest": "^29.7.0",
-    "sass": "^1.79.5",
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^2.8.0",
+    "sass": "^1.79.5",
     "ts-jest": "^29.2.5",
     "typescript": "^5"
   }

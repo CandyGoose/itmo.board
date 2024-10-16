@@ -7,8 +7,20 @@ export default function Main() {
     return (
         <div>
             <h1>{t('test')}</h1>
-            <BoardChooser />
             <ThemeToggleButton />
+            <BoardChooser recentBoards={recentBoards} />
         </div>
     );
 }
+
+// TODO get user's data
+const recentBoards: { name: string; link: string }[] = [
+    {
+        name: 'МатАнализ лек 1',
+        link: '',
+    },
+    {
+        name: 'МатАнализ прак 1',
+        link: '',
+    },
+];

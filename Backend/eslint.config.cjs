@@ -13,11 +13,13 @@ module.exports = [
       sourceType: 'module',
       globals: {
         ...globals.node,
-      }
+        ...globals.jest,  // глобальные переменные Jest
+      },
     },
     plugins: {
       '@typescript-eslint': typescriptPlugin,
       node,
+      jest: require('eslint-plugin-jest'),  // Подключаем плагин для Jest
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
@@ -26,6 +28,9 @@ module.exports = [
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-async-promise-executor': 'warn',
       'node/no-unpublished-require': 'off',
+      'jest/no-disabled-tests': 'warn',  // Рекомендации Jest
+      'jest/no-focused-tests': 'error',  // Рекомендации Jest
+      'jest/no-identical-title': 'error',  // Рекомендации Jest
     },
   },
   js.configs.recommended,
