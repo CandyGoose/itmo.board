@@ -1,6 +1,6 @@
 {
   "Main": {
-    "test": "test"
+    "test": "тест"
   },
   "BoardChooser": {
     "create_a_board": "create a board",
