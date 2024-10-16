@@ -26,8 +26,8 @@ jobs:
         working-directory: Frontend/itmo_board_frontend
         run: |
           npm run build
-          nohup npm start &
-          sleep 5
+          npm start &
+          sleep 1
 
       - name: Run Playwright tests
         working-directory: Frontend/itmo_board_frontend
