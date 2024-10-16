@@ -62,4 +62,4 @@ export function BoardToolMenu({ tools }: { tools: BoardTool[] }) {
             ))}
         </div>
     );
-};
+}

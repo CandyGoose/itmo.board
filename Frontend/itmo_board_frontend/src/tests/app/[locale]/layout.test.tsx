@@ -47,7 +47,7 @@ describe('LocaleLayout component', () => {
 
         expect(NextIntlClientProvider).toHaveBeenCalledWith(
             expect.objectContaining({ messages }),
-            expect.anything()
+            expect.anything(),
         );
     });
 
@@ -61,7 +61,7 @@ describe('LocaleLayout component', () => {
 
         expect(NextIntlClientProvider).toHaveBeenCalledWith(
             expect.objectContaining({ messages: null }),
-            expect.anything()
+            expect.anything(),
         );
     });
 });

@@ -9,7 +9,8 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
     },
     collectCoverage: true,
-    collectCoverageFrom: ['src/**/*.{ts,tsx}',
+    collectCoverageFrom: [
+        'src/**/*.{ts,tsx}',
         '!src/**/*.d.ts',
         '!src/navigation.ts', // эти файлы сделаны по требованиям next-intl
         '!src/middleware.ts',
