@@ -8,7 +8,7 @@ const pool = new Pool({
     port: 5432,
 });
 
-export const query = async (text: string, params?: any[]) => {
+export const query = async (text: string, params?: unknown[]) => {
     const res = await pool.query(text, params);
     return res.rows;
 };
