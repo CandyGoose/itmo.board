@@ -13,7 +13,7 @@ const recentBoards: { name: string; link: string }[] = [
     },
 ];
 
-export const BoardChooser = () => {
+export function BoardChooser(recentBoards: { name: string; link: string }[]) {
     const t = useTranslations('BoardChooser');
 
     return (
@@ -34,4 +34,4 @@ export const BoardChooser = () => {
             ))}
         </div>
     );
-};
+}
