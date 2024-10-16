@@ -7,3 +7,5 @@ export const {Link, getPathname, redirect, usePathname, useRouter} =
         pathnames,
         localePrefix
     });
+
+let a
