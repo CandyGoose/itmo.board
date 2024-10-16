@@ -11,7 +11,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:e2e": "npx playwright test"
-  }, 
+  },  
   "dependencies": {
     "@liveblocks/client": "^2.9.0",
     "@liveblocks/zustand": "^2.9.0",
