@@ -1,4 +1,4 @@
-import { errorHandler } from '../errorHandler';
+import { errorHandler, untestedFunction, untestedCondition } from '../errorHandler';
 import { Request, Response } from 'express';
 
 describe('Error Handler Tests', () => {
@@ -33,5 +33,30 @@ describe('Error Handler Tests', () => {
         expect(consoleSpy).toHaveBeenCalledWith(error.stack);
 
         consoleSpy.mockRestore(); // Восстанавливаем console.error после теста
+    });
+});
+
+describe('untestedFunction', () => {
+    it('logs the correct message', () => {
+        console.log = jest.fn();
+        untestedFunction();
+        expect(console.log).toHaveBeenCalledWith('This function is not covered by tests');
+    });
+});
+
+describe('untestedCondition', () => {
+    it('returns true message when condition is true', () => {
+        const result = untestedCondition(true);
+        expect(result).toBe('Condition is true');
+    });
+
+    it('returns false message when condition is false', () => {
+        const result = untestedCondition(false);
+        expect(result).toBe('Condition is false');
+    });
+
+    it('this test will fail', () => {
+        const result = untestedCondition(true);
+        expect(result).toBe('Condition is false');
     });
 });

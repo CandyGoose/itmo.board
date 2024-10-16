@@ -1,4 +1,4 @@
-import { query } from '../database';
+import { query, untestedFunction, untestedCondition } from '../database';
 import { Pool } from 'pg';
 
 jest.mock('pg', () => {
@@ -30,5 +30,25 @@ describe('Database Tests', () => {
 
         // Тест пройдет, так как запрос вызывает ошибку
         await expect(query('INVALID SQL')).rejects.toThrow('Query error');
+    });
+
+    describe('untestedFunction', () => {
+        it('logs the correct message', () => {
+            console.log = jest.fn();
+            untestedFunction();
+            expect(console.log).toHaveBeenCalledWith('This function is not covered by tests');
+        });
+    });
+
+    describe('untestedCondition', () => {
+        it('returns true message when condition is true', () => {
+            const result = untestedCondition(true);
+            expect(result).toBe('Condition is true');
+        });
+
+        it('returns false message when condition is false', () => {
+            const result = untestedCondition(false);
+            expect(result).toBe('Condition is false');
+        });
     });
 });
