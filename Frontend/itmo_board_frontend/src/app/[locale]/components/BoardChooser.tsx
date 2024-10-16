@@ -1,4 +1,4 @@
-import {useTranslations} from "next-intl";
+ import {useTranslations} from "next-intl";
 import Link from "next/link";
 
 // TODO get user's data
