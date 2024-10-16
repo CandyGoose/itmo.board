@@ -1,7 +1,10 @@
 import { useTranslations } from 'next-intl';
 import { BoardChooser } from '@/app/[locale]/components/BoardChooser';
-import { ThemeToggleButton } from '@/app/[locale]/components/ThemeToggleButton';
+import dynamic from 'next/dynamic';
 
+const ThemeToggleButton = dynamic(
+    () => import('@/app/[locale]/components/buttons/ThemeToggleButton'),
+);
 export default function Main() {
     const t = useTranslations('Main');
     return (

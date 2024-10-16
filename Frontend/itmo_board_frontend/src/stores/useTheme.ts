@@ -12,7 +12,7 @@ const defaultTheme: ThemeState['theme'] = 'light';
 /**
  * Получаем тему из localStorage, если она там есть, иначе возвращаем тему по умолчанию
  */
-const getInitialTheme = (): ThemeState['theme'] => {
+export const getInitialTheme = (): ThemeState['theme'] => {
     if (typeof window !== 'undefined') {
         const storedTheme = localStorage.getItem('theme-storage') as
             | ThemeState['theme']
