@@ -1,2 +1,11 @@
+./Backend/package-lock.json
+./Frontend/itmo_board_frontend/package-lock.json
 .idea
 node_modules
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+/Backend/coverage/
+/Backend/combined.log
