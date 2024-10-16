@@ -1,4 +1,4 @@
-name: Frontend e2e
+name: Frontend test
 on:
   push:
     paths:
@@ -8,7 +8,7 @@ on:
       - 'Frontend/itmo_board_frontend/**'
 
 jobs:
-  e2e-frontend:
+  test-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,19 +21,7 @@ jobs:
       - name: Install dependencies for frontend
         working-directory: Frontend/itmo_board_frontend
         run: npm ci
-
-      - name: Install Playwright
+      
+      - name: Run Jest tests with coverage (Frontend)
         working-directory: Frontend/itmo_board_frontend
-        run: npx playwright install
-
-      - name: Build frontend
-        working-directory: Frontend/itmo_board_frontend
-        run: npm run build
-
-      - name: Start frontend in the background
-        working-directory: Frontend/itmo_board_frontend
-        run: nohup npm start &
-
-      - name: Run Playwright tests
-        working-directory: Frontend/itmo_board_frontend
-        run: npm run test:e2e
+        run: npm test

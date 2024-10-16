@@ -1,4 +1,4 @@
-name: Frontend e2e
+name: Frontend lint
 on:
   push:
     paths:
@@ -8,7 +8,7 @@ on:
       - 'Frontend/itmo_board_frontend/**'
 
 jobs:
-  e2e-frontend:
+  lint-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,18 +22,10 @@ jobs:
         working-directory: Frontend/itmo_board_frontend
         run: npm ci
 
-      - name: Install Playwright
+      - name: Lint frontend
         working-directory: Frontend/itmo_board_frontend
-        run: npx playwright install
+        run: npm run lint
 
-      - name: Build frontend
+      - name: Check formatting with Prettier (Frontend)
         working-directory: Frontend/itmo_board_frontend
-        run: npm run build
-
-      - name: Start frontend in the background
-        working-directory: Frontend/itmo_board_frontend
-        run: nohup npm start &
-
-      - name: Run Playwright tests
-        working-directory: Frontend/itmo_board_frontend
-        run: npm run test:e2e
+        run: npm run format
