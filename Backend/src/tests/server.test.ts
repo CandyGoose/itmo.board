@@ -19,7 +19,9 @@ describe('function b', () => {
     it('logs the correct message', () => {
         console.log = jest.fn();
         b();
-        expect(console.log).toHaveBeenCalledWith("This is function b, but it's never tested");
+        expect(console.log).toHaveBeenCalledWith(
+            "This is function b, but it's never tested",
+        );
     });
 });
 
