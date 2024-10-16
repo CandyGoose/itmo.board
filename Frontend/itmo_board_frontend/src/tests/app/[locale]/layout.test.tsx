@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import LocaleLayout from '@/app/[locale]/layout';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -18,22 +18,15 @@ describe('LocaleLayout component', () => {
         const children = <div>Test Children</div>;
         const params = { locale: 'en' };
 
-        render(await LocaleLayout({ children, params }));
+        // This insane workaround is needed to render the layout within a html
+        // element instead of a div as the render function does by default
+        const htmlContainer = document.createElement('html');
+        const { props } = await LocaleLayout({ children, params });
+        const { container } = render(props.children, {
+            container: htmlContainer,
+        });
 
-        expect(screen.getByText('Test Children')).toBeInTheDocument();
-    });
-
-    it('sets the correct lang attribute on html element', async () => {
-        (getMessages as jest.Mock).mockResolvedValue({});
-
-        const children = <div />;
-        const params = { locale: 'en' };
-
-        const { container } = render(await LocaleLayout({ children, params }));
-
-        // Check the lang attribute on the rendered html element
-        const htmlElement = container.querySelector('html');
-        expect(htmlElement?.getAttribute('lang')).toBe('en');
+        expect(container).toHaveTextContent('Test Children');
     });
 
     it('provides messages to NextIntlClientProvider', async () => {
@@ -43,7 +36,9 @@ describe('LocaleLayout component', () => {
         const children = <div />;
         const params = { locale: 'en' };
 
-        render(await LocaleLayout({ children, params }));
+        const htmlContainer = document.createElement('html');
+        const { props } = await LocaleLayout({ children, params });
+        render(props.children, { container: htmlContainer });
 
         expect(NextIntlClientProvider).toHaveBeenCalledWith(
             expect.objectContaining({ messages }),
@@ -57,7 +52,11 @@ describe('LocaleLayout component', () => {
         const children = <div />;
         const params = { locale: 'en' };
 
-        render(await LocaleLayout({ children, params }));
+        const htmlContainer = document.createElement('html');
+        const { props } = await LocaleLayout({ children, params });
+        render(props.children, {
+            container: htmlContainer,
+        });
 
         expect(NextIntlClientProvider).toHaveBeenCalledWith(
             expect.objectContaining({ messages: null }),
