@@ -1,5 +1,3 @@
-./Backend/package-lock.json
-./Frontend/itmo_board_frontend/package-lock.json
 .idea
 node_modules
 
