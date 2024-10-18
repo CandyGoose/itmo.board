@@ -22,8 +22,8 @@ describe('Error Handler Tests', () => {
     it('should return 500 status and correct error message', () => {
         const error = new Error('Test error');
         const consoleSpy = jest
-          .spyOn(console, 'error')
-          .mockImplementation(() => {}); // Мокаем console.error
+            .spyOn(console, 'error')
+            .mockImplementation(() => {}); // Мокаем console.error
 
         errorHandler(error, req as Request, res as Response); // Вызов функции errorHandler
 
@@ -45,7 +45,7 @@ describe('untestedFunction', () => {
         console.log = jest.fn();
         untestedFunction();
         expect(console.log).toHaveBeenCalledWith(
-          'This function is not covered by tests',
+            'This function is not covered by tests',
         );
     });
 });

@@ -3,8 +3,8 @@ import { a, b, c } from '../server';
 describe('Backend Tests', () => {
     it('should log the correct console output', () => {
         const consoleSpy = jest
-          .spyOn(console, 'log')
-          .mockImplementation(() => {}); // Мокаем console.log для отслеживания
+            .spyOn(console, 'log')
+            .mockImplementation(() => {}); // Мокаем console.log для отслеживания
         a();
         expect(consoleSpy).toHaveBeenCalledWith('It works!'); // Тест теперь пройдет, так как сообщение правильное
         consoleSpy.mockRestore(); // Восстановление состояния console после теста
@@ -20,7 +20,7 @@ describe('function b', () => {
         console.log = jest.fn();
         b();
         expect(console.log).toHaveBeenCalledWith(
-          "This is function b, but it's never tested",
+            "This is function b, but it's never tested",
         );
     });
 });

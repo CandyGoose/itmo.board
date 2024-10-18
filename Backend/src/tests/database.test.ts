@@ -37,7 +37,7 @@ describe('Database Tests', () => {
             console.log = jest.fn();
             untestedFunction();
             expect(console.log).toHaveBeenCalledWith(
-              'This function is not covered by tests',
+                'This function is not covered by tests',
             );
         });
     });

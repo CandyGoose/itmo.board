@@ -15,8 +15,8 @@ describe('Successful Routes Tests', () => {
 
     it('should return 201 and correct message for POST /data', async () => {
         const response = await request(app)
-          .post('/data')
-          .send({ data: 'Some data' });
+            .post('/data')
+            .send({ data: 'Some data' });
         expect(response.status).toBe(201); // Ожидаем 201
         expect(response.body.message).toBe('Data added'); // Проверяем сообщение
         expect(response.body.data).toBe('Some data'); // Проверяем переданные данные
