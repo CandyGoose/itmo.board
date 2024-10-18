@@ -21,7 +21,7 @@ jobs:
       - name: Check frontend coverage
         working-directory: Frontend/itmo_board_frontend
         run: |
-          if npm run test:coverage | grep -q 'Jest: "global" coverage threshold for'; then
+          if npm run test:coverage 2>&1 | grep -q 'Jest: "global" coverage threshold for'; then
             echo "Error: Global coverage threshold found";
             exit 1;
           else
