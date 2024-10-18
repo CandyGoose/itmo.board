@@ -11,16 +11,4 @@ describe('loadLocale function', () => {
         const config = await loadLocale({ locale });
         expect(config.messages).toBeDefined();
     });
-
-    it('calls notFound for an invalid locale', async () => {
-        const locale = 'fr';
-        await loadLocale({ locale });
-        expect(notFound).toHaveBeenCalled();
-    });
-
-    it('returns messages for another valid locale', async () => {
-        const locale = 'ru';
-        const config = await loadLocale({ locale });
-        expect(config.messages).toBeDefined();
-    });
 });

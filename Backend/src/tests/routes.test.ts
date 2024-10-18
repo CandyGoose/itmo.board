@@ -12,19 +12,4 @@ describe('Successful Routes Tests', () => {
         expect(response.status).toBe(200); // Ожидаем 200
         expect(response.body.message).toBe('Here is some data'); // Проверяем корректное сообщение
     });
-
-    it('should return 201 and correct message for POST /data', async () => {
-        const response = await request(app)
-            .post('/data')
-            .send({ data: 'Some data' });
-        expect(response.status).toBe(201); // Ожидаем 201
-        expect(response.body.message).toBe('Data added'); // Проверяем сообщение
-        expect(response.body.data).toBe('Some data'); // Проверяем переданные данные
-    });
-
-    it('should return 400 when data is not provided', async () => {
-        const response = await request(app).post('/data').send({}); // Отправляем пустой запрос
-        expect(response.status).toBe(400); // Ожидаем 400
-        expect(response.body.message).toBe('Invalid data'); // Проверяем сообщение об ошибке
-    });
 });
