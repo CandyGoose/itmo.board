@@ -10,6 +10,7 @@ export default async function LocaleLayout({
     params: { locale: string };
 }) {
     const messages = await getMessages();
+    const unusedVariable = 'This is not used';
 
     return (
         <html lang={locale}>
