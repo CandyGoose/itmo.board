@@ -10,6 +10,7 @@ export default async function LocaleLayout({
     params: { locale: string };
 }) {
     const messages = await getMessages();
+    const par = 123;
 
     return (
         <html lang={locale}>
