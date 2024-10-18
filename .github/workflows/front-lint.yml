@@ -1,4 +1,4 @@
-name: Backend coverage
+name: Frontend lint
 on:
   push:
   pull_request:
