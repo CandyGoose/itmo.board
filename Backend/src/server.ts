@@ -16,18 +16,3 @@ export function c(condition: boolean): string {
     }
 }
 
-// Новый функционал, который не покрыт тестами
-export function d(input: number): number {
-    if (input > 0) {
-        console.log('Input is positive');
-        return input * 2;
-    } else if (input < 0) {
-        console.log('Input is negative');
-        return input - 2;
-    } else {
-        console.log('Input is zero');
-        return 0;
-    }
-}
-
-d(123);
