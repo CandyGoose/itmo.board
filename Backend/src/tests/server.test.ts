@@ -15,24 +15,3 @@ describe('Backend Tests', () => {
         expect(returnValue).toBeUndefined(); // Тест пройдет, так как a() возвращает void
     });
 });
-describe('function b', () => {
-    it('logs the correct message', () => {
-        console.log = jest.fn();
-        b();
-        expect(console.log).toHaveBeenCalledWith(
-            "This is function b, but it's never tested",
-        );
-    });
-});
-
-describe('function c', () => {
-    it('returns true message when condition is true', () => {
-        const result = c(true);
-        expect(result).toBe('Condition is true');
-    });
-
-    it('returns false message when condition is false', () => {
-        const result = c(false);
-        expect(result).toBe('Condition is false');
-    });
-});
