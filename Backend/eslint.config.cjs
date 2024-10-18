@@ -20,6 +20,7 @@ module.exports = [
       '@typescript-eslint': typescriptPlugin,
       node,
       jest: require('eslint-plugin-jest'),  // Подключаем плагин для Jest
+      'no-only-tests': require('eslint-plugin-no-only-tests'),  // Плагин для запрета использования only в тестах
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'error',
