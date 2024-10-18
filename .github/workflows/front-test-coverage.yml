@@ -21,9 +21,11 @@ jobs:
       - name: Check for global coverage threshold message
         working-directory: Frontend/itmo_board_frontend
         run: |
-          if npm run test:coverage 2>&1 | grep -qE 'coverage threshold for'; then
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1)
+          echo "$COVERAGE_OUTPUT"
+          if echo "$COVERAGE_OUTPUT" | grep -qE 'coverage threshold for'; then
             echo "Error: Global coverage threshold not met";
+            exit 1;
           else
             echo "Global coverage threshold met, proceeding...";
-            exit 1;
           fi
