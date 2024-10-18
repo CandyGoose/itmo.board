@@ -1,4 +1,4 @@
-name: Frontend test
+name: Frontend e2e
 on:
   push:
     paths:
@@ -8,17 +8,10 @@ on:
       - 'Frontend/itmo_board_frontend/**'
 
 jobs:
-  test-frontend:
+  e2e-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Check for .only in tests
-        run: |
-          if grep -r "\.only" ./src/tests; then
-            echo "Error: Found .only in test files!"
-            exit 1
-          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -28,7 +21,19 @@ jobs:
       - name: Install dependencies for frontend
         working-directory: Frontend/itmo_board_frontend
         run: npm ci
-      
-      - name: Run Jest tests with coverage (Frontend)
+
+      - name: Install Playwright
         working-directory: Frontend/itmo_board_frontend
-        run: npm test
+        run: npx playwright install
+
+      - name: Build frontend
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run build
+
+      - name: Start frontend in the background
+        working-directory: Frontend/itmo_board_frontend
+        run: nohup npm start &
+
+      - name: Run Playwright tests
+        working-directory: Frontend/itmo_board_frontend
+        run: npm run test:e2e

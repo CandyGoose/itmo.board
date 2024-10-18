@@ -3,7 +3,8 @@ module.exports = {
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
-    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
+    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/', '/e2e/'],
+    coveragePathIgnorePatterns: ['/node_modules/', '/tests/e2e/'],
     moduleNameMapper: {
         '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
         '^@/(.*)$': '<rootDir>/src/$1',
