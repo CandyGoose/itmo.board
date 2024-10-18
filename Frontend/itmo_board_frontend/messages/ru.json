@@ -2,6 +2,9 @@
   "Main": {
     "test": "тест"
   },
+  "Board": {
+    "test": "тест"
+  },
   "BoardChooser": {
     "create_a_board": "создать доску",
     "enter_board_name": "введите название доски",

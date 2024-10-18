@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "@types/supertest": "^6.0.2",
+    "@types/winston": "^2.4.4",
+    "supertest": "^7.0.0"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
