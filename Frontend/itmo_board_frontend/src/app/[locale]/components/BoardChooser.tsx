@@ -13,7 +13,7 @@ export function BoardChooser({
             <div>{t('create_a_board')}</div>
 
             <form>
-                <input placeholder={t('enter_board_name')} />
+                <input placeholder={t('create_a_board')} />
                 <button type={'submit'}>{t('create')}</button>
             </form>
             <div>{t('recent_boards')}</div>
