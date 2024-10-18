@@ -7,7 +7,7 @@ test('Проверка отображения текста "тест"', async ({
     await expect(heading).toHaveText('тест');
 });
 
-test('Проверка отображения несуществующего текста "тест"', async ({ page }) => {
+test('Проверка отображения текста "test"', async ({ page }) => {
     await page.goto('http://localhost:3000/en');
 
     const heading = page.locator('h1');
