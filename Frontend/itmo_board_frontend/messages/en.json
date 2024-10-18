@@ -1,14 +1,14 @@
 {
-  "Main": {
-    "test": "test"
-  },
-  "Board": {
-    "test": "test"
-  },
-  "BoardChooser": {
-    "create_a_board": "create a board",
-    "enter_board_name": "enter board name",
-    "create": "create",
-    "recent_boards": "recent boards"
-  }
+    "Main": {
+        "test": "test"
+    },
+    "Board": {
+        "test": "test"
+    },
+    "BoardChooser": {
+        "create_a_board": "create a board",
+        "enter_board_name": "enter board name",
+        "create": "create",
+        "recent_boards": "recent boards"
+    }
 }

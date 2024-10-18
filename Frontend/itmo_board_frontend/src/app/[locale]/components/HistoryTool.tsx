@@ -1,7 +1,3 @@
 export function HistoryTool() {
-    return (
-        <div>
-
-        </div>
-    );
+    return <div />;
 }
