@@ -19,9 +19,7 @@ describe('function b', () => {
     it('logs the correct message', () => {
         console.log = jest.fn();
         b();
-        expect(console.log).toHaveBeenCalledWith(
-            "This is function b",
-        );
+        expect(console.log).toHaveBeenCalledWith('This is function b');
     });
 });
 
