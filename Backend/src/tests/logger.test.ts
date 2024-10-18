@@ -11,7 +11,7 @@ describe('Logger Tests', () => {
 
     it('should log to file', () => {
         const fileTransport = logger.transports.find(
-          (transport) => transport instanceof transports.File,
+            (transport) => transport instanceof transports.File,
         );
         expect(fileTransport).toBeDefined();
     });
