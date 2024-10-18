@@ -21,4 +21,4 @@ jobs:
       - name: Run backend tests with coverage
         working-directory: Backend
         run: |
-          npm run test:coverage | grep -q 'Jest: "global" coverage threshold for' && exit 1)
+          npm run test:coverage | grep -q 'Jest: "global" coverage threshold for' && exit 1
