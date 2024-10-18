@@ -12,6 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      - name: Check for .only in tests
+        run: |
+          if grep -r "\.only" ./src/tests; then
+            echo "Error: Found .only in test files!"
+            exit 1
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v2

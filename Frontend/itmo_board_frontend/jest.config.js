@@ -1,22 +1,38 @@
 module.exports = {
     preset: 'ts-jest',
-    testEnvironment: 'jest-environment-jsdom',
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    testEnvironment: 'jsdom',
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
-    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
+    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/', '/e2e/'],
+    coveragePathIgnorePatterns: ['/node_modules/', '/tests/e2e/'],
     moduleNameMapper: {
-      '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+        '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+        '^@/(.*)$': '<rootDir>/src/$1',
     },
     collectCoverage: true,
+    collectCoverageFrom: [
+        'src/**/*.{ts,tsx}',
+        '!src/**/*.d.ts',
+        '!src/navigation.ts', // эти файлы сделаны по требованиям next-intl
+        '!src/middleware.ts',
+    ],
     coverageThreshold: {
-      global: {
-        branches: 80,
-        functions: 80,
-        lines: 80,
-        statements: 80
-      }
+        global: {
+            branches: 80,
+            functions: 80,
+            lines: 80,
+            statements: 80,
+        },
+    },
+    transform: {
+        '^.+\\.(ts|tsx)$': [
+            'ts-jest',
+            {
+                tsconfig: './tsconfig.json',
+                babelConfig: true,
+            },
+        ],
     },
     coverageDirectory: 'coverage',
     coverageReporters: ['json', 'lcov', 'text', 'clover'],
-  };
-  
+};
