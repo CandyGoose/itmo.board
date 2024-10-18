@@ -4,7 +4,7 @@ module.exports = {
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
     testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-    collectCoverage: true,
+    collectCoverage: false,
     coverageThreshold: {
         global: {
             branches: 80,

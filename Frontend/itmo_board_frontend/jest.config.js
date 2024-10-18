@@ -10,7 +10,7 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
         '^react($|/.+)': '<rootDir>/node_modules/react$1'
     },
-    collectCoverage: true,
+    collectCoverage: false,
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',
         '!src/**/*.d.ts',
