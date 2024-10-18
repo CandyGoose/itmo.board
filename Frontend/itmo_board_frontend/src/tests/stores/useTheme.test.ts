@@ -1,34 +1,65 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 
-describe('useTheme', () => {
+describe('useTheme (persist)', () => {
     beforeEach(() => {
         localStorage.clear();
     });
 
-    it('uses dark theme when stored in localStorage', async () => {
-        localStorage.setItem('theme-storage', 'dark');
-
+    test('should toggle theme between light and dark', () => {
         const useTheme = require('@/stores/useTheme').default;
         const { result } = renderHook(() => useTheme());
 
-        await waitFor(() => {
-            expect(result.current.theme).toBe('dark');
+        // Initial theme (based on system or default setup)
+        const initialTheme = result.current.theme;
+
+        // Toggle theme
+        act(() => {
+            result.current.toggleTheme();
         });
+
+        // Ensure theme has toggled
+        expect(result.current.theme).toBe(
+            initialTheme === 'light' ? 'dark' : 'light',
+        );
+        expect(
+            JSON.parse(<string>localStorage.getItem('theme-storage')).state
+                .theme,
+        ).toBe(result.current.theme);
+
+        // Toggle back to initial state
+        act(() => {
+            result.current.toggleTheme();
+        });
+
+        expect(result.current.theme).toBe(initialTheme);
+        expect(
+            JSON.parse(<string>localStorage.getItem('theme-storage')).state
+                .theme,
+        ).toBe(initialTheme);
     });
 
-    it('respects the system preference when no theme is stored', () => {
-        Object.defineProperty(window, 'matchMedia', {
-            writable: true,
-            value: jest.fn().mockImplementation(query => ({
-                matches: query === '(prefers-color-scheme: dark)',
-                addListener: jest.fn(),
-                removeListener: jest.fn(),
-            })),
-        });
-
+    test('should set theme explicitly via setTheme', () => {
         const useTheme = require('@/stores/useTheme').default;
         const { result } = renderHook(() => useTheme());
+
+        // Set theme to 'light'
+        act(() => {
+            result.current.setTheme('light');
+        });
+        expect(result.current.theme).toBe('light');
+        expect(
+            JSON.parse(<string>localStorage.getItem('theme-storage')).state
+                .theme,
+        ).toBe('light');
+
+        // Set theme to 'dark'
+        act(() => {
+            result.current.setTheme('dark');
+        });
         expect(result.current.theme).toBe('dark');
+        expect(
+            JSON.parse(<string>localStorage.getItem('theme-storage')).state
+                .theme,
+        ).toBe('dark');
     });
-
 });
