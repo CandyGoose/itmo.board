@@ -1,11 +1,7 @@
-name: Backend test
+name: Backend coverage
 on:
   push:
-    paths:
-      - 'Backend/**'
   pull_request:
-    paths:
-      - 'Backend/**'
 
 jobs:
   test-backend:

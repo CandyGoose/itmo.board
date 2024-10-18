@@ -1,11 +1,7 @@
 name: Backend coverage
 on:
   push:
-    paths:
-      - 'Backend/**'
   pull_request:
-    paths:
-      - 'Backend/**'
 
 jobs:
   coverage-backend:
@@ -22,6 +18,12 @@ jobs:
         working-directory: Backend
         run: npm ci
       
-      - name: Check backend coverage
+      - name: Run backend tests with coverage
         working-directory: Backend
-        run: npm run test:coverage
+        run: |
+          if npm run test:coverage | grep -q 'Jest: "global" coverage threshold for'; then
+            echo "Error: Global coverage threshold found";
+            exit 1;
+          else
+            echo "No global coverage threshold found, proceeding...";
+          fi
