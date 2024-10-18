@@ -15,3 +15,30 @@ export function c(condition: boolean): string {
         return 'Condition is false';
     }
 }
+
+export function d(input: number): number {
+    if (input > 0) {
+        console.log('Input is positive');
+        return input * 2;
+    } else if (input < 0) {
+        console.log('Input is negative');
+        return input - 2;
+    } else {
+        console.log('Input is zero');
+        return 0;
+    }
+}
+
+d(123);
+
+export function e(input: number): number {
+    if (input > 0) {
+        return input + 2;
+    } else if (input < 0) {
+        return input - 2;
+    } else {
+        return 0;
+    }
+}
+
+e(123);
