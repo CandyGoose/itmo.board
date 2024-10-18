@@ -15,3 +15,5 @@ export function c(condition: boolean): string {
         return 'Condition is false';
     }
 }
+
+let d = 123;
