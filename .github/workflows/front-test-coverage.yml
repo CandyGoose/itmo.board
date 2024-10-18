@@ -1,11 +1,7 @@
 name: Frontend coverage
 on:
   push:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
   pull_request:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
 
 jobs:
   coverage-frontend:
@@ -24,4 +20,5 @@ jobs:
 
       - name: Check frontend coverage
         working-directory: Frontend/itmo_board_frontend
-        run: npm run test:coverage
+        run: |
+          npm run test:coverage | grep -q 'Jest: "global" coverage threshold for' && (echo "Global coverage threshold not met" && exit 1) || echo "Global coverage threshold met"
