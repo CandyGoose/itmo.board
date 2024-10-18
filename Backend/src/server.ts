@@ -4,7 +4,7 @@ export function a(): void {
 a();
 
 export function b(): void {
-    console.log("This is function b");
+    console.log('This is function b');
 }
 
 export function c(condition: boolean): string {
