@@ -1,4 +1,4 @@
-name: Backend coverage
+name: Frontend e2e
 on:
   push:
   pull_request:

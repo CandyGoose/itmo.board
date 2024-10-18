@@ -18,12 +18,12 @@ jobs:
         working-directory: Backend
         run: npm ci
       
-      - name: Run backend tests with coverage
+      - name: Check for global coverage threshold message
         working-directory: Backend
         run: |
-          if npm run test:coverage | grep -q 'Jest: "global" coverage threshold for'; then
-            echo "Error: Global coverage threshold found";
-            exit 1;
+          if npm run test:coverage 2>&1 | grep -qE 'coverage threshold for'; then
+            echo "Error: Global coverage threshold not met";
           else
-            echo "No global coverage threshold found, proceeding...";
+            echo "Global coverage threshold met, proceeding...";
+            exit 1;
           fi
