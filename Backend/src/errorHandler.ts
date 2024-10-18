@@ -7,7 +7,7 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
 
 // Дополнительная не покрытая функция
 export function untestedFunction() {
-    console.log('This function is not covered by tests');
+    console.log('This is not covered by tests');
 }
 
 // Дополнительная не покрытая ветвь
