@@ -7,34 +7,20 @@ interface ThemeState {
     setTheme: (theme: 'light' | 'dark') => void;
 }
 
-const defaultTheme: ThemeState['theme'] = 'light';
-
 /**
  * Получаем тему из localStorage, если она там есть, иначе возвращаем тему по умолчанию
  */
-export const getInitialTheme = (): ThemeState['theme'] => {
-    if (typeof window !== 'undefined') {
-        const storedTheme = localStorage.getItem('theme-storage') as
-            | ThemeState['theme']
-            | null;
-        if (storedTheme === 'light' || storedTheme === 'dark') {
-            return storedTheme;
-        }
-        // Если тема не сохранена в localStorage, то возвращаем тему из настроек браузера
-        return window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light';
+const getInitialTheme = (): ThemeState['theme'] => {
+    const storedTheme = localStorage.getItem('theme-storage') as
+        | ThemeState['theme']
+        | null;
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+        return storedTheme;
     }
-    return defaultTheme;
-};
-
-/**
- * Пустое хранилище, которое ничего не делает, используется при SSR
- */
-const noopStorage: PersistStorage<unknown> = {
-    getItem: () => Promise.resolve(null),
-    setItem: () => Promise.resolve(),
-    removeItem: () => Promise.resolve(),
+    // Если тема не сохранена в localStorage, то возвращаем тему из настроек браузера
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
 };
 
 /**
@@ -52,15 +38,7 @@ const useTheme = create<ThemeState>()(
         }),
         {
             name: 'theme-storage', // Название ключа в localStorage
-            storage:
-                typeof window !== 'undefined'
-                    ? createJSONStorage(() => localStorage)
-                    : noopStorage,
-            onRehydrateStorage: () => (state) => {
-                if (state?.theme) {
-                    // Действия при загрузке темы из localStorage
-                }
-            },
+            storage: createJSONStorage(() => localStorage)
         },
     ),
 );
