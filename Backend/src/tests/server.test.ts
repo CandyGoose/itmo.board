@@ -20,7 +20,7 @@ describe('function b', () => {
         console.log = jest.fn();
         b();
         expect(console.log).toHaveBeenCalledWith(
-            "This is function b, but it's never tested",
+            "This is function b",
         );
     });
 });

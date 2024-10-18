@@ -3,9 +3,8 @@ export function a(): void {
 }
 a();
 
-// Не используемые функции, которые не будут покрываться тестами
 export function b(): void {
-    console.log("This is function b, but it's never tested");
+    console.log("This is function b");
 }
 
 export function c(condition: boolean): string {
