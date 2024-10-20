@@ -1,11 +1,7 @@
 name: Frontend coverage
 on:
   push:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
   pull_request:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
 
 jobs:
   coverage-frontend:
@@ -22,6 +18,14 @@ jobs:
         working-directory: Frontend/itmo_board_frontend
         run: npm ci
 
-      - name: Check frontend coverage
+      - name: Check for global coverage threshold message
         working-directory: Frontend/itmo_board_frontend
-        run: npm run test:coverage
+        run: |
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1)
+          echo "$COVERAGE_OUTPUT"
+          if echo "$COVERAGE_OUTPUT" | grep -qE 'coverage threshold for'; then
+            echo "Error: Global coverage threshold not met";
+            exit 1;
+          else
+            echo "Global coverage threshold met, proceeding...";
+          fi

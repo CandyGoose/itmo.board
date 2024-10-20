@@ -1,11 +1,7 @@
 name: Backend lint
 on:
   push:
-    paths:
-      - 'Backend/**'
   pull_request:
-    paths:
-      - 'Backend/**'
 
 jobs:
   lint-backend:
