@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import useTheme from '@/stores/useTheme';
 import ThemeToggleButton from '@/app/[locale]/components/buttons/ThemeToggleButton';
 
@@ -19,7 +19,9 @@ describe('ThemeToggleButton', () => {
         const toggleThemeMock = jest.fn();
         useTheme.setState({ theme: 'light', toggleTheme: toggleThemeMock });
         render(<ThemeToggleButton />);
-        fireEvent.click(screen.getByRole('button'));
+        act(() => {
+            fireEvent.click(screen.getByRole('button'));
+        });
         expect(toggleThemeMock).toHaveBeenCalled();
     });
 
