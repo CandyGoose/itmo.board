@@ -8,7 +8,7 @@ export default function ThemeToggleButton() {
 
     // TODO: The component will be implemented correctly later
     return (
-        <button onClick={toggleTheme}>
+        <button onClick={toggleTheme} data-testid={'theme-toggle-button'}>
             Switch to {theme === 'light' ? 'dark' : 'light'} mode
         </button>
     );

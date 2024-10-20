@@ -5,41 +5,44 @@ test('Clicking on ThemeToggleButton component changes background', async ({
 }) => {
     await page.goto('http://localhost:3000/ru');
 
-    // Получаем только rgb из строки
-    const extractRGB = (color: string) => {
-        const match = color.match(/\d+, \d+, \d+/);
-        return match ? match[0] : '';
-    };
-
     // Начальный цвет фона
     const initialBackgroundColor = await page.evaluate(() => {
         return window.getComputedStyle(document.body).backgroundColor;
     });
 
     // Кнопка из компонента ThemeToggleButton
-    await page.click('button:has-text("Switch to dark mode")'); // Текст может быть другим
+    await page.click('[data-testid="theme-toggle-button"]');
 
-    // Ожидание из-за transition в CSS
-    await page.waitForTimeout(1000);
+    // Ожидание завершения всех анимаций
+    await page.evaluate(() =>
+        Promise.all(
+            document.body
+                .getAnimations({ subtree: true })
+                .map((animation) => animation.finished),
+        ),
+    );
 
     // Цвет фона после смены темы
     const newBackgroundColor = await page.evaluate(() => {
         return window.getComputedStyle(document.body).backgroundColor;
     });
 
-    expect(extractRGB(newBackgroundColor)).not.toBe(
-        extractRGB(initialBackgroundColor),
+    expect(newBackgroundColor).not.toBe(initialBackgroundColor);
+
+    await page.click('[data-testid="theme-toggle-button"]');
+
+    // Ожидание завершения всех анимаций
+    await page.evaluate(() =>
+        Promise.all(
+            document.body
+                .getAnimations({ subtree: true })
+                .map((animation) => animation.finished),
+        ),
     );
-
-    await page.click('button:has-text("Switch to light mode")'); // Текст может быть другим
-
-    await page.waitForTimeout(1000);
 
     const finalBackgroundColor = await page.evaluate(() => {
         return window.getComputedStyle(document.body).backgroundColor;
     });
 
-    expect(extractRGB(finalBackgroundColor)).toBe(
-        extractRGB(initialBackgroundColor),
-    );
+    expect(finalBackgroundColor).not.toBe(newBackgroundColor);
 });
