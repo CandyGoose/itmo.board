@@ -1,11 +1,7 @@
 name: Frontend lint
 on:
   push:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
   pull_request:
-    paths:
-      - 'Frontend/itmo_board_frontend/**'
 
 jobs:
   lint-frontend:
