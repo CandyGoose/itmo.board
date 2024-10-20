@@ -1,11 +1,16 @@
 import { useTranslations } from 'next-intl';
 import { BoardChooser } from '@/app/[locale]/components/BoardChooser';
+import dynamic from 'next/dynamic';
 
+const ThemeToggleButton = dynamic(
+    () => import('@/app/[locale]/components/buttons/ThemeToggleButton'),
+);
 export default function Main() {
     const t = useTranslations('Main');
     return (
         <div>
             <h1>{t('test')}</h1>
+            <ThemeToggleButton />
             <BoardChooser recentBoards={recentBoards} />
         </div>
     );

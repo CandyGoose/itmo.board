@@ -1,6 +1,8 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode } from 'react';
 import { getMessages } from 'next-intl/server';
+import '../globals.scss';
+import ThemeProvider from '@/providers/ThemeProvider';
 
 export default async function LocaleLayout({
     children,
@@ -15,6 +17,7 @@ export default async function LocaleLayout({
         <html lang={locale}>
             <body>
                 <NextIntlClientProvider messages={messages}>
+                    <ThemeProvider />
                     {children}
                 </NextIntlClientProvider>
             </body>

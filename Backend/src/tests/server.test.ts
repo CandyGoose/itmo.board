@@ -11,7 +11,7 @@ describe('Backend Tests', () => {
     });
 
     it('should confirm that function a() returns nothing', () => {
-        const returnValue = require('../server').a();
+        const returnValue = a();
         expect(returnValue).toBeUndefined(); // Тест пройдет, так как a() возвращает void
     });
 });
