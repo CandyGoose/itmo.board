@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import ColorPicker from './ColorPicker';
+import { ToolButton } from './ToolButton';
+import { Brush, Eraser } from 'lucide-react';
+import ColorPicker from "@/app/(dashboard)/boards/[boardId]/_components/ColorPicker";
 
 interface ToolbarProps {
     onSelectTool: (tool: string) => void;
@@ -10,24 +12,26 @@ interface ToolbarProps {
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
-    onSelectTool,
-    onColorChange,
-    currentColor,
-}) => {
+                                             onSelectTool,
+                                             onColorChange,
+                                             currentColor,
+                                         }) => {
     return (
         <div className="toolbar">
-            <button
+            <ToolButton
+                label="Brush"
+                icon={Brush}
                 onClick={() => onSelectTool('brush')}
-                className="tool-button"
-            >
-                🖌️
-            </button>
-            <button
+                isActive={currentColor === 'brush'}
+                aria-label="Brush Tool" // Добавляем aria-label для доступности
+            />
+            <ToolButton
+                label="Eraser"
+                icon={Eraser}
                 onClick={() => onSelectTool('eraser')}
-                className="tool-button"
-            >
-                🧽
-            </button>
+                isActive={currentColor === 'eraser'}
+                aria-label="Eraser Tool" // Добавляем aria-label для доступности
+            />
             <ColorPicker color={currentColor} onChange={onColorChange} />
         </div>
     );
