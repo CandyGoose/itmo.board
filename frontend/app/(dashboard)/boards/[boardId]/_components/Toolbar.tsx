@@ -2,6 +2,8 @@
 
 import React from 'react';
 import ColorPicker from './ColorPicker';
+import { ToolButton } from './ToolButton';
+import { Brush, Eraser } from 'lucide-react';
 
 interface ToolbarProps {
     onSelectTool: (tool: string) => void;
@@ -10,24 +12,24 @@ interface ToolbarProps {
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
-    onSelectTool,
-    onColorChange,
-    currentColor,
-}) => {
+                                             onSelectTool,
+                                             onColorChange,
+                                             currentColor,
+                                         }) => {
     return (
         <div className="toolbar">
-            <button
+            <ToolButton
+                label="Brush"
+                icon={Brush}
                 onClick={() => onSelectTool('brush')}
-                className="tool-button"
-            >
-                🖌️
-            </button>
-            <button
+                isActive={currentColor === 'brush'}
+            />
+            <ToolButton
+                label="Eraser"
+                icon={Eraser}
                 onClick={() => onSelectTool('eraser')}
-                className="tool-button"
-            >
-                🧽
-            </button>
+                isActive={currentColor === 'eraser'}
+            />
             <ColorPicker color={currentColor} onChange={onColorChange} />
         </div>
     );
