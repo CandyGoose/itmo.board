@@ -12,10 +12,10 @@ interface ToolbarProps {
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
-                                             onSelectTool,
-                                             onColorChange,
-                                             currentColor,
-                                         }) => {
+    onSelectTool,
+    onColorChange,
+    currentColor,
+}) => {
     return (
         <div className="toolbar">
             <ToolButton
