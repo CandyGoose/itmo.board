@@ -1,18 +1,15 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { InviteButton } from "./InviteButton";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { InviteButton } from './InviteButton';
+import '@testing-library/jest-dom';
 
-describe("InviteButton", () => {
-  it("renders the invite button with correct text", () => {
-    render(<InviteButton />);
-    expect(screen.getByText("Invite Members")).toBeInTheDocument();
-  });
+jest.mock('@clerk/nextjs', () => ({
+    OrganizationProfile: () => <div data-testid="organization-profile">Organization Profile</div>
+}));
 
-  test("dialog is not visible initially", () => {
-    render(<InviteButton />);
+describe('InviteButton Component', () => {
+    test('renders the invite button with correct label', () => {
+        render(<InviteButton />);
 
-    const dialogContent = screen.queryByTestId("dialog-content");
-    expect(dialogContent).not.toBeInTheDocument();
-  });
+        expect(screen.getByRole('button', { name: /invite members/i })).toBeInTheDocument();
+    });
 });

@@ -1,17 +1,12 @@
-import { render, screen } from "@testing-library/react";
-import { EmptySearch } from "./EmptySearch";
-import "@testing-library/jest-dom";
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { EmptySearch } from './EmptySearch';
 
-describe("EmptySearch", () => {
-  it("renders the main heading", () => {
-    render(<EmptySearch />);
-    expect(screen.getByText("No results found!")).toBeInTheDocument();
-  });
+describe('EmptySearch Component', () => {
+    test('renders "No results found!" message', () => {
+        render(<EmptySearch />);
 
-  it("renders the subtext", () => {
-    render(<EmptySearch />);
-    expect(
-      screen.getByText("Try searching for something else!")
-    ).toBeInTheDocument();
-  });
+        expect(screen.getByText('No results found!')).toBeInTheDocument();
+        expect(screen.getByText('Try searching for something else!')).toBeInTheDocument();
+    });
 });
