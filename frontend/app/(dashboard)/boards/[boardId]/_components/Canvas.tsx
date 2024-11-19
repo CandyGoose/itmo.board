@@ -83,6 +83,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         width: 100,
                         fill: { r: 0, g: 0, b: 0 },
                     };
+                    case LayerType.Text:
                     // more will be added
                     break;
                 default:

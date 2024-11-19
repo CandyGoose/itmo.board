@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CanvasMode, CanvasState } from '@/types/canvas';
+import { CanvasMode, CanvasState, LayerType } from '@/types/canvas';
 import { ToolButton } from './ToolButton';
 import {
     Trash2,
@@ -9,6 +9,7 @@ import {
     ArrowDown,
     ArrowUp,
     Pencil,
+    Type,
     MousePointer2,
 } from 'lucide-react';
 
@@ -91,16 +92,22 @@ export const ToolBar = ({
                     isDisabled={!editable}
                 />
                 <ToolButton
-                    label="Pen"
-                    icon={Pencil}
+                    label="Text"
+                    icon={Type}
                     onClick={() =>
                         setCanvasState({
-                            mode: CanvasMode.Pencil,
+                            mode: CanvasMode.Inserting,
+                            layerType: LayerType.Text,
                         })
                     }
-                    isActive={canvasState.mode === CanvasMode.Pencil}
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting
+                        &&
+                        canvasState.layerType === LayerType.Text
+                    }
                     isDisabled={!editable}
                 />
+  
             </div>
 
             {/* Spacer with 4-pixel gap */}
