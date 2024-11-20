@@ -12,7 +12,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install dependencies for frontend
         working-directory: frontend
@@ -35,7 +35,7 @@ jobs:
           PORT: ${{ vars.PORT }}
         run: |
           npm run build
-          nohup npm start &      
+          nohup npm start &
 
       - name: Run Playwright tests
         working-directory: frontend

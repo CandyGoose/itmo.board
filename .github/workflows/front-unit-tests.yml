@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Check for .only in tests
         run: |
           if grep -r "\.only" ./src/tests; then
@@ -19,12 +19,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install dependencies for frontend
         working-directory: frontend
         run: npm ci
-      
+
       - name: Run Jest tests with coverage (Frontend)
         working-directory: frontend
         run: npm test
