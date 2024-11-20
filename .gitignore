@@ -141,3 +141,5 @@ dist
 
 # Tests
 test-results
+
+.env.sentry-build-plugin
