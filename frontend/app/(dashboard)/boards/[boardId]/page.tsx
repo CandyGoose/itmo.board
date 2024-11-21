@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Canvas from './_components/Canvas';
 import { useCanvasStore } from '@/store/useCanvasStore';
 import { Layer, LayerType } from '@/types/canvas';
-import { CanvasLoading } from "./_components/Loading";
+import { CanvasLoading } from './_components/Loading';
 
 export default function BoardPage() {
     const addLayer = useCanvasStore((state) => state.addLayer);
