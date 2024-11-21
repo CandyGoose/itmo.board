@@ -35,6 +35,10 @@ export default function BoardPage() {
     return (
         <div>
             <Canvas />
+            <div style="display: none;">
+                <CanvasLoading/>
+            </div>
         </div>
+        
     );
 }
