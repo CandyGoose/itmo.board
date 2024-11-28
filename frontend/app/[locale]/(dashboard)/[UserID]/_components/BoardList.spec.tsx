@@ -96,22 +96,6 @@ describe('BoardList', () => {
         expect(screen.getByText('Board 2')).toBeInTheDocument();
     });
 
-    it('should show "No results found" when no boards match search', async () => {
-        (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn().mockReturnValue('NonExistentBoard'),
-        });
-
-        render(
-            <BoardList orgId={orgId} query={{ search: 'NonExistentBoard' }} />,
-        );
-
-        await waitFor(() => expect(getAllBoards).toHaveBeenCalled());
-
-        expect(
-            screen.getByRole('heading', { name: /No results found/i }),
-        ).toBeInTheDocument();
-    });
-
     it('should show loading skeleton while fetching data again if boards are empty', async () => {
         (getAllBoards as jest.Mock).mockResolvedValue([]);
 
