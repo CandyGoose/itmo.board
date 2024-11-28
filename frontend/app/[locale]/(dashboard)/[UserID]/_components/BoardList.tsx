@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { EmptySearch } from './EmptySearch';
 import { NewBoardButton } from './NewBoardButton';
 import { useParams, useSearchParams } from 'next/navigation';
-import {BoardCard, BoardCardSkeleton} from './board-card/Index';
-import { Board, getAllBoards } from "@/actions/Board";
+import { BoardCard, BoardCardSkeleton } from './board-card/Index';
+import { Board, getAllBoards } from '@/actions/Board';
 
 interface BoardListProps {
     orgId: string;
@@ -14,10 +14,7 @@ interface BoardListProps {
     };
 }
 
-export const BoardList = ({
-                              orgId,
-                              query,
-                          }: BoardListProps) => {
+export const BoardList = ({ orgId, query }: BoardListProps) => {
     const [data, setData] = useState<Board[]>([]);
     const [filteredData, setFilteredData] = useState<Board[]>([]);
     const [loading, setLoading] = useState(true);
@@ -43,9 +40,9 @@ export const BoardList = ({
     }, [orgId, params.UserID, fetchBoards]);
 
     useEffect(() => {
-        const searchQuery = searchParams.get("search")?.toLowerCase() || "";
+        const searchQuery = searchParams.get('search')?.toLowerCase() || '';
         const filteredBoards = data.filter((board) =>
-            board.title.toLowerCase().includes(searchQuery)
+            board.title.toLowerCase().includes(searchQuery),
         );
         setFilteredData(filteredBoards);
     }, [data, searchParams]);

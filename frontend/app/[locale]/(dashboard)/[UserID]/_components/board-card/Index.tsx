@@ -19,11 +19,11 @@ interface BoardCardProps {
 }
 
 export const BoardCard = ({
-                              id,
-                              title,
-                              authorId,
-                              createdAt,
-                          }: BoardCardProps) => {
+    id,
+    title,
+    authorId,
+    createdAt,
+}: BoardCardProps) => {
     const router = useRouter();
     const params = useParams();
     const [authorLabel, setAuthorLabel] = useState(
