@@ -1,10 +1,10 @@
 'use client';
 
-import { toast } from "sonner";
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import {Board, createBoard} from "@/actions/Board";
+import { Board, createBoard } from '@/actions/Board';
 import { Plus } from 'lucide-react';
-import {useParams} from "next/navigation";
+import { useParams } from 'next/navigation';
 
 interface NewBoardButtonProps {
     orgId: string;
@@ -12,23 +12,23 @@ interface NewBoardButtonProps {
     disabled?: boolean;
 }
 
-export const NewBoardButton  = ({
-                                    orgId,
-                                    onBoardCreated,
-                                    disabled,
-                                }: NewBoardButtonProps) => {
+export const NewBoardButton = ({
+    orgId,
+    onBoardCreated,
+    disabled,
+}: NewBoardButtonProps) => {
     const params = useParams();
     const onClick = async () => {
         try {
             const response = await createBoard(params.UserID as string, orgId);
             const newBoard: Board = response.data;
 
-            toast.success("Created successfully.");
+            toast.success('Created successfully.');
 
             // Call the callback to update the board list
             onBoardCreated(newBoard);
         } catch {
-            toast.error("Failed to create.");
+            toast.error('Failed to create.');
         }
     };
 

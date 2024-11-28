@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useClerk } from '@clerk/nextjs';
-import Image from "next/image";
+import Image from 'next/image';
 
 interface BoardCardProps {
     id: string;
@@ -26,7 +26,7 @@ export const BoardCard = ({
     title,
     authorId,
     createdAt,
-                              imageUrl,
+    imageUrl,
 }: BoardCardProps) => {
     const t = useTranslations('utils');
     const router = useRouter();
@@ -74,13 +74,7 @@ export const BoardCard = ({
             onClick={onClick}
         >
             <div className="relative flex-1 bg-white">
-                <Image
-                    src={imageUrl}
-                    alt=""
-                    fill
-
-                    className="object-fit"
-                />
+                <Image src={imageUrl} alt="" fill className="object-fit" />
                 <Overlay />
             </div>
             <Footer
@@ -95,7 +89,10 @@ export const BoardCard = ({
 
 BoardCard.Skeleton = function BoardCardSkeleton() {
     return (
-        <div data-testid="board-card-skeleton" className="aspect-[100/127] rounded-lg overflow-hidden">
+        <div
+            data-testid="board-card-skeleton"
+            className="aspect-[100/127] rounded-lg overflow-hidden"
+        >
             <Skeleton className="h-full w-full" />
         </div>
     );

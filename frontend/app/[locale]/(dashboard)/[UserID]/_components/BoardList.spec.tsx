@@ -18,13 +18,23 @@ jest.mock('@/actions/Board', () => ({
     createBoard: jest.fn(),
 }));
 
-jest.mock('@/app/[locale]/(dashboard)/[UserID]/_components/NewBoardButton', () => ({
-    NewBoardButton: ({ onBoardCreated }: { onBoardCreated: (board: Board) => void }) => (
-        <button data-testid="new-board-button" onClick={() => onBoardCreated(mockNewBoard)}>
-            New Board
-        </button>
-    ),
-}));
+jest.mock(
+    '@/app/[locale]/(dashboard)/[UserID]/_components/NewBoardButton',
+    () => ({
+        NewBoardButton: ({
+            onBoardCreated,
+        }: {
+            onBoardCreated: (board: Board) => void;
+        }) => (
+            <button
+                data-testid="new-board-button"
+                onClick={() => onBoardCreated(mockNewBoard)}
+            >
+                New Board
+            </button>
+        ),
+    }),
+);
 
 jest.mock('@clerk/nextjs', () => ({
     useClerk: () => ({
@@ -64,12 +74,12 @@ const mockNewBoard: Board = {
 
 const mockMessages = {
     utils: {
-        you: "You",
-        teammate: "Teammate",
+        you: 'You',
+        teammate: 'Teammate',
     },
     search: {
-        notFound: "No boards found.",
-        tryAnother: "Please try another search term.",
+        notFound: 'No boards found.',
+        tryAnother: 'Please try another search term.',
     },
 };
 
@@ -93,7 +103,7 @@ describe('BoardList Component', () => {
         render(
             <NextIntlClientProvider locale="en" messages={mockMessages}>
                 <BoardList orgId="org1" query={{}} />
-            </NextIntlClientProvider>
+            </NextIntlClientProvider>,
         );
 
         const skeletons = screen.getAllByTestId('board-card-skeleton');
@@ -109,7 +119,7 @@ describe('BoardList Component', () => {
         render(
             <NextIntlClientProvider locale="en" messages={mockMessages}>
                 <BoardList orgId="org1" query={{}} />
-            </NextIntlClientProvider>
+            </NextIntlClientProvider>,
         );
 
         await waitFor(() => {
@@ -131,7 +141,7 @@ describe('BoardList Component', () => {
         render(
             <NextIntlClientProvider locale="en" messages={mockMessages}>
                 <BoardList orgId="org1" query={{ search: 'One' }} />
-            </NextIntlClientProvider>
+            </NextIntlClientProvider>,
         );
 
         await waitFor(() => {
@@ -153,7 +163,7 @@ describe('BoardList Component', () => {
         render(
             <NextIntlClientProvider locale="en" messages={mockMessages}>
                 <BoardList orgId="org1" query={{ search: 'Nonexistent' }} />
-            </NextIntlClientProvider>
+            </NextIntlClientProvider>,
         );
 
         await waitFor(() => {
@@ -161,10 +171,10 @@ describe('BoardList Component', () => {
         });
 
         expect(screen.getByText('No boards found.')).toBeInTheDocument();
-        expect(screen.getByText('Please try another search term.')).toBeInTheDocument();
+        expect(
+            screen.getByText('Please try another search term.'),
+        ).toBeInTheDocument();
     });
-
-
 
     it('обновляет список при создании новой доски', async () => {
         (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
@@ -175,7 +185,7 @@ describe('BoardList Component', () => {
         render(
             <NextIntlClientProvider locale="en" messages={mockMessages}>
                 <BoardList orgId="org1" query={{}} />
-            </NextIntlClientProvider>
+            </NextIntlClientProvider>,
         );
 
         await waitFor(() => {
@@ -191,5 +201,4 @@ describe('BoardList Component', () => {
         const boardCard = screen.getByTestId('board-card-3');
         expect(within(boardCard).getByText('New Board')).toBeInTheDocument();
     });
-
 });
