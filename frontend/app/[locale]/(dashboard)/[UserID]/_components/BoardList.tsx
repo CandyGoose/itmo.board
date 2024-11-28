@@ -78,6 +78,7 @@ export const BoardList = ({
                     key={board._id}
                     id={board._id}
                     title={board.title}
+                    imageUrl={board.imageUrl}
                     authorId={board.authorId}
                     createdAt={new Date(board.createdAt || '')}
                     orgId={board.orgId}
