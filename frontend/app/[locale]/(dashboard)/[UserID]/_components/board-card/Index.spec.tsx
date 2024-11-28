@@ -71,14 +71,15 @@ describe('BoardCard Component', () => {
         });
     });
 
-    test('displays the author\'s first name when authorId does not match UserID', async () => {
+    test("displays the author's first name when authorId does not match UserID", async () => {
         render(<BoardCard {...defaultProps} authorId="456" />);
 
         await waitFor(() => {
-            expect(screen.getByText((content) => content.includes('Test User'))).toBeInTheDocument();
+            expect(
+                screen.getByText((content) => content.includes('Test User')),
+            ).toBeInTheDocument();
         });
     });
-
 
     test('navigates to board on click', async () => {
         render(<BoardCard {...defaultProps} />);
