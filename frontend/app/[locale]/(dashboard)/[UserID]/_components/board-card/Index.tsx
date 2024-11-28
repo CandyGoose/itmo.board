@@ -10,12 +10,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useClerk } from '@clerk/nextjs';
+import Image from "next/image";
 
 interface BoardCardProps {
     id: string;
     title: string;
     authorId: string;
     createdAt: Date;
+    imageUrl: string;
     orgId: string;
 }
 
@@ -24,6 +26,7 @@ export const BoardCard = ({
     title,
     authorId,
     createdAt,
+                              imageUrl,
 }: BoardCardProps) => {
     const t = useTranslations('utils');
     const router = useRouter();
@@ -70,6 +73,13 @@ export const BoardCard = ({
             onClick={onClick}
         >
             <div className="relative flex-1 bg-white">
+                <Image
+                    src={imageUrl}
+                    alt=""
+                    fill
+
+                    className="object-fit"
+                />
                 <Overlay />
             </div>
             <Footer
