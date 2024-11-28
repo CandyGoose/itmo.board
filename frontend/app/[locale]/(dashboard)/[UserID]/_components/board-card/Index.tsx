@@ -70,7 +70,7 @@ export const BoardCard = ({
         <div
             className="group aspect-[100/127] border rounded-lg flex cursor-pointer
             flex-col justify-between overflow-hidden relative"
-            data-testid="board-card"
+            data-testid={`board-card-${id}`} // Уникальный data-testid
             onClick={onClick}
         >
             <div className="relative flex-1 bg-white">
@@ -95,7 +95,7 @@ export const BoardCard = ({
 
 BoardCard.Skeleton = function BoardCardSkeleton() {
     return (
-        <div className="aspect-[100/127] rounded-lg overflow-hidden">
+        <div data-testid="board-card-skeleton" className="aspect-[100/127] rounded-lg overflow-hidden">
             <Skeleton className="h-full w-full" />
         </div>
     );

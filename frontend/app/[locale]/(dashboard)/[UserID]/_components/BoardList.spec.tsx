@@ -1,149 +1,195 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { BoardList, Board, getAllBoards } from './BoardList';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import React from 'react';
-import { ClerkProvider, useClerk } from '@clerk/nextjs';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { BoardList } from './BoardList';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import '@testing-library/jest-dom';
+import { Board, getAllBoards } from '@/actions/Board';
+import { NextIntlClientProvider } from 'next-intl';
+import { within } from '@testing-library/react';
 
 jest.mock('next/navigation', () => ({
     useParams: jest.fn(),
     useSearchParams: jest.fn(),
     useRouter: jest.fn(),
-    usePathname: jest.fn(),
 }));
 
-jest.mock('./BoardList', () => {
-    const originalModule = jest.requireActual('./BoardList');
-    return {
-        __esModule: true,
-        ...originalModule,
-        getAllBoards: jest.fn(),
-    };
-});
+jest.mock('@/actions/Board', () => ({
+    getAllBoards: jest.fn(),
+    createBoard: jest.fn(),
+}));
 
-jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(),
+jest.mock('@/app/[locale]/(dashboard)/[UserID]/_components/NewBoardButton', () => ({
+    NewBoardButton: ({ onBoardCreated }: { onBoardCreated: (board: Board) => void }) => (
+        <button data-testid="new-board-button" onClick={() => onBoardCreated(mockNewBoard)}>
+            New Board
+        </button>
+    ),
 }));
 
 jest.mock('@clerk/nextjs', () => ({
-    useClerk: jest.fn(),
-    ClerkProvider: jest.fn(),
+    useClerk: () => ({
+        user: {
+            firstName: 'TestUser',
+        },
+    }),
 }));
 
+const mockBoards: Board[] = [
+    {
+        _id: '1',
+        title: 'Board One',
+        orgId: 'org1',
+        authorId: 'user1',
+        imageUrl: '/image1.png',
+        createdAt: new Date('2024-01-01T00:00:00Z'),
+    },
+    {
+        _id: '2',
+        title: 'Board Two',
+        orgId: 'org1',
+        authorId: 'user2',
+        imageUrl: '/image2.png',
+        createdAt: new Date('2024-02-01T00:00:00Z'),
+    },
+];
+
+const mockNewBoard: Board = {
+    _id: '3',
+    title: 'New Board',
+    orgId: 'org1',
+    authorId: 'user1',
+    imageUrl: '/image3.png',
+    createdAt: new Date('2024-03-01T00:00:00Z'),
+};
+
+const mockMessages = {
+    utils: {
+        you: "You",
+        teammate: "Teammate",
+    },
+    search: {
+        notFound: "No boards found.",
+        tryAnother: "Please try another search term.",
+    },
+};
+
 describe('BoardList Component', () => {
-    const mockBoards: Board[] = [
-        {
-            _id: '1',
-            title: 'Test Board 1',
-            authorId: 'user1',
-            createdAt: '2023-11-01T10:00:00Z',
-            orgId: 'org1',
-            imageUrl: '/images/board1.png',
-        },
-        {
-            _id: '2',
-            title: 'Test Board 2',
-            authorId: 'user2',
-            createdAt: '2023-11-02T11:00:00Z',
-            orgId: 'org1',
-            imageUrl: '/images/board2.png',
-        },
-    ];
-
-    const messages: { [key: string]: string } = {
-        searchBoards: 'search boards',
-        notFound: 'no results found',
-        tryAnother: 'try searching for something else',
-    };
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(
-        () => (key: string) => messages[key],
-    );
-
-    const mockClerkProvider = ClerkProvider as jest.Mock;
-    mockClerkProvider.mockImplementation(({ children }) => <>{children}</>);
-
-    const mockUseClerk = useClerk as jest.Mock;
-    mockUseClerk.mockReturnValue({ user: { firstName: 'you' } });
-
-    const renderWithClerk = (component: React.ReactNode) => {
-        return render(<ClerkProvider>{component}</ClerkProvider>);
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
-    });
 
-    test('fetches boards on mount and displays them', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
-        (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn(),
-        });
         (useRouter as jest.Mock).mockReturnValue({
             push: jest.fn(),
             replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
-        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
-
-        renderWithClerk(<BoardList orgId="org1" query={{}} />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Test Board 1')).toBeInTheDocument();
-            expect(screen.getByText('Test Board 2')).toBeInTheDocument();
+            back: jest.fn(),
         });
     });
 
-    test('filters boards based on search param', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
-        (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn().mockImplementation((key) => {
-                if (key === 'search') {
-                    return 'Board 1';
-                }
-                return null;
-            }),
-        });
-        (useRouter as jest.Mock).mockReturnValue({
-            push: jest.fn(),
-            replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
+    it('отображает скелетоны при загрузке', async () => {
+        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+        (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
+
+        (getAllBoards as jest.Mock).mockReturnValue(new Promise(() => {}));
+
+        render(
+            <NextIntlClientProvider locale="en" messages={mockMessages}>
+                <BoardList orgId="org1" query={{}} />
+            </NextIntlClientProvider>
+        );
+
+        const skeletons = screen.getAllByTestId('board-card-skeleton');
+        expect(skeletons.length).toBeGreaterThan(0);
+    });
+
+    it('отображает список досок после загрузки', async () => {
+        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+        (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
+
         (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
 
-        renderWithClerk(<BoardList orgId="org1" query={{}} />);
+        render(
+            <NextIntlClientProvider locale="en" messages={mockMessages}>
+                <BoardList orgId="org1" query={{}} />
+            </NextIntlClientProvider>
+        );
 
         await waitFor(() => {
-            expect(screen.getByText('Test Board 1')).toBeInTheDocument();
-            expect(screen.queryByText('Test Board 2')).not.toBeInTheDocument();
+            expect(getAllBoards).toHaveBeenCalledWith('user1', 'org1');
+        });
+
+        mockBoards.forEach((board) => {
+            expect(screen.getByText(board.title)).toBeInTheDocument();
         });
     });
 
-    test('shows EmptySearch when no boards match the search', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
-        (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn().mockImplementation((key) => {
-                if (key === 'search') {
-                    return 'NonExistingBoard';
-                }
-                return null;
-            }),
-        });
-        (useRouter as jest.Mock).mockReturnValue({
-            push: jest.fn(),
-            replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
+    it('фильтрует доски по поисковому запросу', async () => {
+        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+        const searchParams = new URLSearchParams();
+        searchParams.set('search', 'One');
+        (useSearchParams as jest.Mock).mockReturnValue(searchParams);
         (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
 
-        render(<BoardList orgId="org1" query={{}} />);
+        render(
+            <NextIntlClientProvider locale="en" messages={mockMessages}>
+                <BoardList orgId="org1" query={{ search: 'One' }} />
+            </NextIntlClientProvider>
+        );
 
         await waitFor(() => {
-            expect(screen.getByText('no results found')).toBeInTheDocument();
+            expect(getAllBoards).toHaveBeenCalledWith('user1', 'org1');
         });
+
+        expect(screen.getByText('Board One')).toBeInTheDocument();
+        expect(screen.queryByText('Board Two')).not.toBeInTheDocument();
     });
+
+    it('отображает EmptySearch, если нет результатов поиска', async () => {
+        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+        const searchParams = new URLSearchParams();
+        searchParams.set('search', 'Nonexistent');
+        (useSearchParams as jest.Mock).mockReturnValue(searchParams);
+
+        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
+
+        render(
+            <NextIntlClientProvider locale="en" messages={mockMessages}>
+                <BoardList orgId="org1" query={{ search: 'Nonexistent' }} />
+            </NextIntlClientProvider>
+        );
+
+        await waitFor(() => {
+            expect(getAllBoards).toHaveBeenCalledWith('user1', 'org1');
+        });
+
+        expect(screen.getByText('No boards found.')).toBeInTheDocument();
+        expect(screen.getByText('Please try another search term.')).toBeInTheDocument();
+    });
+
+
+
+    it('обновляет список при создании новой доски', async () => {
+        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+        (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
+
+        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
+
+        render(
+            <NextIntlClientProvider locale="en" messages={mockMessages}>
+                <BoardList orgId="org1" query={{}} />
+            </NextIntlClientProvider>
+        );
+
+        await waitFor(() => {
+            expect(getAllBoards).toHaveBeenCalledWith('user1', 'org1');
+        });
+
+        mockBoards.forEach((board) => {
+            expect(screen.getByText(board.title)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('new-board-button'));
+
+        const boardCard = screen.getByTestId('board-card-3');
+        expect(within(boardCard).getByText('New Board')).toBeInTheDocument();
+    });
+
 });
