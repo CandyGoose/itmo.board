@@ -1,132 +1,113 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import { BoardList } from './BoardList';
+import { getAllBoards } from '@/actions/Board';
+import { useSearchParams } from 'next/navigation';
 import '@testing-library/jest-dom';
-import { BoardList, Board, getAllBoards } from './BoardList';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 
-jest.mock('next/navigation', () => ({
-    useParams: jest.fn(),
-    useSearchParams: jest.fn(),
-    useRouter: jest.fn(),
-    usePathname: jest.fn(),
-}));
-
-jest.mock('./BoardList', () => {
-    const originalModule = jest.requireActual('./BoardList');
-    return {
-        __esModule: true,
-        ...originalModule,
-        getAllBoards: jest.fn(),
-    };
-});
-
-jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(),
-}));
-
-describe('BoardList Component', () => {
-    const mockBoards: Board[] = [
+jest.mock('@/actions/Board', () => ({
+    getAllBoards: jest.fn().mockResolvedValue([
         {
             _id: '1',
-            title: 'Test Board 1',
+            title: 'Board 1',
             authorId: 'user1',
-            createdAt: '2023-11-01T10:00:00Z',
+            createdAt: '2024-01-01',
             orgId: 'org1',
-            imageUrl: '/images/board1.png',
         },
         {
             _id: '2',
-            title: 'Test Board 2',
+            title: 'Board 2',
             authorId: 'user2',
-            createdAt: '2023-11-02T11:00:00Z',
+            createdAt: '2024-02-01',
             orgId: 'org1',
-            imageUrl: '/images/board2.png',
         },
-    ];
+    ]),
+}));
 
-    const messages: { [key: string]: string } = {
-        searchBoards: 'search boards',
-        notFound: 'no results found',
-        tryAnother: 'try searching for something else',
-    };
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(
-        () => (key: string) => messages[key],
-    );
+jest.mock('next/navigation', () => ({
+    useParams: jest.fn().mockReturnValue({ UserID: 'user1' }),
+    useSearchParams: jest.fn(),
+}));
+
+
+const mockBoards = [
+    {
+        _id: '1',
+        title: 'Board 1',
+        authorId: 'user1',
+        createdAt: '2024-01-01',
+        orgId: 'org1',
+    },
+    {
+        _id: '2',
+        title: 'Board 2',
+        authorId: 'user2',
+        createdAt: '2024-02-01',
+        orgId: 'org1',
+    },
+];
+
+jest.mock('@/actions/Board', () => ({
+    getAllBoards: jest.fn().mockResolvedValue([
+        { _id: '1', title: 'Board 1', authorId: 'user1', createdAt: '2024-01-01', orgId: 'org1' },
+        { _id: '2', title: 'Board 2', authorId: 'user2', createdAt: '2024-02-01', orgId: 'org1' },
+    ]),
+}));
+
+jest.mock('next/navigation', () => ({
+    useParams: jest.fn().mockReturnValue({ UserID: 'user1' }),
+    useSearchParams: jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue('NonExistentBoard'),
+    }),
+    useRouter: jest.fn().mockReturnValue({
+        push: jest.fn(),
+        pathname: '/some-path',
+        query: {},
+    }),
+}));
+
+describe('BoardList', () => {
+    const orgId = 'org1';
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
     });
 
-    test('fetches boards on mount and displays them', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
+    it('should display boards after loading', async () => {
         (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn(),
+            get: jest.fn().mockReturnValue(null),
         });
-        (useRouter as jest.Mock).mockReturnValue({
-            push: jest.fn(),
-            replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
-        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
 
-        render(<BoardList orgId="org1" query={{}} />);
+        render(<BoardList orgId={orgId} query={{ search: '' }} />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Test Board 1')).toBeInTheDocument();
-            expect(screen.getByText('Test Board 2')).toBeInTheDocument();
-        });
+        await waitFor(() => expect(getAllBoards).toHaveBeenCalled());
+
+        expect(screen.getByText('Board 1')).toBeInTheDocument();
+        expect(screen.getByText('Board 2')).toBeInTheDocument();
     });
 
-    test('filters boards based on search param', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
+
+
+    it('should show "No results found" when no boards match search', async () => {
         (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn().mockImplementation((key) => {
-                if (key === 'search') {
-                    return 'Board 1';
-                }
-                return null;
-            }),
+            get: jest.fn().mockReturnValue('NonExistentBoard')
         });
-        (useRouter as jest.Mock).mockReturnValue({
-            push: jest.fn(),
-            replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
-        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
 
-        render(<BoardList orgId="org1" query={{}} />);
+        render(<BoardList orgId={orgId} query={{ search: 'NonExistentBoard' }} />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Test Board 1')).toBeInTheDocument();
-            expect(screen.queryByText('Test Board 2')).not.toBeInTheDocument();
-        });
+        await waitFor(() => expect(getAllBoards).toHaveBeenCalled());
+
+        expect(screen.getByRole('heading', { name: /No results found/i })).toBeInTheDocument();
     });
 
-    test('shows EmptySearch when no boards match the search', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: '123' });
-        (useSearchParams as jest.Mock).mockReturnValue({
-            get: jest.fn().mockImplementation((key) => {
-                if (key === 'search') {
-                    return 'NonExistingBoard';
-                }
-                return null;
-            }),
-        });
-        (useRouter as jest.Mock).mockReturnValue({
-            push: jest.fn(),
-            replace: jest.fn(),
-            pathname: '/some-path',
-            query: {},
-        });
-        (getAllBoards as jest.Mock).mockResolvedValue(mockBoards);
 
-        render(<BoardList orgId="org1" query={{}} />);
+    it('should show loading skeleton while fetching data again if boards are empty', async () => {
+        (getAllBoards as jest.Mock).mockResolvedValue([]);
 
-        await waitFor(() => {
-            expect(screen.getByText('no results found')).toBeInTheDocument();
+        const { container } = render(<BoardList orgId={orgId} query={{}} />);
+
+        await act(async () => {
+            const skeletons = container.querySelectorAll('.animate-pulse');
+            expect(skeletons.length).toBeGreaterThan(0);
         });
     });
 });

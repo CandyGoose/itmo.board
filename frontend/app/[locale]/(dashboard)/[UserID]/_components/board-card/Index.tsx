@@ -9,7 +9,6 @@ import { Overlay } from './Overlay';
 import { Footer } from './Footer';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 
 interface BoardCardProps {
     id: string;
@@ -20,17 +19,15 @@ interface BoardCardProps {
 }
 
 export const BoardCard = ({
-    id,
-    title,
-    authorId,
-    createdAt,
-}: BoardCardProps) => {
-    const t = useTranslations('utils');
-
+                              id,
+                              title,
+                              authorId,
+                              createdAt,
+                          }: BoardCardProps) => {
     const router = useRouter();
     const params = useParams();
     const [authorLabel, setAuthorLabel] = useState(
-        params.UserID === authorId ? t('you') : t('teammate'),
+        params.UserID === authorId ? 'You' : 'Another',
     );
     const [loading, setLoading] = useState(false);
 
@@ -38,17 +35,13 @@ export const BoardCard = ({
         const getFirstName = async (userID: string) => {
             const user = await clerkClient.users?.getUser(userID);
             setAuthorLabel(
-                userID === authorId
-                    ? t('you')
-                    : user?.firstName || t('teammate'),
+                userID === authorId ? 'You' : user?.firstName || 'Teammate',
             );
         };
         getFirstName(params.UserID as string);
     });
 
-    const createdAtLabel = formatDistanceToNow(new Date(createdAt), {
-        addSuffix: true,
-    });
+    const createdAtLabel = formatDistanceToNow(createdAt, { addSuffix: true });
 
     const onClick = () => {
         try {
@@ -80,10 +73,10 @@ export const BoardCard = ({
     );
 };
 
-BoardCard.Skeleton = function BoardCardSkeleton() {
+export function BoardCardSkeleton() {
     return (
         <div className="aspect-[100/127] rounded-lg overflow-hidden">
             <Skeleton className="h-full w-full" />
         </div>
     );
-};
+}

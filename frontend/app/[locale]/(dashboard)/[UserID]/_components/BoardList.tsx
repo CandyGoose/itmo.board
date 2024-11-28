@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { EmptySearch } from './EmptySearch';
 import { NewBoardButton } from './NewBoardButton';
 import { useParams, useSearchParams } from 'next/navigation';
-import { BoardCard } from './board-card/Index';
+import {BoardCard, BoardCardSkeleton} from './board-card/Index';
 import { Board, getAllBoards } from "@/actions/Board";
 
 interface BoardListProps {
@@ -58,10 +58,10 @@ export const BoardList = ({
     if (loading) {
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
-                <BoardCard.Skeleton />
-                <BoardCard.Skeleton />
-                <BoardCard.Skeleton />
-                <BoardCard.Skeleton />
+                <BoardCardSkeleton />
+                <BoardCardSkeleton />
+                <BoardCardSkeleton />
+                <BoardCardSkeleton />
             </div>
         );
     }
@@ -73,16 +73,21 @@ export const BoardList = ({
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 mt-8 pb-10">
             <NewBoardButton orgId={orgId} onBoardCreated={handleBoardCreated} />
-            {filteredData.map((board) => (
-                <BoardCard
-                    key={board._id}
-                    id={board._id}
-                    title={board.title}
-                    authorId={board.authorId}
-                    createdAt={new Date(board.createdAt || '')}
-                    orgId={board.orgId}
-                />
-            ))}
+            {filteredData.map((board) => {
+                // Ensure createdAt is always treated as a Date object
+                const createdAtDate = new Date(board.createdAt || '');
+
+                return (
+                    <BoardCard
+                        key={board._id}
+                        id={board._id}
+                        title={board.title}
+                        authorId={board.authorId}
+                        createdAt={createdAtDate}
+                        orgId={board.orgId}
+                    />
+                );
+            })}
         </div>
     );
 };
