@@ -26,6 +26,7 @@
     "@rollbar/react": "^0.12.0-beta",
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.7.8",
+    "axios-mock-adapter": "^2.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
