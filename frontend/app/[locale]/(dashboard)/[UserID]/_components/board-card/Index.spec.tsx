@@ -92,15 +92,14 @@ describe('BoardCard Component', () => {
     test('sets loading state during navigation', async () => {
         render(<BoardCard {...defaultProps} />);
 
-        const card = screen.getByTestId('board-card');
+        // Update the test ID to match the element in your component
+        const card = screen.getByTestId('board-card-1');
 
         await act(async () => {
             fireEvent.click(card);
         });
 
         expect(mockPush).toHaveBeenCalledWith(`boards/${defaultProps.id}`);
-
         expect(card).toHaveClass('cursor-pointer');
     });
-
 });
