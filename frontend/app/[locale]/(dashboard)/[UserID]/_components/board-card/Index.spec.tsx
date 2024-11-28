@@ -4,7 +4,6 @@ import { BoardCard } from '@/app/[locale]/(dashboard)/[UserID]/_components/board
 import { clerkClient } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { act } from 'react';
-import { useTranslations } from 'next-intl';
 
 jest.mock('@clerk/nextjs', () => ({
     clerkClient: {
@@ -20,10 +19,6 @@ jest.mock('next/navigation', () => ({
     usePathname: jest.fn(),
 }));
 
-jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(),
-}));
-
 describe('BoardCard Component', () => {
     const mockPush = jest.fn();
     const defaultProps = {
@@ -33,9 +28,6 @@ describe('BoardCard Component', () => {
         createdAt: new Date('2023-01-01'),
         orgId: 'org123',
     };
-
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(() => () => 'you');
 
     beforeEach(() => {
         (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
@@ -60,14 +52,14 @@ describe('BoardCard Component', () => {
 
     test('displays "You" if the authorId matches UserID in params', async () => {
         (clerkClient.users.getUser as jest.Mock).mockResolvedValue({
-            firstName: 'you',
+            firstName: 'You',
         });
 
         render(<BoardCard {...defaultProps} authorId="123" />);
 
         await waitFor(() => {
             expect(
-                screen.getByText((content) => content.includes('you,')),
+                screen.getByText((content) => content.includes('You,')),
             ).toBeInTheDocument();
         });
     });
