@@ -252,7 +252,8 @@ export function clickCloseToAnyPath(
     const clickX = point.x;
     const clickY = point.y;
 
-    for (let i = 0, len = layerIds.length; i < len; i++) {
+    // Iterate from topmost (last) to bottom-most (first)
+    for (let i = layerIds.length - 1; i >= 0; i--) {
         const layerId = layerIds[i];
         const layer = layers.get(layerId);
         if (!layer || layer.type !== LayerType.Path) {
@@ -265,7 +266,7 @@ export function clickCloseToAnyPath(
         const width = pathLayer.width;
         const height = pathLayer.height;
 
-        // Bounding box check (with threshold padding)
+        // Bounding box check with threshold padding
         if (
             clickX < x - threshold ||
             clickX > x + width + threshold ||
@@ -278,7 +279,7 @@ export function clickCloseToAnyPath(
         const points = pathLayer.points;
         let minDistanceForThisPathSq = Infinity;
 
-        for (let j = 0, jlen = points.length; j < jlen; j++) {
+        for (let j = 0; j < points.length; j++) {
             const pt = points[j];
             const dx = clickX - pt[0];
             const dy = clickY - pt[1];
