@@ -281,8 +281,8 @@ export function clickCloseToAnyPath(
 
         for (let j = 0; j < points.length; j++) {
             const pt = points[j];
-            const dx = clickX - pt[0];
-            const dy = clickY - pt[1];
+            const dx = clickX - (pt[0] + x);
+            const dy = clickY - (pt[1] + y);
             const distSq = dx * dx + dy * dy;
 
             if (distSq < minDistanceForThisPathSq) {
