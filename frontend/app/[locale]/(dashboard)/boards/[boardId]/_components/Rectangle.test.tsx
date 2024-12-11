@@ -17,22 +17,37 @@ const mockLayer: RectangleLayer = {
 
 const mockOnPointerDown = jest.fn();
 
-test('renders rectangle with correct props', () => {
-    const { container } = render(
-        <Rectangle
-            id="1"
-            layer={mockLayer}
-            onPointerDown={mockOnPointerDown}
-            selectionColor="blue"
-        />,
-    );
+describe('Rectangle', () => {
+    it('renders rectangle with correct props', () => {
+        const { container } = render(
+            <Rectangle
+                id="1"
+                layer={mockLayer}
+                onPointerDown={mockOnPointerDown}
+                selectionColor="blue"
+            />,
+        );
 
-    const rectElement = container.querySelector('rect');
-    expect(rectElement).toHaveAttribute('x', '0');
-    expect(rectElement).toHaveAttribute('y', '0');
-    expect(rectElement).toHaveAttribute('width', '100');
-    expect(rectElement).toHaveAttribute('height', '50');
-    expect(rectElement).toHaveStyle('transform: translate(10px, 20px)');
-    expect(rectElement).toHaveAttribute('fill', colorToCss(mockLayer.fill));
-    expect(rectElement).toHaveAttribute('stroke', 'blue');
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('x', '0');
+        expect(rectElement).toHaveAttribute('y', '0');
+        expect(rectElement).toHaveAttribute('width', '100');
+        expect(rectElement).toHaveAttribute('height', '50');
+        expect(rectElement).toHaveStyle('transform: translate(10px, 20px)');
+        expect(rectElement).toHaveAttribute('fill', colorToCss(mockLayer.fill));
+        expect(rectElement).toHaveAttribute('stroke', 'blue');
+    });
+
+    it('sets transparent stroke color if selectionColor is not provided', () => {
+        const { container } = render(
+            <Rectangle
+                id="1"
+                layer={mockLayer}
+                onPointerDown={mockOnPointerDown}
+            />,
+        );
+
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('stroke', 'transparent');
+    });
 });
