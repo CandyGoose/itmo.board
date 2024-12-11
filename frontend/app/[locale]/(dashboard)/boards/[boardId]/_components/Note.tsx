@@ -38,7 +38,7 @@ export const calculateFontSize = (
     testElement.textContent = text;
     document.body.appendChild(testElement);
 
-    while ((testElement.offsetHeight > height) && fontSize >= minFontSize) {
+    while (testElement.offsetHeight > height && fontSize >= minFontSize) {
         fontSize -= 1;
         testElement.style.fontSize = `${fontSize}px`;
     }
@@ -55,11 +55,11 @@ interface NoteProps {
 }
 
 export const Note = ({
-                         layer,
-                         onPointerDown,
-                         id,
-                         selectionColor,
-                     }: NoteProps) => {
+    layer,
+    onPointerDown,
+    id,
+    selectionColor,
+}: NoteProps) => {
     const { x, y, width, height, fill, value } = layer;
     const [noteValue, setNoteValue] = useState(value || 'Text');
     const [fontSize, setFontSize] = useState(72);

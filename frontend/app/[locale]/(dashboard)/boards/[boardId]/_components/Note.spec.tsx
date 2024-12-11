@@ -49,7 +49,7 @@ describe('Note component', () => {
                     layer={mockLayer}
                     onPointerDown={onPointerDown}
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = await screen.findByTestId(
@@ -69,11 +69,12 @@ describe('Note component', () => {
                     layer={mockLayer}
                     onPointerDown={onPointerDown}
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv = foreignObjectElement.querySelector('div.mocked-class');
+        const editableDiv =
+            foreignObjectElement.querySelector('div.mocked-class');
 
         // Симулируем изменение текста
         fireEvent.input(editableDiv!, {
@@ -91,11 +92,12 @@ describe('Note component', () => {
                     layer={mockLayer}
                     onPointerDown={onPointerDown}
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv = foreignObjectElement.querySelector('div.mocked-class');
+        const editableDiv =
+            foreignObjectElement.querySelector('div.mocked-class');
 
         expect(editableDiv).toHaveStyle('color: #000000');
     });
@@ -108,7 +110,7 @@ describe('Note component', () => {
                     layer={mockLayer}
                     onPointerDown={onPointerDown}
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
@@ -129,7 +131,7 @@ describe('Note component', () => {
                     onPointerDown={onPointerDown}
                     selectionColor="#FF00FF"
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
@@ -149,13 +151,14 @@ describe('Note component', () => {
                     layer={layerWithoutFill}
                     onPointerDown={onPointerDown}
                 />
-            </svg>
+            </svg>,
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
         expect(foreignObjectElement).toHaveStyle('background-color: #000');
 
-        const editableDiv = foreignObjectElement.querySelector('div.mocked-class');
+        const editableDiv =
+            foreignObjectElement.querySelector('div.mocked-class');
         expect(editableDiv).toHaveStyle('color: #000');
     });
 });
