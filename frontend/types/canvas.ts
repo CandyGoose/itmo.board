@@ -46,7 +46,7 @@ export type NoteLayer = {
     y: number;
     height: number;
     width: number;
-    fill: Color;
+    fill?: Color;
     value?: string;
 };
 
