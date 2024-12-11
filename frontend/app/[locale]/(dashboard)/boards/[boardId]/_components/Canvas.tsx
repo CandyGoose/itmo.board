@@ -225,9 +225,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         (current: Point, origin: Point) => {
             if (!editable) return;
 
-            const layers = new Map(
-                getLayers(layerIds).map((layer) => [layer.id, layer]),
-            );
+            const read_layers = new Map(layers) as ReadonlyMap<string, Layer>;
 
             setCanvasState({
                 mode: CanvasMode.SelectionNet,
@@ -237,14 +235,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
 
             const selectedLayerIds = findIntersectingLayersWithRectangle(
                 layerIds,
-                layers,
+                read_layers,
                 origin,
                 current,
             );
 
             setSelection(selectedLayerIds);
         },
-        [editable, getLayers, layerIds],
+        [editable, layerIds, layers],
     );
 
     // Start multi-selection if pointer moved sufficiently
