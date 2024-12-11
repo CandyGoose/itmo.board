@@ -1,23 +1,36 @@
 'use client';
 
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Board, createBoard } from '@/actions/Board';
 import { Plus } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 
 interface NewBoardButtonProps {
     orgId: string;
+    onBoardCreated: (newBoard: Board) => void;
     disabled?: boolean;
 }
 
-export const NewBoardButton = ({ disabled }: NewBoardButtonProps) => {
+export const NewBoardButton = ({
+    orgId,
+    onBoardCreated,
+    disabled,
+}: NewBoardButtonProps) => {
+    const params = useParams();
     const onClick = async () => {
         try {
-        } catch (error) {
-            console.error('Failed to create:', error);
+            const response = await createBoard(params.UserID as string, orgId);
+            const newBoard: Board = response.data;
+
+            toast.success('Created successfully.');
+
+            // Call the callback to update the board list
+            onBoardCreated(newBoard);
+        } catch {
+            toast.error('Failed to create.');
         }
     };
-
-    const t = useTranslations('utils');
 
     return (
         <button
@@ -29,7 +42,7 @@ export const NewBoardButton = ({ disabled }: NewBoardButtonProps) => {
             )}
         >
             <Plus className="h-12 w-12 text-white stroke-2" />
-            <p className="text-sm text-white font-medium">{t('newBoard')}</p>
+            <p className="text-sm text-white font-medium">New board</p>
         </button>
     );
 };
