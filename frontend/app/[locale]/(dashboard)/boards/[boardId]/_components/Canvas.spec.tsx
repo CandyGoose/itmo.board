@@ -44,6 +44,7 @@ jest.mock('@/lib/utils', () => ({
         height: 150,
     })),
     colorToCss: jest.fn((color) => `#${color.r}${color.g}${color.b}`),
+    clickCloseToAnyPath: jest.fn(() => null),
 }));
 
 jest.mock('nanoid', () => ({
