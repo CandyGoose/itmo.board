@@ -20,7 +20,6 @@ export const SelectionTools = memo(
                 data-testid="selection-tools-container"
                 className={`absolute p-3 rounded-xl bg-white shadow-sm border flex select-none ${className}`}
                 style={{
-                    top: '65px',
                     right: '8px',
                 }}
             >
