@@ -17,22 +17,40 @@ const mockLayer: EllipseLayer = {
 
 const mockOnPointerDown = jest.fn();
 
-test('renders ellipse with correct props', () => {
-    const { container } = render(
-        <Ellipse
-            id="1"
-            layer={mockLayer}
-            onPointerDown={mockOnPointerDown}
-            selectionColor="blue"
-        />,
-    );
+describe('Ellipse', () => {
+    it('renders ellipse with correct props', () => {
+        const { container } = render(
+            <Ellipse
+                id="1"
+                layer={mockLayer}
+                onPointerDown={mockOnPointerDown}
+                selectionColor="blue"
+            />,
+        );
 
-    const ellipseElement = container.querySelector('ellipse');
-    expect(ellipseElement).toBeInTheDocument();
-    expect(ellipseElement).toHaveAttribute('cx', '50');
-    expect(ellipseElement).toHaveAttribute('cy', '25');
-    expect(ellipseElement).toHaveAttribute('rx', '50');
-    expect(ellipseElement).toHaveAttribute('ry', '25');
-    expect(ellipseElement).toHaveAttribute('fill', colorToCss(mockLayer.fill));
-    expect(ellipseElement).toHaveAttribute('stroke', 'blue');
+        const ellipseElement = container.querySelector('ellipse');
+        expect(ellipseElement).toBeInTheDocument();
+        expect(ellipseElement).toHaveAttribute('cx', '50');
+        expect(ellipseElement).toHaveAttribute('cy', '25');
+        expect(ellipseElement).toHaveAttribute('rx', '50');
+        expect(ellipseElement).toHaveAttribute('ry', '25');
+        expect(ellipseElement).toHaveAttribute(
+            'fill',
+            colorToCss(mockLayer.fill),
+        );
+        expect(ellipseElement).toHaveAttribute('stroke', 'blue');
+    });
+
+    it('sets transparent stroke color if selectionColor is not provided', () => {
+        const { container } = render(
+            <Ellipse
+                id="1"
+                layer={mockLayer}
+                onPointerDown={mockOnPointerDown}
+            />,
+        );
+
+        const ellipseElement = container.querySelector('ellipse');
+        expect(ellipseElement).toHaveAttribute('stroke', 'transparent');
+    });
 });
