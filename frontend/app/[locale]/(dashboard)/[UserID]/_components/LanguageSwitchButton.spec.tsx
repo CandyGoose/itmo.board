@@ -53,6 +53,20 @@ describe('LanguageSwitchButton', () => {
         });
     });
 
+    it('should switch language from ru to en', async () => {
+        (useLocale as jest.Mock).mockReturnValue('ru');
+        render(<LanguageSwitchButton />);
+        const button = screen.getByRole('button');
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(mockRouterReplace).toHaveBeenCalledWith(
+                { pathname: '/current-path', query: {} },
+                { locale: 'en' },
+            );
+        });
+    });
+
     it('shows the correct flag for Russian locale', () => {
         (useLocale as jest.Mock).mockReturnValue('ru');
         render(<LanguageSwitchButton />);
