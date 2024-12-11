@@ -1202,9 +1202,7 @@ describe('Utility Functions', () => {
         });
 
         it('should return null when the closest distance is exactly the threshold', () => {
-            const layers = [
-                createPathLayer('path1', [[10, 10]], 0, 0, 20, 20),
-            ];
+            const layers = [createPathLayer('path1', [[10, 10]], 0, 0, 20, 20)];
             const data = createDataForClickCloseToAnyPath(
                 layers,
                 { x: 30, y: 10 },
