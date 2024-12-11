@@ -658,7 +658,16 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 moveBackward={handleMoveBackward}
             />
             {editable && isAnyToolActive && showSelectionTools && (
-                <SelectionTools setLastUsedColor={setLastUsedColor} />
+                <SelectionTools
+                    setLastUsedColor={setLastUsedColor}
+                    className="top-[65px]"
+                />
+            )}
+            {editable && selection.length === 1 && (
+                <SelectionTools
+                    setLastUsedColor={setLastUsedColor}
+                    className="top-[175px]"
+                />
             )}
             <svg
                 ref={svgRef}
