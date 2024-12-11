@@ -569,6 +569,15 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         setSelection([...layerIds]);
     }, [layerIds]);
 
+    const setLayerColor = useCallback(
+        (color: Color) => {
+            selection.forEach((id) => {
+                updateLayer(id, { fill: color });
+            });
+        },
+        [selection, updateLayer],
+    );
+
     // Keyboard Actions
     useEffect(() => {
         function onKeyDown(e: KeyboardEvent) {
@@ -665,7 +674,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             )}
             {editable && selection.length === 1 && (
                 <SelectionTools
-                    setLastUsedColor={setLastUsedColor}
+                    setLastUsedColor={setLayerColor}
                     className="top-[175px]"
                 />
             )}
