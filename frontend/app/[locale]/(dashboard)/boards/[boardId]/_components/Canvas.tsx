@@ -20,6 +20,7 @@ import {
     Side,
 } from '@/types/canvas';
 import {
+    clickCloseToAnyPath,
     cn,
     colorToCss,
     findIntersectingLayersWithRectangle,
@@ -389,6 +390,18 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         current: point,
                     });
                 } else {
+                    const read_layers = new Map(layers) as ReadonlyMap<string, Layer>;
+                    const closePathId = clickCloseToAnyPath(
+                        layerIds,
+                        read_layers,
+                        point,
+                        10,
+                    )
+                    if (closePathId) {
+                        // setSelection([closePathId]);
+                        onLayerPointerDown(e, closePathId);
+                        return;
+                    }
                     setIsPanning(true);
                     setLastPointerPosition({ x: e.clientX, y: e.clientY });
                 }
