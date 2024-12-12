@@ -4,16 +4,12 @@ import React, { memo, useCallback, useState } from 'react';
 import { Color, LayerType, Layer } from '@/types/canvas';
 import { ColorPicker } from './ColorPicker';
 import * as Toolbar from "@radix-ui/react-toolbar";
-import {
-    FontBoldIcon,
-    FontItalicIcon,
-    StrikethroughIcon,
-    TextAlignCenterIcon,
-    TextAlignLeftIcon,
-    TextAlignRightIcon,
-} from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 import { TransparentFillChecker } from './TransparentFillChecker';
+import { LineWidthInput } from './LineWidthInput';
+import { TwoValueInput } from './TwoValueInput';
+import { FontPicker } from './FontPicker';
+import { TextFormatPicker } from './TextFormatPicker';
 
 interface SelectionToolsProps {
     selectedLayers: Layer[];
@@ -161,63 +157,31 @@ export const SelectionTools = memo(
                     {/* Line width */}
                     {(noneSelected || singleSelected) && (
                         <>
-                            <div className="flex flex-col mb-2">
-                                <label className="text-sm mb-1">Line Width</label> {/*TODO: Add translation*/}
-                                <input
-                                    type="number"
-                                    value={lineWidth}
-                                    onChange={(e) => handleLineWidthChange(e.target.value)}
-                                    className="border rounded p-1 text-sm"
-                                    min={1}
-                                />
-                                <div className="mt-1 flex items-center">
-                                    <div
-                                        className="bg-black"
-                                        style={{ width: '50px', height: `${lineWidth}px`}}
-                                    />
-                                </div>
-                            </div>
+                            <LineWidthInput
+                                lineWidth={lineWidth}
+                                onLineWidthChange={handleLineWidthChange}
+                            />
                             <Toolbar.Separator className="my-2 h-px bg-mauve6" />
                         </>
                     )}
 
                     {/* Coordinates and Size */}
-                    {(noneSelected || singleSelected) && (
+                    {singleSelected && (
                         <>
-                            <div className="mb-2">
-                                <label className="text-sm">X,Y Position:</label>
-                                <div className="flex gap-1">
-                                    <input
-                                        type="number"
-                                        value={x}
-                                        onChange={(e) => handlePositionChange(e.target.value, y.toString())}
-                                        className="border rounded p-1 text-sm w-1/2"
-                                    />
-                                    <input
-                                        type="number"
-                                        value={y}
-                                        onChange={(e) => handlePositionChange(x.toString(), e.target.value)}
-                                        className="border rounded p-1 text-sm w-1/2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="mb-2">
-                                <label className="text-sm">Width,Height:</label>
-                                <div className="flex gap-1">
-                                    <input
-                                        type="number"
-                                        value={w}
-                                        onChange={(e) => handleSizeChange(e.target.value, h.toString())}
-                                        className="border rounded p-1 text-sm w-1/2"
-                                    />
-                                    <input
-                                        type="number"
-                                        value={h}
-                                        onChange={(e) => handleSizeChange(w.toString(), e.target.value)}
-                                        className="border rounded p-1 text-sm w-1/2"
-                                    />
-                                </div>
-                            </div>
+                            <TwoValueInput
+                                label="X,Y Position:"
+                                value1={x}
+                                value2={y}
+                                onChange1={(val) => handlePositionChange(val, y.toString())}
+                                onChange2={(val) => handlePositionChange(x.toString(), val)}
+                            />
+                            <TwoValueInput
+                                label="Width,Height:"
+                                value1={w}
+                                value2={h}
+                                onChange1={(val) => handleSizeChange(val, h.toString())}
+                                onChange2={(val) => handleSizeChange(w.toString(), val)}
+                            />
                             {isNote && <Toolbar.Separator className="my-2 h-px bg-mauve6" />}
                         </>
                     )}
@@ -225,113 +189,21 @@ export const SelectionTools = memo(
                     {/* Font and Text styling (only if single note selected) */}
                     {isNote && (
                         <>
-                            {/* Font selection */}
-                            <div className="mb-2">
-                                <label className="text-sm mb-1 block">Font</label>
-                                <select
-                                    value={fontName}
-                                    onChange={(e) => handleFontChange(e.target.value)}
-                                    className="border rounded p-1 text-sm w-full"
-                                >
-                                    <option value="Arial">Arial</option>
-                                    <option value="Times New Roman">Times New Roman</option>
-                                    <option value="Courier New">Courier New</option>
-                                    {/* Add more fonts as needed */}
-                                </select>
-                            </div>
-
-                            {/* Font size */}
-                            <div className="mb-2">
-                                <label className="text-sm mb-1 block">Font Size</label>
-                                <input
-                                    type="number"
-                                    value={fontSize}
-                                    onChange={(e) => handleFontSizeChange(e.target.value)}
-                                    className="border rounded p-1 text-sm w-full"
-                                    min={1}
-                                />
-                            </div>
-
+                            <FontPicker
+                                fontName={fontName}
+                                onFontChange={handleFontChange}
+                                fontSize={fontSize}
+                                onFontSizeChange={handleFontSizeChange}
+                            />
                             <Toolbar.Separator className="my-2 h-px bg-mauve6" />
 
-                            {/* Text formatting */}
-                            <Toolbar.ToggleGroup
-                                type="multiple"
-                                aria-label="Text formatting"
-                                className="flex mb-2"
-                                onValueChange={(values) => {
-                                    setBold(values.includes('bold'));
-                                    setItalic(values.includes('italic'));
-                                    setStrike(values.includes('strike'));
-                                    handleFormatChange({
-                                        bold: values.includes('bold'),
-                                        italic: values.includes('italic'),
-                                        strike: values.includes('strike')
-                                    });
-                                }}
-                                value={[
-                                    bold ? 'bold' : '',
-                                    italic ? 'italic' : '',
-                                    strike ? 'strike' : ''
-                                ].filter(Boolean)}
-                            >
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="bold"
-                                    aria-label="Bold"
-                                >
-                                    <FontBoldIcon />
-                                </Toolbar.ToggleItem>
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="italic"
-                                    aria-label="Italic"
-                                >
-                                    <FontItalicIcon />
-                                </Toolbar.ToggleItem>
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="strike"
-                                    aria-label="Strike through"
-                                >
-                                    <StrikethroughIcon />
-                                </Toolbar.ToggleItem>
-                            </Toolbar.ToggleGroup>
-
-                            <Toolbar.ToggleGroup
-                                type="single"
-                                aria-label="Text alignment"
-                                className="flex"
-                                value={align}
-                                onValueChange={(val) => {
-                                    if (val) {
-                                        setAlign(val as 'left'|'center'|'right');
-                                        handleFormatChange({ align: val as 'left'|'center'|'right' });
-                                    }
-                                }}
-                            >
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="left"
-                                    aria-label="Left aligned"
-                                >
-                                    <TextAlignLeftIcon />
-                                </Toolbar.ToggleItem>
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="center"
-                                    aria-label="Center aligned"
-                                >
-                                    <TextAlignCenterIcon />
-                                </Toolbar.ToggleItem>
-                                <Toolbar.ToggleItem
-                                    className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-                                    value="right"
-                                    aria-label="Right aligned"
-                                >
-                                    <TextAlignRightIcon />
-                                </Toolbar.ToggleItem>
-                            </Toolbar.ToggleGroup>
+                            <TextFormatPicker
+                                bold={bold}
+                                italic={italic}
+                                strike={strike}
+                                align={align}
+                                onFormatChange={handleFormatChange}
+                            />
                         </>
                     )}
                 </Toolbar.Root>

@@ -105,6 +105,9 @@ export const Note = ({
             <div
                 ref={containerRef}
                 className="h-full w-full flex flex-col items-center justify-center text-center"
+                style={{
+                    backgroundColor: backgroundColor,
+                }}
             >
                 <div
                     contentEditable
