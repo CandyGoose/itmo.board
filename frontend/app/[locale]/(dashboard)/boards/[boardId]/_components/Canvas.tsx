@@ -752,7 +752,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                         .filter(Boolean) as Layer[]
                                 }
                                 lastUsedColor={lastUsedColor}
-                                setLastUsedColor={
+                                onColorChange={
                                     selection.length === 1
                                         ? setLayerColor
                                         : setLastUsedColor

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
-import { Color, LayerType, Layer, TextAlign, TextFormat } from '@/types/canvas';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { Color, Layer, LayerType, TextAlign, TextFormat } from '@/types/canvas';
 import { ColorPicker } from './ColorPicker';
 import * as Toolbar from '@radix-ui/react-toolbar';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,7 @@ import { TextFormatPicker } from './TextFormatPicker';
 interface SelectionToolsProps {
     selectedLayers: Layer[];
     lastUsedColor: Color;
-    setLastUsedColor: (color: Color) => void;
+    onColorChange: (color: Color) => void;
 
     onLineWidthChange?: (width: number) => void;
     onFontChange?: (fontName: string) => void;
@@ -30,56 +30,88 @@ interface SelectionToolsProps {
 
 export const SelectionTools = memo(
     ({
-        selectedLayers,
-        lastUsedColor,
-        setLastUsedColor,
-        onLineWidthChange,
-        onFontChange,
-        onFontSizeChange,
-        onTextFormatChange,
-        onPositionChange,
-        onSizeChange,
-        onTransparentFillChange,
-        className = '',
-    }: SelectionToolsProps) => {
+         selectedLayers,
+         onColorChange,
+         onLineWidthChange,
+         onFontChange,
+         onFontSizeChange,
+         onTextFormatChange,
+         onPositionChange,
+         onSizeChange,
+         onTransparentFillChange,
+         className = '',
+     }: SelectionToolsProps) => {
         const singleSelected = selectedLayers.length === 1;
-        const noneSelected = selectedLayers.length === 0;
         const multiSelected = selectedLayers.length > 1;
 
         const selectedLayer = singleSelected ? selectedLayers[0] : null;
 
-        const [lineWidth, setLineWidth] = useState(2);
-        const [fontName, setFontName] = useState('Arial');
-        const [fontSize, setFontSize] = useState(14);
-        const [bold, setBold] = useState(false);
-        const [italic, setItalic] = useState(false);
-        const [strike, setStrike] = useState(false);
-        const [align, setAlign] = useState<'left' | 'center' | 'right'>('left');
-        // TODO: These values should be updated based on the selected layer
+        // State variables
+        const [lineWidth, setLineWidth] = useState<number>(2);
+        const [fontName, setFontName] = useState<string>('Arial');
+        const [fontSize, setFontSize] = useState<number>(14);
+        const [format, setFormat] = useState<TextFormat[]>([]);
+        const [align, setAlign] = useState<TextAlign>(TextAlign.Left);
+        const [x, setX] = useState<number>(0);
+        const [y, setY] = useState<number>(0);
+        const [w, setW] = useState<number>(100);
+        const [h, setH] = useState<number>(100);
+        const [transparentFill, setTransparentFill] = useState<boolean>(false);
 
-        const [x, setX] = useState(0);
-        const [y, setY] = useState(0);
-        const [w, setW] = useState(100);
-        const [h, setH] = useState(100);
+        useEffect(() => {
+            if (selectedLayer) {
+                setLineWidth(selectedLayer.lineWidth ?? 2);
+                if (selectedLayer.type === LayerType.Note) {
+                    setFontName(selectedLayer.fontName ?? 'Arial');
+                    setFontSize(selectedLayer.fontSize ?? 14);
+                    setFormat(selectedLayer.textFormat ?? []);
+                    setAlign(selectedLayer.textAlign ?? TextAlign.Left);
+                }
+                if (selectedLayer.x && selectedLayer.y) {
+                    setX(selectedLayer.x);
+                    setY(selectedLayer.y);
+                }
+                if (selectedLayer.width && selectedLayer.height) {
+                    setW(selectedLayer.width);
+                    setH(selectedLayer.height);
+                }
+                setTransparentFill(!selectedLayer.fill);
+            } else {
+                // TODO: Set to global values from canvas instead of defaults
+                setLineWidth(2);
+                setFontName('Arial');
+                setFontSize(14);
+                setFormat([]);
+                setAlign(TextAlign.Left);
+                setX(0);
+                setY(0);
+                setW(100);
+                setH(100);
+                setTransparentFill(false);
+            }
+        }, [selectedLayer]);
 
-        const [transparentFill, setTransparentFill] = useState(false);
-
-        // Determine which fields to show based on selection
         const isNote = singleSelected && selectedLayer?.type === LayerType.Note;
         const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
 
         // Handle changes
         const handleColorChange = useCallback(
             (color: Color) => {
-                setLastUsedColor(color);
+                onColorChange(color);
+                // Optionally, update the selected layer's color here
+                // Example:
+                // if (selectedLayer) {
+                //     updateLayerColor(selectedLayer.id, color);
+                // }
             },
-            [setLastUsedColor],
+            [onColorChange],
         );
 
         const handleTransparentChange = useCallback(
             (checked: boolean) => {
                 setTransparentFill(checked);
                 onTransparentFillChange?.(checked);
+                // Optionally, update the selected layer's transparency here
             },
             [onTransparentFillChange],
         );
@@ -116,21 +148,40 @@ export const SelectionTools = memo(
 
         const handleFormatChange = useCallback(
             (
-                format: Partial<{
-                    bold: boolean;
-                    italic: boolean;
-                    strike: boolean;
-                    align: 'left' | 'center' | 'right';
+                textFormatting: Partial<{
+                    format: TextFormat[];
+                    align: TextAlign;
                 }>,
             ) => {
-                onTextFormatChange?.({
-                    bold: format.bold ?? bold,
-                    italic: format.italic ?? italic,
-                    strike: format.strike ?? strike,
-                    align: format.align ?? align,
-                });
+                const newFormat = textFormatting.format ?? format;
+                const newAlign = textFormatting.align ?? align;
+
+                setFormat(newFormat);
+                setAlign(newAlign);
+
+                const updatedFormats: TextFormat[] = [];
+                if (newFormat.length > 0) {
+                    updatedFormats.push(...newFormat);
+                }
+                if (newAlign) {
+                    switch (newAlign) {
+                        case TextAlign.Left:
+                            updatedFormats.push(TextAlign.Left);
+                            break;
+                        case TextAlign.Center:
+                            updatedFormats.push(TextAlign.Center);
+                            break;
+                        case TextAlign.Right:
+                            updatedFormats.push(TextAlign.Right);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                onTextFormatChange?.(updatedFormats);
             },
-            [onTextFormatChange, bold, italic, strike, align],
+            [format, align, onTextFormatChange],
         );
 
         const handlePositionChange = useCallback(
@@ -174,7 +225,7 @@ export const SelectionTools = memo(
                 aria-label="Formatting options"
             >
                 {/* Colors and fill */}
-                {(noneSelected || singleSelected) && (
+                {(selectedLayer || !selectedLayer) && (
                     <>
                         <div className="mb-2">
                             <ColorPicker onChangeAction={handleColorChange} />
@@ -192,7 +243,7 @@ export const SelectionTools = memo(
                 )}
 
                 {/* Line width */}
-                {(noneSelected || singleSelected) && (
+                {(selectedLayer || !selectedLayer) && (
                     <>
                         <LineWidthInput
                             lineWidth={lineWidth}
@@ -203,7 +254,7 @@ export const SelectionTools = memo(
                 )}
 
                 {/* Coordinates and Size */}
-                {singleSelected && (
+                {selectedLayer && (
                     <>
                         <TwoValueInput
                             label="X,Y Position:"
