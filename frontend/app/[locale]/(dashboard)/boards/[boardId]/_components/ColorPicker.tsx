@@ -38,7 +38,7 @@ export const ColorPicker = ({ onChangeAction }: ColorPickerProps) => {
     }, []);
 
     return (
-        <div className="flex flex-wrap gap-2 items-center max-w-[164px] pr-2 mr-2 border-r border-neutral-200">
+        <div className="flex flex-wrap gap-2 items-center max-w-[164px] pr-2 mr-2">
             {modernColors.map((color, index) => (
                 <ColorButton
                     key={index}
