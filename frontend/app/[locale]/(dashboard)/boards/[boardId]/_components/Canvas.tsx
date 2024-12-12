@@ -666,17 +666,42 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 moveForward={handleMoveForward}
                 moveBackward={handleMoveBackward}
             />
-            {editable && isAnyToolActive && showSelectionTools && (
-                <SelectionTools
-                    setLastUsedColor={setLastUsedColor}
-                    className="top-[65px]"
-                />
-            )}
-            {editable && selection.length === 1 && (
-                <SelectionTools
-                    setLastUsedColor={setLayerColor}
-                    className="top-[175px]"
-                />
+            {editable && (
+                <>
+                    {/* If showSelectionTools and no selection or single selection */}
+                    {(showSelectionTools && (selection.length === 0 || selection.length === 1)) && (
+                        <SelectionTools
+                            selectedLayers={selection.map((id) => getLayer(id)).filter(Boolean) as Layer[]}
+                            lastUsedColor={lastUsedColor}
+                            setLastUsedColor={selection.length === 1 ? setLayerColor : setLastUsedColor}
+                            // Implement these callbacks to update your layers or global defaults
+                            onLineWidthChange={(width) => {
+                                // Update line width of selected layer or global default
+                            }}
+                            onFontChange={(font) => {
+                                if (selection.length === 1 && getLayer(selection[0])?.type === LayerType.Note) {
+                                    updateLayer(selection[0], { value: `<span style="font-family:${font};">${getLayer(selection[0])?.value||''}</span>` });
+                                }
+                            }}
+                            onFontSizeChange={(size) => {/* ... */}}
+                            onTextFormatChange={(format) => {/* ... */}}
+                            onPositionChange={(x,y) => {
+                                if (selection.length === 1) {
+                                    updateLayer(selection[0], { x, y });
+                                } else {
+                                    // global default?
+                                }
+                            }}
+                            onSizeChange={(width,height) => {
+                                if (selection.length === 1) {
+                                    updateLayer(selection[0], { width, height });
+                                }
+                            }}
+                            onTransparentFillChange={(transparent) => {/* ... */}}
+                            className="top-[65px]"
+                        />
+                    )}
+                </>
             )}
             <svg
                 ref={svgRef}

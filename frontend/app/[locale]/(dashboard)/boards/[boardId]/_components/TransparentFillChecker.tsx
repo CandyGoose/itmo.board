@@ -1,0 +1,22 @@
+import React, { memo } from 'react';
+
+interface TransparentFillCheckerProps {
+    transparentFill: boolean;
+    onTransparentFillChange: (checked: boolean) => void;
+}
+
+export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> = memo(({ transparentFill, onTransparentFillChange }) => {
+    return (
+        <div className="flex items-center mt-2">
+            <input
+                type="checkbox"
+                checked={transparentFill}
+                onChange={(e) => onTransparentFillChange(e.target.checked)}
+                className="mr-2"
+            />
+            <span>Transparent Fill</span> {/*TODO: Add translation*/}
+        </div>
+    );
+});
+
+TransparentFillChecker.displayName = 'TransparentFillChecker';
