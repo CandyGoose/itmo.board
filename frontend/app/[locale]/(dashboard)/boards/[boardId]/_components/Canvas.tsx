@@ -20,6 +20,7 @@ import {
     Side,
 } from '@/types/canvas';
 import {
+    clickCloseToAnyPath,
     cn,
     colorToCss,
     findIntersectingLayersWithRectangle,
@@ -225,9 +226,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         (current: Point, origin: Point) => {
             if (!editable) return;
 
-            const layers = new Map(
-                getLayers(layerIds).map((layer) => [layer.id, layer]),
-            );
+            const read_layers = new Map(layers) as ReadonlyMap<string, Layer>;
 
             setCanvasState({
                 mode: CanvasMode.SelectionNet,
@@ -237,14 +236,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
 
             const selectedLayerIds = findIntersectingLayersWithRectangle(
                 layerIds,
-                layers,
+                read_layers,
                 origin,
                 current,
             );
 
             setSelection(selectedLayerIds);
         },
-        [editable, getLayers, layerIds],
+        [editable, layerIds, layers],
     );
 
     // Start multi-selection if pointer moved sufficiently
@@ -372,6 +371,27 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         [scale, camera],
     );
 
+    const onLayerPointerDown = useCallback(
+        (e: React.PointerEvent, layerId: string) => {
+            if (
+                canvasState.mode === CanvasMode.Pencil ||
+                canvasState.mode === CanvasMode.Inserting ||
+                !editable
+            ) {
+                return;
+            }
+            e.stopPropagation();
+            const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
+
+            const isSelected = selection.includes(layerId);
+            const newSelection = isSelected ? selection : [layerId];
+            setSelection(newSelection);
+            // Start translating
+            setCanvasState({ mode: CanvasMode.Translating, current: point });
+        },
+        [canvasState, editable, camera, scale, svgRect, selection],
+    );
+
     const onPointerDown = useCallback(
         (e: React.PointerEvent) => {
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
@@ -391,6 +411,21 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         current: point,
                     });
                 } else {
+                    const read_layers = new Map(layers) as ReadonlyMap<
+                        string,
+                        Layer
+                    >;
+                    const closePathId = clickCloseToAnyPath(
+                        layerIds,
+                        read_layers,
+                        point,
+                        10,
+                    );
+                    if (closePathId) {
+                        // setSelection([closePathId]);
+                        onLayerPointerDown(e, closePathId);
+                        return;
+                    }
                     setIsPanning(true);
                     setLastPointerPosition({ x: e.clientX, y: e.clientY });
                 }
@@ -398,7 +433,16 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 setCanvasState({ mode: CanvasMode.Pressing, origin: point });
             }
         },
-        [camera, canvasState, scale, startDrawing, svgRect],
+        [
+            camera,
+            canvasState.mode,
+            layerIds,
+            layers,
+            onLayerPointerDown,
+            scale,
+            startDrawing,
+            svgRect,
+        ],
     );
 
     const onPointerMove = useCallback(
@@ -490,27 +534,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const onPointerLeave = useCallback(() => {
         setIsPanning(false);
     }, []);
-
-    const onLayerPointerDown = useCallback(
-        (e: React.PointerEvent, layerId: string) => {
-            if (
-                canvasState.mode === CanvasMode.Pencil ||
-                canvasState.mode === CanvasMode.Inserting ||
-                !editable
-            ) {
-                return;
-            }
-            e.stopPropagation();
-            const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
-
-            const isSelected = selection.includes(layerId);
-            const newSelection = isSelected ? selection : [layerId];
-            setSelection(newSelection);
-            // Start translating
-            setCanvasState({ mode: CanvasMode.Translating, current: point });
-        },
-        [canvasState, editable, camera, scale, svgRect, selection],
-    );
 
     const deleteLayers = useCallback(() => {
         removeLayers(selection);

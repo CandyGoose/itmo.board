@@ -4,19 +4,25 @@ import { createBoard } from '@/actions/Board';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import '@testing-library/jest-dom';
+import { useTranslations } from 'next-intl';
 
 jest.mock('@/actions/Board');
 jest.mock('sonner');
 jest.mock('next/navigation', () => ({
     useParams: jest.fn(),
 }));
+jest.mock('next-intl', () => ({
+    useTranslations: jest.fn(),
+}));
 
 describe('NewBoardButton', () => {
     const orgId = 'org1';
     const onBoardCreated = jest.fn();
+    const mockUseTranslations = useTranslations as jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockUseTranslations.mockImplementation(() => () => 'New Board');
     });
 
     test('должна быть активной кнопкой по умолчанию', () => {
