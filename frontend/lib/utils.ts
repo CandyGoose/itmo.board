@@ -277,6 +277,9 @@ export function clickCloseToAnyPath(
         }
 
         const points = pathLayer.points;
+        if (!points || points.length === 0) {
+            continue;
+        }
         let minDistanceForThisPathSq = Infinity;
 
         for (let j = 0; j < points.length; j++) {
