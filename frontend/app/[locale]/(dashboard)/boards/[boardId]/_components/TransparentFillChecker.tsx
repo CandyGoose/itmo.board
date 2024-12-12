@@ -5,18 +5,19 @@ interface TransparentFillCheckerProps {
     onTransparentFillChange: (checked: boolean) => void;
 }
 
-export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> = memo(({ transparentFill, onTransparentFillChange }) => {
-    return (
-        <div className="flex items-center mt-2">
-            <input
-                type="checkbox"
-                checked={transparentFill}
-                onChange={(e) => onTransparentFillChange(e.target.checked)}
-                className="mr-2"
-            />
-            <span>Transparent Fill</span> {/*TODO: Add translation*/}
-        </div>
-    );
-});
+export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> =
+    memo(({ transparentFill, onTransparentFillChange }) => {
+        return (
+            <div className="flex items-center mt-2">
+                <input
+                    type="checkbox"
+                    checked={transparentFill}
+                    onChange={(e) => onTransparentFillChange(e.target.checked)}
+                    className="mr-2"
+                />
+                <span>Transparent Fill</span> {/*TODO: Add translation, make font similar to other options*/}
+            </div>
+        );
+    });
 
 TransparentFillChecker.displayName = 'TransparentFillChecker';

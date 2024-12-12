@@ -74,7 +74,7 @@ export const Note = ({
     };
 
     const textColor = fill ? getContrastingTextColor(fill) : '#000';
-    const backgroundColor = fill ? colorToCss(fill) : '#000';
+    const backgroundColor = fill ? colorToCss(fill) : 'transparent';
     const outlineStyle = selectionColor
         ? `1px solid ${selectionColor}`
         : 'none';

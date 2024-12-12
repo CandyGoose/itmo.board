@@ -9,15 +9,20 @@ import { useCanvasStore } from '@/store/useCanvasStore';
 import { LayerPreview } from './LayerPreview';
 import {
     Camera,
-    Color,
     CanvasMode,
     CanvasState,
+    Color,
+    EllipseLayer,
     Layer,
     LayerType,
+    NoteLayer,
     PathLayer,
     Point,
-    XYWH,
+    RectangleLayer,
     Side,
+    TextAlign,
+    TextFormat,
+    XYWH,
 } from '@/types/canvas';
 import {
     clickCloseToAnyPath,
@@ -84,6 +89,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         g: 0,
         b: 0,
     });
+    const [transparentFill, setTransparentFill] = useState(false);
+    const [lineWidth, setLineWidth] = useState<number>(2);
+    const [fontName, setFontName] = useState<string>('Arial');
+    const [fontSize, setFontSize] = useState<number>(14);
+    const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Left);
+    const [textFormat, setTextFormat] = useState<TextFormat[]>([
+        TextFormat.None,
+    ]);
 
     useEffect(() => {
         if (svgRef.current) {
@@ -104,7 +117,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     }, []);
 
     useEffect(() => {
-        if (edit !== false) setEditable(true); // later will depend on user permissions
+        if (edit !== false) setEditable(true); // TODO: later will depend on user permissions
     }, [edit]);
 
     // Determine if any tool is active
@@ -154,8 +167,8 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         y: position.y,
                         height: 100,
                         width: 100,
-                        fill: lastUsedColor,
-                    };
+                        fill: transparentFill ? undefined : lastUsedColor,
+                    } as RectangleLayer;
                     break;
                 case LayerType.Ellipse:
                     layer = {
@@ -165,8 +178,8 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         y: position.y,
                         height: 100,
                         width: 100,
-                        fill: lastUsedColor,
-                    };
+                        fill: transparentFill ? undefined : lastUsedColor,
+                    } as EllipseLayer;
                     break;
                 case LayerType.Note:
                     layer = {
@@ -176,9 +189,13 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         y: position.y,
                         height: 100,
                         width: 100,
-                        fill: lastUsedColor,
+                        fill: transparentFill ? undefined : lastUsedColor,
                         value: '',
-                    };
+                        fontName: fontName,
+                        fontSize: fontSize,
+                        textAlign: textAlign,
+                        textFormat: textFormat,
+                    } as NoteLayer;
                     break;
                 default:
                     throw new Error(`Invalid layer type: ${layerType}`);
@@ -188,7 +205,15 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             setSelection([id]);
             setCanvasState({ mode: CanvasMode.None });
         },
-        [addLayer, lastUsedColor],
+        [
+            addLayer,
+            fontName,
+            fontSize,
+            lastUsedColor,
+            textAlign,
+            textFormat,
+            transparentFill,
+        ],
     );
 
     const translateSelectedLayers = useCallback(
@@ -298,11 +323,12 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 type: LayerType.Path,
                 ...penPointsToPathLayer(pencilDraft),
                 fill: lastUsedColor,
+                lineWidth: lineWidth,
             } as PathLayer;
             addLayer(newLayer);
         }
         setPencilDraft(null);
-    }, [pencilDraft, lastUsedColor, addLayer]);
+    }, [pencilDraft, lastUsedColor, lineWidth, addLayer]);
 
     const startDrawing = useCallback((point: Point) => {
         setPencilDraft([[point.x, point.y]]);
@@ -422,7 +448,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         10,
                     );
                     if (closePathId) {
-                        // setSelection([closePathId]);
                         onLayerPointerDown(e, closePathId);
                         return;
                     }
@@ -578,6 +603,15 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         [selection, updateLayer],
     );
 
+    const setLayerTransparent = useCallback(
+        (checked: boolean) => {
+            selection.forEach((id) => {
+                updateLayer(id, { fill: checked ? undefined : lastUsedColor });
+            });
+        },
+        [selection, lastUsedColor, updateLayer],
+    );
+
     // Keyboard Actions
     useEffect(() => {
         function onKeyDown(e: KeyboardEvent) {
@@ -669,38 +703,50 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             {editable && (
                 <>
                     {/* If showSelectionTools and no selection or single selection */}
-                    {(showSelectionTools && (selection.length === 0 || selection.length === 1)) && (
-                        <SelectionTools
-                            selectedLayers={selection.map((id) => getLayer(id)).filter(Boolean) as Layer[]}
-                            lastUsedColor={lastUsedColor}
-                            setLastUsedColor={selection.length === 1 ? setLayerColor : setLastUsedColor}
-                            // Implement these callbacks to update your layers or global defaults
-                            onLineWidthChange={(width) => {
-                                // Update line width of selected layer or global default
-                            }}
-                            onFontChange={(font) => {
-                                if (selection.length === 1 && getLayer(selection[0])?.type === LayerType.Note) {
-                                    updateLayer(selection[0], { value: `<span style="font-family:${font};">${getLayer(selection[0])?.value||''}</span>` });
+                    {showSelectionTools &&
+                        (selection.length === 0 || selection.length === 1) && (
+                            <SelectionTools
+                                selectedLayers={
+                                    selection
+                                        .map((id) => getLayer(id))
+                                        .filter(Boolean) as Layer[]
                                 }
-                            }}
-                            onFontSizeChange={(size) => {/* ... */}}
-                            onTextFormatChange={(format) => {/* ... */}}
-                            onPositionChange={(x,y) => {
-                                if (selection.length === 1) {
-                                    updateLayer(selection[0], { x, y });
-                                } else {
-                                    // global default?
+                                lastUsedColor={lastUsedColor}
+                                setLastUsedColor={
+                                    selection.length === 1
+                                        ? setLayerColor
+                                        : setLastUsedColor
                                 }
-                            }}
-                            onSizeChange={(width,height) => {
-                                if (selection.length === 1) {
-                                    updateLayer(selection[0], { width, height });
+                                onLineWidthChange={(width) => {
+                                    // Update line width of selected layer or global default
+                                }}
+                                onFontChange={(font) => {
+                                }}
+                                onFontSizeChange={(size) => {
+                                    /* ... */
+                                }}
+                                onTextFormatChange={(format) => {
+                                    /* ... */
+                                }}
+                                onPositionChange={(x, y) => {
+                                    if (selection.length === 1) {
+                                        updateLayer(selection[0], { x, y });
+                                    }
+                                }}
+                                onSizeChange={(width, height) => {
+                                    if (selection.length === 1) {
+                                        updateLayer(selection[0], {
+                                            width,
+                                            height,
+                                        });
+                                    }
+                                }}
+                                onTransparentFillChange={
+                                    selection.length === 1 ? setLayerTransparent : setTransparentFill
                                 }
-                            }}
-                            onTransparentFillChange={(transparent) => {/* ... */}}
-                            className="top-[65px]"
-                        />
-                    )}
+                                className="top-[65px]"
+                            />
+                        )}
                 </>
             )}
             <svg
@@ -744,7 +790,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                 .join(' ')}
                             stroke={colorToCss(lastUsedColor)}
                             fill="none"
-                            strokeWidth={2}
+                            strokeWidth={lineWidth}
                             strokeDasharray="4 2" // Dashed line for distinction
                         />
                     )}
