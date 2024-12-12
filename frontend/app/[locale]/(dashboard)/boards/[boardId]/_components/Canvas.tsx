@@ -594,6 +594,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         setSelection([...layerIds]);
     }, [layerIds]);
 
+    // TODO: move these functions to SelectionTools
     const setLayerColor = useCallback(
         (color: Color) => {
             selection.forEach((id) => {
@@ -602,7 +603,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         },
         [selection, updateLayer],
     );
-
     const setLayerTransparent = useCallback(
         (checked: boolean) => {
             selection.forEach((id) => {
@@ -610,6 +610,46 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             });
         },
         [selection, lastUsedColor, updateLayer],
+    );
+    const setLayerLineWidth = useCallback(
+        (width: number) => {
+            selection.forEach((id) => {
+                updateLayer(id, { lineWidth: width });
+            });
+        },
+        [selection, updateLayer],
+    );
+    const setLayerFont = useCallback(
+        (name: string) => {
+            selection.forEach((id) => {
+                updateLayer(id, { fontName: name });
+            });
+        },
+        [selection, updateLayer],
+    );
+    const setLayerFontSize = useCallback(
+        (size: number) => {
+            selection.forEach((id) => {
+                updateLayer(id, { fontSize: size });
+            });
+        },
+        [selection, updateLayer],
+    );
+    const setLayerTextAlign = useCallback(
+        (align: TextAlign) => {
+            selection.forEach((id) => {
+                updateLayer(id, { textAlign: align });
+            });
+        },
+        [selection, updateLayer],
+    );
+    const setLayerTextFormat = useCallback(
+        (format: TextFormat[]) => {
+            selection.forEach((id) => {
+                updateLayer(id, { textFormat: format });
+            });
+        },
+        [selection, updateLayer],
     );
 
     // Keyboard Actions
@@ -717,17 +757,31 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                         ? setLayerColor
                                         : setLastUsedColor
                                 }
-                                onLineWidthChange={(width) => {
-                                    // Update line width of selected layer or global default
-                                }}
-                                onFontChange={(font) => {
-                                }}
-                                onFontSizeChange={(size) => {
-                                    /* ... */
-                                }}
-                                onTextFormatChange={(format) => {
-                                    /* ... */
-                                }}
+                                onLineWidthChange={
+                                    selection.length === 1
+                                        ? setLayerLineWidth
+                                        : setLineWidth
+                                }
+                                onFontChange={
+                                    selection.length === 1
+                                        ? setLayerFont
+                                        : setFontName
+                                }
+                                onFontSizeChange={
+                                    selection.length === 1
+                                        ? setLayerFontSize
+                                        : setFontSize
+                                }
+                                onTextAlignChange={
+                                    selection.length === 1
+                                        ? setLayerTextAlign
+                                        : setTextAlign
+                                }
+                                onTextFormatChange={
+                                    selection.length === 1
+                                        ? setLayerTextFormat
+                                        : setTextFormat
+                                }
                                 onPositionChange={(x, y) => {
                                     if (selection.length === 1) {
                                         updateLayer(selection[0], { x, y });
@@ -742,7 +796,9 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                     }
                                 }}
                                 onTransparentFillChange={
-                                    selection.length === 1 ? setLayerTransparent : setTransparentFill
+                                    selection.length === 1
+                                        ? setLayerTransparent
+                                        : setTransparentFill
                                 }
                                 className="top-[65px]"
                             />

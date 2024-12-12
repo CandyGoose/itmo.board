@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useCallback, useState } from 'react';
-import { Color, LayerType, Layer } from '@/types/canvas';
+import { Color, LayerType, Layer, TextAlign, TextFormat } from '@/types/canvas';
 import { ColorPicker } from './ColorPicker';
 import * as Toolbar from '@radix-ui/react-toolbar';
 import { cn } from '@/lib/utils';
@@ -19,12 +19,8 @@ interface SelectionToolsProps {
     onLineWidthChange?: (width: number) => void;
     onFontChange?: (fontName: string) => void;
     onFontSizeChange?: (size: number) => void;
-    onTextFormatChange?: (format: {
-        bold?: boolean;
-        italic?: boolean;
-        strike?: boolean;
-        align?: 'left' | 'center' | 'right';
-    }) => void;
+    onTextAlignChange?: (align: TextAlign) => void;
+    onTextFormatChange?: (format: TextFormat[]) => void;
     onPositionChange?: (x: number, y: number) => void;
     onSizeChange?: (width: number, height: number) => void;
     onTransparentFillChange?: (transparent: boolean) => void;
@@ -59,6 +55,7 @@ export const SelectionTools = memo(
         const [italic, setItalic] = useState(false);
         const [strike, setStrike] = useState(false);
         const [align, setAlign] = useState<'left' | 'center' | 'right'>('left');
+        // TODO: These values should be updated based on the selected layer
 
         const [x, setX] = useState(0);
         const [y, setY] = useState(0);
