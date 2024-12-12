@@ -19,7 +19,7 @@ describe('SelectionTools', () => {
     it('calls setLastUsedColor when a color is selected', () => {
         const mockSetLastUsedColor = jest.fn();
 
-        render(<SelectionTools setLastUsedColor={mockSetLastUsedColor} />);
+        render(<SelectionTools onColorChange={mockSetLastUsedColor} />);
 
         const colorPicker = screen.getByTestId('color-picker-button');
 
@@ -36,7 +36,7 @@ describe('SelectionTools', () => {
     it('renders without crashing', () => {
         const mockSetLastUsedColor = jest.fn();
 
-        render(<SelectionTools setLastUsedColor={mockSetLastUsedColor} />);
+        render(<SelectionTools onColorChange={mockSetLastUsedColor} />);
 
         const container = screen.getByTestId('selection-tools-container');
         expect(container).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe('SelectionTools', () => {
 
         render(
             <SelectionTools
-                setLastUsedColor={mockSetLastUsedColor}
+                onColorChange={mockSetLastUsedColor}
                 className={additionalClassName}
             />,
         );
