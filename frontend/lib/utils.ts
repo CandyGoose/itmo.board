@@ -240,3 +240,68 @@ export function getContrastingTextColor(color: Color) {
 
     return luminance > 182 ? 'black' : 'white';
 }
+
+export function clickCloseToAnyPath(
+    layerIds: readonly string[],
+    layers: ReadonlyMap<string, Layer>,
+    point: Point,
+    threshold: number,
+): string | null {
+    let closestPathId: string | null = null;
+    let closestDistanceSq = threshold * threshold;
+    const clickX = point.x;
+    const clickY = point.y;
+
+    // Iterate from topmost (last) to bottom-most (first)
+    for (let i = layerIds.length - 1; i >= 0; i--) {
+        const layerId = layerIds[i];
+        const layer = layers.get(layerId);
+        if (!layer || layer.type !== LayerType.Path) {
+            continue;
+        }
+
+        const pathLayer = layer as PathLayer;
+        const x = pathLayer.x;
+        const y = pathLayer.y;
+        const width = pathLayer.width;
+        const height = pathLayer.height;
+
+        // Bounding box check with threshold padding
+        if (
+            clickX < x - threshold ||
+            clickX > x + width + threshold ||
+            clickY < y - threshold ||
+            clickY > y + height + threshold
+        ) {
+            continue;
+        }
+
+        const points = pathLayer.points;
+        if (!points || points.length === 0) {
+            continue;
+        }
+        let minDistanceForThisPathSq = Infinity;
+
+        for (let j = 0; j < points.length; j++) {
+            const pt = points[j];
+            const dx = clickX - (pt[0] + x);
+            const dy = clickY - (pt[1] + y);
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < minDistanceForThisPathSq) {
+                minDistanceForThisPathSq = distSq;
+                // Early exit if we hit an exact point match
+                if (distSq === 0) {
+                    return layerId;
+                }
+            }
+        }
+
+        if (minDistanceForThisPathSq < closestDistanceSq) {
+            closestDistanceSq = minDistanceForThisPathSq;
+            closestPathId = layerId;
+        }
+    }
+
+    return closestPathId;
+}

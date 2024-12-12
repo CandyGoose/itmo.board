@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Board, createBoard } from '@/actions/Board';
 import { Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface NewBoardButtonProps {
     orgId: string;
@@ -17,6 +18,7 @@ export const NewBoardButton = ({
     onBoardCreated,
     disabled,
 }: NewBoardButtonProps) => {
+    const t = useTranslations('utils');
     const params = useParams();
     const onClick = async () => {
         try {
@@ -42,7 +44,7 @@ export const NewBoardButton = ({
             )}
         >
             <Plus className="h-12 w-12 text-white stroke-2" />
-            <p className="text-sm text-white font-medium">New board</p>
+            <p className="text-sm text-white font-medium">{t('newBoard')}</p>
         </button>
     );
 };
