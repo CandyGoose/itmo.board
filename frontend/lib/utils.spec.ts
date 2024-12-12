@@ -1,5 +1,6 @@
 import {
     boundsFromPoints,
+    clickCloseToAnyPath,
     cn,
     colorToCss,
     findIntersectingLayersWithRectangle,
@@ -15,6 +16,7 @@ import {
     Color,
     Layer,
     LayerType,
+    PathLayer,
     Point,
     Side,
     XYWH,
@@ -934,6 +936,495 @@ describe('Utility Functions', () => {
                 width: 10,
                 height: 100,
             });
+        });
+    });
+
+    describe('clickCloseToAnyPath', () => {
+        const createLayer = (
+            id: string,
+            type:
+                | LayerType.Rectangle
+                | LayerType.Ellipse
+                | LayerType.Path
+                | LayerType.Note,
+            overrides: Partial<Layer> = {},
+        ): Layer => {
+            const baseLayer: Partial<Layer> = {
+                id,
+                type,
+                x: overrides.x ?? 0,
+                y: overrides.y ?? 0,
+                width: overrides.width ?? 100,
+                height: overrides.height ?? 100,
+                fill: overrides.fill ?? { r: 0, g: 0, b: 0 },
+            };
+
+            if (type === LayerType.Path) {
+                if (overrides.type === LayerType.Path) {
+                    return {
+                        ...baseLayer,
+                        type: LayerType.Path,
+                        points: overrides.points ?? [],
+                    } as PathLayer;
+                }
+            }
+            return baseLayer as Layer;
+        };
+
+        const createPathLayer = (
+            id: string,
+            points: [number, number][],
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 100,
+            fill = { r: 0, g: 0, b: 0 },
+        ): PathLayer => ({
+            id,
+            type: LayerType.Path,
+            x,
+            y,
+            width,
+            height,
+            fill,
+            points,
+        });
+
+        const createRectangleLayer = (
+            id: string,
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 100,
+            fill = { r: 0, g: 0, b: 0 },
+        ) =>
+            createLayer(id, LayerType.Rectangle, {
+                x,
+                y,
+                width,
+                height,
+                fill,
+            });
+
+        const createEllipseLayer = (
+            id: string,
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 100,
+            fill = { r: 0, g: 0, b: 0 },
+        ) =>
+            createLayer(id, LayerType.Ellipse, {
+                x,
+                y,
+                width,
+                height,
+                fill,
+            });
+
+        const buildLayersMap = (layers: Layer[]) => {
+            const layerIds = layers.map(
+                (layer) => layer.id,
+            ) as readonly string[];
+            const layersMap = new Map<string, Layer>();
+            layers.forEach((layer) => layersMap.set(layer.id, layer));
+            return { layerIds, layers: layersMap };
+        };
+
+        const createDataForClickCloseToAnyPath = (
+            layers: Layer[] = [],
+            point: Point = { x: 0, y: 0 },
+            threshold: number = 10,
+        ) => {
+            const { layerIds, layers: layersMap } = buildLayersMap(layers);
+            return { layerIds, layers: layersMap, point, threshold };
+        };
+
+        it('should return null when there are no layers', () => {
+            const data = createDataForClickCloseToAnyPath();
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should return null when there are no path layers', () => {
+            const layers = [
+                createRectangleLayer('layer1'),
+                createEllipseLayer('layer2'),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 50, y: 50 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should return null when click is outside the threshold of any path', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [10, 10],
+                        [20, 20],
+                    ],
+                    0,
+                    0,
+                    30,
+                    30,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 100, y: 100 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should return the layer ID when click is within threshold of a single path', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [10, 10],
+                        [20, 20],
+                    ],
+                    0,
+                    0,
+                    30,
+                    30,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 15, y: 15 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
+        });
+
+        it('should return the topmost layer ID when multiple paths are within threshold', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [10, 10],
+                        [20, 20],
+                    ],
+                    0,
+                    0,
+                    30,
+                    30,
+                ),
+                createPathLayer(
+                    'path2',
+                    [
+                        [15, 15],
+                        [25, 25],
+                    ],
+                    0,
+                    0,
+                    30,
+                    30,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 16, y: 16 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path2');
+        });
+
+        it('should handle multiple points within a single path correctly', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [10, 10],
+                        [20, 20],
+                        [30, 30],
+                    ],
+                    0,
+                    0,
+                    40,
+                    40,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 21, y: 21 },
+                5,
+            );
+
+            // The closest point is (20,20), distance squared = 1 + 1 = 2 < 25
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
+        });
+
+        it('should return null when the closest distance is exactly the threshold', () => {
+            const layers = [createPathLayer('path1', [[10, 10]], 0, 0, 20, 20)];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 30, y: 10 },
+                10,
+            ); // Distance is exactly 10
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should return the layer ID when a point is exactly on a path point', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [10, 10],
+                        [20, 20],
+                    ],
+                    0,
+                    0,
+                    30,
+                    30,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 10, y: 10 },
+                5,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
+        });
+
+        it('should correctly handle layers with different positions', () => {
+            const layers = [
+                createPathLayer('path1', [[0, 0]], 100, 100, 50, 50),
+                createPathLayer('path2', [[0, 0]], 200, 200, 50, 50),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 102, y: 102 },
+                5,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
+        });
+
+        it('should ignore non-path layers and still find the correct path', () => {
+            const layers = [
+                createRectangleLayer('rect1'),
+                createPathLayer('path1', [[10, 10]], 0, 0, 20, 20),
+                createEllipseLayer('circle1'),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 12, y: 12 },
+                5,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
+        });
+
+        it('should handle multiple path layers with overlapping bounding boxes correctly', () => {
+            const layers = [
+                createPathLayer('path1', [[10, 10]], 0, 0, 30, 30),
+                createPathLayer('path2', [[15, 15]], 5, 5, 30, 30),
+                createPathLayer('path3', [[20, 20]], 10, 10, 30, 30),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 25, y: 25 },
+                10,
+            );
+
+            // All paths are within threshold, path3 is topmost
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path3');
+        });
+
+        it('should return null if layers contain non-Path types only', () => {
+            const layers = [
+                createRectangleLayer('layer1'),
+                createEllipseLayer('layer2'),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 50, y: 50 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should handle empty points array in a path layer', () => {
+            const layers = [
+                createLayer('path1', LayerType.Path, { points: [] }),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 5, y: 5 },
+                10,
+            );
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should handle multiple layers with some non-path and some path layers', () => {
+            const layers = [
+                createRectangleLayer('layer1'),
+                createPathLayer('path1', [[10, 10]], 0, 0, 20, 20),
+                createEllipseLayer('layer2'),
+                createPathLayer('path2', [[15, 15]], 0, 0, 20, 20),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 16, y: 16 },
+                5,
+            );
+
+            // path2 is topmost path layer
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path2');
+        });
+
+        it('should correctly calculate distances and choose the closest path', () => {
+            const layers = [
+                createPathLayer('path1', [[10, 10]], 0, 0, 20, 20),
+                createPathLayer('path2', [[20, 20]], 0, 0, 30, 30),
+                createPathLayer('path3', [[30, 30]], 0, 0, 40, 40),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 19, y: 19 },
+                15,
+            );
+
+            // Distance to path1's point: sqrt((19-10)^2 + (19-10)^2) ≈ 12.73
+            // Distance to path2's point: sqrt((19-20)^2 + (19-20)^2) ≈ 1.41
+            // Distance to path3's point: sqrt((19-30)^2 + (19-30)^2) ≈ 15.56
+            // path2 is closest within threshold
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path2');
+        });
+
+        it('should handle layers with different positions and sizes correctly', () => {
+            const layers = [
+                createPathLayer(
+                    'path1',
+                    [
+                        [5, 5],
+                        [15, 15],
+                    ],
+                    50,
+                    50,
+                    100,
+                    100,
+                ),
+            ];
+            const data = createDataForClickCloseToAnyPath(
+                layers,
+                { x: 60, y: 60 },
+                10,
+            ); // Close to (5+50, 5+50) = (55, 55), distance ≈ 7.07
+
+            const result = clickCloseToAnyPath(
+                data.layerIds,
+                data.layers,
+                data.point,
+                data.threshold,
+            );
+            expect(result).toBe('path1');
         });
     });
 });

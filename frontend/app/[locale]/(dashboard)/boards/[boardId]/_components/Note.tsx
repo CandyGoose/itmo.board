@@ -2,7 +2,7 @@ import { Kalam } from 'next/font/google';
 import { ContentEditableEvent } from 'react-contenteditable';
 import { NoteLayer } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const font = Kalam({
     subsets: ['latin'],
@@ -15,7 +15,7 @@ export const calculateFontSize = (
     text: string,
 ) => {
     const maxFontSize = 72;
-    const minFontSize = 10;
+    const minFontSize = 7;
     const scaleFactor = 0.15;
 
     const fontSizeBasedOnHeight = height * scaleFactor;
@@ -27,14 +27,18 @@ export const calculateFontSize = (
         maxFontSize,
     );
 
-    const testElement = document.createElement('span');
+    const testElement = document.createElement('div');
     testElement.style.fontFamily = 'Kalam';
     testElement.style.position = 'absolute';
     testElement.style.visibility = 'hidden';
+    testElement.style.whiteSpace = 'normal';
+    testElement.style.fontSize = `${fontSize}px`;
+    testElement.style.width = `${width}px`;
+    testElement.style.wordBreak = 'break-word';
     testElement.textContent = text;
     document.body.appendChild(testElement);
 
-    while (testElement.offsetWidth > width && fontSize > minFontSize) {
+    while (testElement.offsetHeight > height && fontSize >= minFontSize) {
         fontSize -= 1;
         testElement.style.fontSize = `${fontSize}px`;
     }
@@ -60,10 +64,14 @@ export const Note = ({
     const [noteValue, setNoteValue] = useState(value || 'Text');
     const [fontSize, setFontSize] = useState(72);
     const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLDivElement>(null);
 
-    const handleContentChange = useCallback((e: ContentEditableEvent) => {
-        setNoteValue(e.target.value);
-    }, []);
+    const handleContentChange = (e: ContentEditableEvent) => {
+        if (inputRef.current) {
+            inputRef.current.textContent = e.currentTarget.textContent;
+        }
+        setNoteValue(e.currentTarget.textContent || '');
+    };
 
     const textColor = fill ? getContrastingTextColor(fill) : '#000';
     const backgroundColor = fill ? colorToCss(fill) : '#000';
@@ -83,7 +91,7 @@ export const Note = ({
             );
 
             if (newFontSize !== fontSize) {
-                setFontSize(newFontSize);
+                setFontSize(() => newFontSize);
             }
         }
     }, [noteValue, fontSize, width, height]);
@@ -111,6 +119,7 @@ export const Note = ({
             >
                 <div
                     contentEditable
+                    ref={inputRef}
                     className={cn(
                         'h-full w-full flex flex-col items-center justify-center text-center outline-none',
                         font.className,
@@ -121,10 +130,7 @@ export const Note = ({
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
                     }}
-                    onInput={(e) =>
-                        handleContentChange(e as ContentEditableEvent)
-                    }
-                    dangerouslySetInnerHTML={{ __html: noteValue }}
+                    onInput={handleContentChange}
                 />
             </div>
         </foreignObject>
