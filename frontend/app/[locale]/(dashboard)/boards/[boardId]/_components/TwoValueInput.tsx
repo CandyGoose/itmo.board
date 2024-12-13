@@ -11,7 +11,7 @@ interface TwoValueInputProps {
 }
 
 export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
-    ({ label1, label2, value1, value2, onChange1, onChange2, className}) => {
+    ({ label1, label2, value1, value2, onChange1, onChange2, className }) => {
         return (
             <div className={`flex gap-4 items-center ${className}`}>
                 <div className="flex flex-col w-1/2">

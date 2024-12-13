@@ -9,12 +9,15 @@ interface LineWidthInputProps {
 export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
     ({ lineWidth, onLineWidthChange }) => {
         const t = useTranslations('tools');
-        const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            const width = parseInt(e.target.value, 10);
-            if (!isNaN(width)) {
-                onLineWidthChange(width);
-            }
-        }, [onLineWidthChange]);
+        const handleChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                const width = parseInt(e.target.value, 10);
+                if (!isNaN(width)) {
+                    onLineWidthChange(width);
+                }
+            },
+            [onLineWidthChange],
+        );
 
         return (
             <div className="flex flex-col mb-2">
@@ -29,7 +32,7 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                     />
                     <div
                         className="bg-black w-1/3"
-                        style={{height: `${lineWidth}px` }}
+                        style={{ height: `${lineWidth}px` }}
                     />
                 </div>
             </div>

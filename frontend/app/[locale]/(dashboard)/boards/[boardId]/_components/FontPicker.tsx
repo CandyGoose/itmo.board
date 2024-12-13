@@ -69,7 +69,9 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                     <input
                         type="number"
                         value={fontSize}
-                        onChange={(e) => onFontSizeChange(parseInt(e.target.value, 10))}
+                        onChange={(e) =>
+                            onFontSizeChange(parseInt(e.target.value, 10))
+                        }
                         onBlur={(e) => handleFontSizeBlur(e.target.value)}
                         className="border rounded p-1 text-sm w-full"
                         min={MIN_FONT_SIZE}
