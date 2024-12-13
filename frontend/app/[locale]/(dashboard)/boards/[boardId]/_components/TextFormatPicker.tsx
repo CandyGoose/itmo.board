@@ -8,134 +8,144 @@ import {
     TextAlignRightIcon,
 } from '@radix-ui/react-icons';
 import * as Toolbar from '@radix-ui/react-toolbar';
+import { TextAlign, TextFormat } from '@/types/canvas';
 
 interface TextFormatPickerProps {
-    bold: boolean;
-    italic: boolean;
-    strike: boolean;
-    align: string;
-    onFormatChange: (format: {
-        bold?: boolean;
-        italic?: boolean;
-        strike?: boolean;
-        align?: string;
+    textFormat: TextFormat[];
+    textAlign: TextAlign;
+    onFormatChange: (textFormatting: {
+        textFormat?: TextFormat[];
+        textAlign?: TextAlign;
     }) => void;
 }
 
 const textFormats = [
-    { value: 'bold', icon: <FontBoldIcon />, ariaLabel: 'Bold' },
-    { value: 'italic', icon: <FontItalicIcon />, ariaLabel: 'Italic' },
     {
-        value: 'strike',
+        value: TextFormat.Bold,
+        icon: <FontBoldIcon />,
+        ariaLabel: 'Bold',
+    },
+    {
+        value: TextFormat.Italic,
+        icon: <FontItalicIcon />,
+        ariaLabel: 'Italic',
+    },
+    {
+        value: TextFormat.Strike,
         icon: <StrikethroughIcon />,
-        ariaLabel: 'Strike through',
+        ariaLabel: 'Strike Through',
     },
 ];
 
 const textAligns = [
-    { value: 'left', icon: <TextAlignLeftIcon />, ariaLabel: 'Left aligned' },
     {
-        value: 'center',
-        icon: <TextAlignCenterIcon />,
-        ariaLabel: 'Center aligned',
+        value: TextAlign.Left,
+        icon: <TextAlignLeftIcon />,
+        ariaLabel: 'Left Aligned',
     },
     {
-        value: 'right',
+        value: TextAlign.Center,
+        icon: <TextAlignCenterIcon />,
+        ariaLabel: 'Center Aligned',
+    },
+    {
+        value: TextAlign.Right,
         icon: <TextAlignRightIcon />,
-        ariaLabel: 'Right aligned',
+        ariaLabel: 'Right Aligned',
     },
 ];
 
-const ToolbarToggleItem = ({
-    value,
-    icon,
-    ariaLabel,
-    selected,
-    onChange,
-}: {
-    value: string;
-    icon: React.ReactNode;
-    ariaLabel: string;
-    selected: boolean;
-    onChange: (value: string) => void;
-}) => (
-    <Toolbar.ToggleItem
-        className="ml-0.5 inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
-        value={value}
-        aria-label={ariaLabel}
-        data-state={selected ? 'active' : 'inactive'}
-        onClick={() => onChange(value)}
-    >
-        {icon}
-    </Toolbar.ToggleItem>
+const ToolbarToggleItem = memo(
+    ({
+        value,
+        icon,
+        ariaLabel,
+        selected,
+        onChange,
+    }: {
+        value: string;
+        icon: React.ReactNode;
+        ariaLabel: string;
+        selected: boolean;
+        onChange: (value: string) => void;
+    }) => (
+        <Toolbar.ToggleItem
+            className="inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
+            value={value}
+            aria-label={ariaLabel}
+            data-state={selected ? 'on' : 'off'}
+            onClick={() => onChange(value)}
+        >
+            {icon}
+        </Toolbar.ToggleItem>
+    ),
 );
+ToolbarToggleItem.displayName = 'ToolbarToggleItem';
 
 export const TextFormatPicker: React.FC<TextFormatPickerProps> = memo(
-    ({ bold, italic, strike, align, onFormatChange }) => {
+    ({ textFormat, textAlign, onFormatChange }) => {
         const handleFormatChange = (values: string[]) => {
-            onFormatChange({
-                bold: values.includes('bold'),
-                italic: values.includes('italic'),
-                strike: values.includes('strike'),
-            });
+            const selectedFormats = values.map((v) => Number(v) as TextFormat);
+            onFormatChange({ textFormat: selectedFormats, textAlign });
         };
 
         const handleAlignChange = (value: string | null) => {
-            if (value) {
-                onFormatChange({ align: value });
+            if (value !== null) {
+                const newAlign = Number(value) as TextAlign;
+                onFormatChange({ textFormat, textAlign: newAlign });
             }
         };
 
         return (
-            <div className="flex flex-wrap">
-                {/* Formatting Group */}
+            <div className="flex">
+                {/* Text Formatting (multiple select) */}
                 <Toolbar.ToggleGroup
                     type="multiple"
                     aria-label="Text formatting"
-                    className="flex mb-2"
+                    className="flex"
                     onValueChange={handleFormatChange}
-                    value={
-                        [
-                            bold && 'bold',
-                            italic && 'italic',
-                            strike && 'strike',
-                        ].filter(Boolean) as string[]
-                    }
+                    value={textFormat.map((f) => f.toString())}
                 >
                     {textFormats.map(({ value, icon, ariaLabel }) => (
                         <ToolbarToggleItem
                             key={value}
-                            value={value}
+                            value={value.toString()}
                             icon={icon}
                             ariaLabel={ariaLabel}
-                            selected={
-                                value === 'bold'
-                                    ? bold
-                                    : value === 'italic'
-                                    ? italic
-                                    : strike
-                            }
-                            onChange={() => handleFormatChange([value])}
+                            selected={textFormat.includes(value)}
+                            onChange={(val) => {
+                                const currentSelected = new Set(textFormat);
+                                const toggledValue = Number(val) as TextFormat;
+                                if (currentSelected.has(toggledValue)) {
+                                    currentSelected.delete(toggledValue);
+                                } else {
+                                    currentSelected.add(toggledValue);
+                                }
+                                onFormatChange({
+                                    textFormat: Array.from(currentSelected),
+                                    textAlign,
+                                });
+                            }}
                         />
                     ))}
                 </Toolbar.ToggleGroup>
 
-                {/* Alignment Group */}
+                {/* Text Alignment (single select) */}
                 <Toolbar.ToggleGroup
                     type="single"
                     aria-label="Text alignment"
-                    className="flex"
+                    className="flex ml-2"
                     onValueChange={handleAlignChange}
-                    value={align}
+                    value={textAlign.toString()}
                 >
                     {textAligns.map(({ value, icon, ariaLabel }) => (
                         <ToolbarToggleItem
                             key={value}
-                            value={value}
+                            value={value.toString()}
                             icon={icon}
                             ariaLabel={ariaLabel}
-                            selected={align === value}
-                            onChange={handleAlignChange}
+                            selected={textAlign === value}
+                            onChange={(val) => handleAlignChange(val)}
                         />
                     ))}
                 </Toolbar.ToggleGroup>
