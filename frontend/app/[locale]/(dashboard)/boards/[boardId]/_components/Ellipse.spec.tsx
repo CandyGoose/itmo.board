@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { Ellipse } from './Ellipse';
 import { EllipseLayer, LayerType } from '@/types/canvas';
 import '@testing-library/jest-dom';
@@ -52,5 +52,24 @@ describe('Ellipse', () => {
 
         const ellipseElement = container.querySelector('ellipse');
         expect(ellipseElement).toHaveAttribute('stroke', 'transparent');
+    });
+
+    it('calls onPointerDown when the ellipse is clicked', () => {
+        const { container } = render(
+            <Ellipse
+                id="1"
+                layer={mockLayer}
+                onPointerDown={mockOnPointerDown}
+                selectionColor="blue"
+            />,
+        );
+
+        const ellipseElement = container.querySelector('ellipse');
+        expect(ellipseElement).toBeInTheDocument();
+
+        fireEvent.pointerDown(ellipseElement!);
+
+        expect(mockOnPointerDown).toHaveBeenCalledTimes(1);
+        expect(mockOnPointerDown).toHaveBeenCalledWith(expect.any(Object), '1');
     });
 });
