@@ -28,6 +28,7 @@
     "more": "more",
     "rectangle": "rectangle",
     "ellipse": "ellipse",
-    "stickyNote": "sticky note"
+    "stickyNote": "sticky note",
+    "lineWidth": "line width"
   }
 }
