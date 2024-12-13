@@ -1,17 +1,20 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 interface LineWidthInputProps {
     lineWidth: number;
-    onLineWidthChange: (width: string) => void;
+    onLineWidthChange: (width: number) => void;
 }
 
 export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
     ({ lineWidth, onLineWidthChange }) => {
         const t = useTranslations('tools');
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            onLineWidthChange(e.target.value);
-        };
+        const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+            const width = parseInt(e.target.value, 10);
+            if (!isNaN(width)) {
+                onLineWidthChange(width);
+            }
+        }, [onLineWidthChange]);
 
         return (
             <div className="flex flex-col mb-2">
