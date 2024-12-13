@@ -92,9 +92,9 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     });
     const [transparentFill, setTransparentFill] = useState(false);
     const [lineWidth, setLineWidth] = useState<number>(2);
-    const [fontName, setFontName] = useState<string>('Arial');
+    const [fontName, setFontName] = useState<string>('Kalam');
     const [fontSize, setFontSize] = useState<number>(14);
-    const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Left);
+    const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Center);
     const [textFormat, setTextFormat] = useState<TextFormat[]>([
         TextFormat.None,
     ]);
@@ -548,7 +548,18 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             }
             setMoved(false);
         },
-        [camera, canvasState, editable, insertLayer, insertPath, moved, pencilDraft, scale, svgRect, unselectLayers],
+        [
+            camera,
+            canvasState,
+            editable,
+            insertLayer,
+            insertPath,
+            moved,
+            pencilDraft,
+            scale,
+            svgRect,
+            unselectLayers,
+        ],
     );
 
     const onPointerLeave = useCallback(() => {
@@ -751,26 +762,31 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                         ? setLayerColor
                                         : setLastUsedColor
                                 }
+                                lineWidth={lineWidth}
                                 onLineWidthChange={
                                     selection.length === 1
                                         ? setLayerLineWidth
                                         : setLineWidth
                                 }
+                                fontName={fontName}
                                 onFontChange={
                                     selection.length === 1
                                         ? setLayerFont
                                         : setFontName
                                 }
+                                fontSize={fontSize}
                                 onFontSizeChange={
                                     selection.length === 1
                                         ? setLayerFontSize
                                         : setFontSize
                                 }
+                                fontAlign={textAlign}
                                 onTextAlignChange={
                                     selection.length === 1
                                         ? setLayerTextAlign
                                         : setTextAlign
                                 }
+                                fontFormat={textFormat}
                                 onTextFormatChange={
                                     selection.length === 1
                                         ? setLayerTextFormat
@@ -789,6 +805,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                                         });
                                     }
                                 }}
+                                transparentFill={transparentFill}
                                 onTransparentFillChange={
                                     selection.length === 1
                                         ? setLayerTransparent
