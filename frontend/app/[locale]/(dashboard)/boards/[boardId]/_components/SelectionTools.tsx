@@ -13,9 +13,7 @@ import { TextFormatPicker } from './TextFormatPicker';
 
 interface SelectionToolsProps {
     selectedLayers: Layer[];
-    lastUsedColor: Color;
     onColorChange: (color: Color) => void;
-
     onLineWidthChange?: (width: number) => void;
     onFontChange?: (fontName: string) => void;
     onFontSizeChange?: (size: number) => void;
@@ -24,23 +22,23 @@ interface SelectionToolsProps {
     onPositionChange?: (x: number, y: number) => void;
     onSizeChange?: (width: number, height: number) => void;
     onTransparentFillChange?: (transparent: boolean) => void;
-
     className?: string;
 }
 
 export const SelectionTools = memo(
     ({
-         selectedLayers,
-         onColorChange,
-         onLineWidthChange,
-         onFontChange,
-         onFontSizeChange,
-         onTextFormatChange,
-         onPositionChange,
-         onSizeChange,
-         onTransparentFillChange,
-         className = '',
-     }: SelectionToolsProps) => {
+        selectedLayers,
+        onColorChange,
+        onLineWidthChange,
+        onFontChange,
+        onFontSizeChange,
+        onTextAlignChange,
+        onTextFormatChange,
+        onPositionChange,
+        onSizeChange,
+        onTransparentFillChange,
+        className = '',
+    }: SelectionToolsProps) => {
         const singleSelected = selectedLayers.length === 1;
         const multiSelected = selectedLayers.length > 1;
 
@@ -147,41 +145,20 @@ export const SelectionTools = memo(
         );
 
         const handleFormatChange = useCallback(
-            (
-                textFormatting: Partial<{
-                    format: TextFormat[];
-                    align: TextAlign;
-                }>,
-            ) => {
-                const newFormat = textFormatting.format ?? format;
-                const newAlign = textFormatting.align ?? align;
+            (textFormatting: {
+                textFormat?: TextFormat[];
+                textAlign?: TextAlign;
+            }) => {
+                const newFormat = textFormatting.textFormat ?? format;
+                const newAlign = textFormatting.textAlign ?? align;
 
                 setFormat(newFormat);
                 setAlign(newAlign);
 
-                const updatedFormats: TextFormat[] = [];
-                if (newFormat.length > 0) {
-                    updatedFormats.push(...newFormat);
-                }
-                if (newAlign) {
-                    switch (newAlign) {
-                        case TextAlign.Left:
-                            updatedFormats.push(TextAlign.Left);
-                            break;
-                        case TextAlign.Center:
-                            updatedFormats.push(TextAlign.Center);
-                            break;
-                        case TextAlign.Right:
-                            updatedFormats.push(TextAlign.Right);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                onTextFormatChange?.(updatedFormats);
+                onTextFormatChange?.(newFormat);
+                onTextAlignChange?.(newAlign);
             },
-            [format, align, onTextFormatChange],
+            [format, align, onTextFormatChange, onTextAlignChange],
         );
 
         const handlePositionChange = useCallback(
@@ -296,10 +273,8 @@ export const SelectionTools = memo(
                         <Toolbar.Separator className="my-2 h-px bg-mauve6" />
 
                         <TextFormatPicker
-                            bold={bold}
-                            italic={italic}
-                            strike={strike}
-                            align={align}
+                            textFormat={format}
+                            textAlign={align}
                             onFormatChange={handleFormatChange}
                         />
                     </>
