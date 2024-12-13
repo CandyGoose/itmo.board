@@ -1,21 +1,21 @@
 import { Kalam } from 'next/font/google';
-import { ContentEditableEvent } from 'react-contenteditable';
-import { NoteLayer } from '@/types/canvas';
+import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, CSSProperties } from 'react';
 
 const font = Kalam({
     subsets: ['latin'],
     weight: ['400'],
 });
 
+export const MIN_FONT_SIZE = 7;
+export const MAX_FONT_SIZE = 72;
+
 export const calculateFontSize = (
     width: number,
     height: number,
     text: string,
 ) => {
-    const maxFontSize = 72;
-    const minFontSize = 7;
     const scaleFactor = 0.15;
 
     const fontSizeBasedOnHeight = height * scaleFactor;
@@ -24,7 +24,7 @@ export const calculateFontSize = (
     let fontSize = Math.min(
         fontSizeBasedOnHeight,
         fontSizeBasedOnWidth,
-        maxFontSize,
+        MAX_FONT_SIZE,
     );
 
     const testElement = document.createElement('div');
@@ -38,7 +38,7 @@ export const calculateFontSize = (
     testElement.textContent = text;
     document.body.appendChild(testElement);
 
-    while (testElement.offsetHeight > height && fontSize >= minFontSize) {
+    while (testElement.offsetHeight > height && fontSize >= MIN_FONT_SIZE) {
         fontSize -= 1;
         testElement.style.fontSize = `${fontSize}px`;
     }
@@ -60,17 +60,27 @@ export const Note = ({
     id,
     selectionColor,
 }: NoteProps) => {
-    const { x, y, width, height, fill, value } = layer;
+    const {
+        x,
+        y,
+        width,
+        height,
+        fill,
+        value,
+        fontName,
+        fontSize: initialFontSize,
+        textAlign,
+        textFormat,
+    } = layer;
+
     const [noteValue, setNoteValue] = useState(value || 'Text');
-    const [fontSize, setFontSize] = useState(72);
+    const [fontSize, setFontSize] = useState(initialFontSize);
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
-    const handleContentChange = (e: ContentEditableEvent) => {
-        if (inputRef.current) {
-            inputRef.current.textContent = e.currentTarget.textContent;
-        }
-        setNoteValue(e.currentTarget.textContent || '');
+    const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
+        const newText = e.currentTarget.textContent || '';
+        setNoteValue(newText);
     };
 
     const textColor = fill ? getContrastingTextColor(fill) : '#000';
@@ -91,10 +101,27 @@ export const Note = ({
             );
 
             if (newFontSize !== fontSize) {
-                setFontSize(() => newFontSize);
+                setFontSize(newFontSize);
             }
         }
-    }, [noteValue, fontSize, width, height]);
+    }, [noteValue, fontSize]);
+
+    const applyTextFormat = (format: TextFormat[]): CSSProperties => {
+        return {
+            fontWeight: format.includes(TextFormat.Bold) ? 'bold' : undefined,
+            fontStyle: format.includes(TextFormat.Italic) ? 'italic' : undefined,
+            textDecoration: format.includes(TextFormat.Strike) ? 'line-through' : undefined,
+        };
+    };
+
+    const applyTextAlign = (align: TextAlign): CSSProperties => {
+        const alignmentMap: Record<TextAlign, CSSProperties> = {
+            [TextAlign.Left]: { textAlign: 'start' },
+            [TextAlign.Center]: { textAlign: 'center' },
+            [TextAlign.Right]: { textAlign: 'end' },
+        };
+        return alignmentMap[align] || { textAlign: 'center' };
+    };
 
     return (
         <foreignObject
@@ -112,7 +139,7 @@ export const Note = ({
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center text-center"
+                className="h-full w-full flex flex-col items-center justify-center"
                 style={{
                     backgroundColor: backgroundColor,
                 }}
@@ -121,12 +148,15 @@ export const Note = ({
                     contentEditable
                     ref={inputRef}
                     className={cn(
-                        'h-full w-full flex flex-col items-center justify-center text-center outline-none',
-                        font.className,
+                        'h-full w-full flex flex-col justify-center outline-none',
+                        fontName === 'Kalam' ? font : '', // includes the font
                     )}
                     style={{
                         fontSize: `${fontSize}px`,
                         color: textColor,
+                        fontFamily: fontName,
+                        ...applyTextAlign(textAlign),
+                        ...applyTextFormat(textFormat),
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
                     }}

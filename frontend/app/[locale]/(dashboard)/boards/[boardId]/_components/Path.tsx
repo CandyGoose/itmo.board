@@ -40,7 +40,7 @@ export const Path = memo(
             });
             const optimizedStroke = optimizeStroke(stroke);
             return getSvgPathFromStroke(optimizedStroke);
-        }, [points]);
+        }, [lineWidth, points]);
 
         const originalBoundingBox = useMemo(() => {
             const xs = points.map((p) => p[0]);
@@ -72,7 +72,7 @@ export const Path = memo(
                 y={y}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={lineWidth ?? 1}
+                strokeWidth={0.5}
             />
         );
     },
