@@ -523,13 +523,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
 
     const onPointerUp = useCallback(
         (e: React.PointerEvent) => {
-            setIsPanning(false);
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
             if (
                 canvasState.mode === CanvasMode.None ||
                 canvasState.mode === CanvasMode.Pressing
             ) {
-                unselectLayers();
+                if (!isPanning) {
+                    unselectLayers();
+                }
                 setCanvasState({
                     mode: CanvasMode.None,
                 });
@@ -542,6 +543,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                     mode: CanvasMode.None,
                 });
             }
+            setIsPanning(false);
         },
         [
             camera,
@@ -549,6 +551,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             editable,
             insertLayer,
             insertPath,
+            isPanning,
             pencilDraft,
             scale,
             svgRect,
