@@ -10,6 +10,7 @@ import { LineWidthInput } from './LineWidthInput';
 import { TwoValueInput } from './TwoValueInput';
 import { FontPicker } from './FontPicker';
 import { TextFormatPicker } from './TextFormatPicker';
+import { useTranslations } from 'next-intl';
 
 interface SelectionToolsProps {
     selectedLayers: Layer[];
@@ -51,6 +52,7 @@ export const SelectionTools = memo(
         onTransparentFillChange,
         className = '',
     }: SelectionToolsProps) => {
+        const t = useTranslations('tools');
         const singleSelected = selectedLayers.length === 1;
         const multiSelected = selectedLayers.length > 1;
 
@@ -189,7 +191,8 @@ export const SelectionTools = memo(
                 {selectedLayer && (
                     <>
                         <TwoValueInput
-                            label="X,Y Position:"
+                            label1={'X'}
+                            label2={'Y'}
                             value1={selectedLayer.x}
                             value2={selectedLayer.y}
                             onChange1={(val) =>
@@ -206,7 +209,8 @@ export const SelectionTools = memo(
                             }
                         />
                         <TwoValueInput
-                            label="Width,Height:"
+                            label1={t('width')}
+                            label2={t('height')}
                             value1={selectedLayer.width}
                             value2={selectedLayer.height}
                             onChange1={(val) =>

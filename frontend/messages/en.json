@@ -29,6 +29,11 @@
     "rectangle": "rectangle",
     "ellipse": "ellipse",
     "stickyNote": "sticky note",
-    "lineWidth": "line width"
+    "lineWidth": "Line width",
+    "transparentFill": "Transparent fill",
+    "width": "Width",
+    "height": "Height",
+    "font": "Font",
+    "fontSize": "Font size"
   }
 }
