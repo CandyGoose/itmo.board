@@ -1,7 +1,14 @@
 import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect, CSSProperties } from 'react';
+import {
+    useState,
+    useRef,
+    useEffect,
+    CSSProperties,
+    useCallback,
+    useMemo,
+} from 'react';
 
 const font = Kalam({
     subsets: ['latin'],
@@ -66,28 +73,37 @@ export const Note = ({
         width,
         height,
         fill,
-        value,
+        value = 'Text',
         fontName,
         fontSize: initialFontSize,
         textAlign,
         textFormat,
     } = layer;
 
-    const [noteValue, setNoteValue] = useState(value || 'Text');
+    const [noteValue, setNoteValue] = useState(value);
     const [fontSize, setFontSize] = useState(initialFontSize);
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
-    const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-        const newText = e.currentTarget.textContent || '';
-        setNoteValue(newText);
-    };
+    const handleContentChange = useCallback(
+        (e: React.FormEvent<HTMLDivElement>) => {
+            setNoteValue(e.currentTarget.textContent || '');
+        },
+        [],
+    );
 
-    const textColor = fill ? getContrastingTextColor(fill) : '#000';
-    const backgroundColor = fill ? colorToCss(fill) : 'transparent';
-    const outlineStyle = selectionColor
-        ? `1px solid ${selectionColor}`
-        : 'none';
+    const textColor = useMemo(
+        () => (fill ? getContrastingTextColor(fill) : '#000'),
+        [fill],
+    );
+    const backgroundColor = useMemo(
+        () => (fill ? colorToCss(fill) : 'transparent'),
+        [fill],
+    );
+    const outlineStyle = useMemo(
+        () => (selectionColor ? `1px solid ${selectionColor}` : 'none'),
+        [selectionColor],
+    );
 
     useEffect(() => {
         if (containerRef.current) {
@@ -106,22 +122,36 @@ export const Note = ({
         }
     }, [noteValue, fontSize]);
 
-    const applyTextFormat = (format: TextFormat[]): CSSProperties => {
-        return {
-            fontWeight: format.includes(TextFormat.Bold) ? 'bold' : undefined,
-            fontStyle: format.includes(TextFormat.Italic) ? 'italic' : undefined,
-            textDecoration: format.includes(TextFormat.Strike) ? 'line-through' : undefined,
-        };
-    };
+    const applyTextFormat = useMemo<CSSProperties>(() => {
+        const styles: CSSProperties = {};
+        if (textFormat.includes(TextFormat.Bold)) styles.fontWeight = 'bold';
+        if (textFormat.includes(TextFormat.Italic)) styles.fontStyle = 'italic';
+        if (textFormat.includes(TextFormat.Strike))
+            styles.textDecoration = 'line-through';
+        return styles;
+    }, [textFormat]);
 
-    const applyTextAlign = (align: TextAlign): CSSProperties => {
-        const alignmentMap: Record<TextAlign, CSSProperties> = {
-            [TextAlign.Left]: { textAlign: 'start' },
-            [TextAlign.Center]: { textAlign: 'center' },
-            [TextAlign.Right]: { textAlign: 'end' },
+    const applyTextAlign = useMemo<CSSProperties>(() => {
+        const alignmentMap: Record<TextAlign, CSSProperties['textAlign']> = {
+            [TextAlign.Left]: 'start',
+            [TextAlign.Center]: 'center',
+            [TextAlign.Right]: 'end',
         };
-        return alignmentMap[align] || { textAlign: 'center' };
-    };
+        return { textAlign: alignmentMap[textAlign] || 'center' };
+    }, [textAlign]);
+
+    const textStyle = useMemo<CSSProperties>(
+        () => ({
+            fontSize: `${fontSize}px`,
+            color: textColor,
+            fontFamily: fontName,
+            ...applyTextAlign,
+            ...applyTextFormat,
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+        }),
+        [fontSize, textColor, fontName, applyTextAlign, applyTextFormat]
+    );
 
     return (
         <foreignObject
@@ -149,17 +179,9 @@ export const Note = ({
                     ref={inputRef}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
-                        fontName === 'Kalam' ? font : '', // includes the font
+                        fontName === 'Kalam' ? font.className : ''
                     )}
-                    style={{
-                        fontSize: `${fontSize}px`,
-                        color: textColor,
-                        fontFamily: fontName,
-                        ...applyTextAlign(textAlign),
-                        ...applyTextFormat(textFormat),
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                    }}
+                    style={textStyle}
                     onInput={handleContentChange}
                 />
             </div>
