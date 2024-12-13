@@ -103,4 +103,17 @@ describe('BoardCard Component', () => {
         expect(mockPush).toHaveBeenCalledWith(`boards/${defaultProps.id}`);
         expect(card).toHaveClass('cursor-pointer');
     });
+
+    test('displays "Teammate" when authorId does not match UserID and user is null', async () => {
+        // Mock useClerk to return null for the user
+        mockUseClerk.mockReturnValue({ user: null });
+
+        render(<BoardCard {...defaultProps} authorId="456" />);
+
+        await waitFor(() => {
+            expect(
+                screen.getByText((content) => content.includes('Teammate')),
+            ).toBeInTheDocument();
+        });
+    });
 });
