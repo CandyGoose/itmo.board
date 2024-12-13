@@ -25,7 +25,7 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                 />
                 <div
                     className="bg-black"
-                    style={{ width: '40px', height: `${lineWidth}px` }}
+                    style={{ width: '36px', height: `${lineWidth}px` }}
                 />
             </div>
         );
