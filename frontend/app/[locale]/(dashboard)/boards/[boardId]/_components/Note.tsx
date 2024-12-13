@@ -150,7 +150,7 @@ export const Note = ({
             whiteSpace: 'normal',
             wordBreak: 'break-word',
         }),
-        [fontSize, textColor, fontName, applyTextAlign, applyTextFormat]
+        [fontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
 
     return (
@@ -179,7 +179,7 @@ export const Note = ({
                     ref={inputRef}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
-                        fontName === 'Kalam' ? font.className : ''
+                        fontName === 'Kalam' ? font.className : '',
                     )}
                     style={textStyle}
                     onInput={handleContentChange}
