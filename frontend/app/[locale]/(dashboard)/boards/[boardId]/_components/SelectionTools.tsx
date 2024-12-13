@@ -126,16 +126,10 @@ export const SelectionTools = memo(
                             value1={selectedLayer.x}
                             value2={selectedLayer.y}
                             onChange1={(val) =>
-                                onPositionChange(
-                                    val,
-                                    selectedLayer.y,
-                                )
+                                onPositionChange(val, selectedLayer.y)
                             }
                             onChange2={(val) =>
-                                onPositionChange(
-                                    selectedLayer.x,
-                                    val,
-                                )
+                                onPositionChange(selectedLayer.x, val)
                             }
                             className="mb-1"
                         />
@@ -145,16 +139,10 @@ export const SelectionTools = memo(
                             value1={selectedLayer.width}
                             value2={selectedLayer.height}
                             onChange1={(val) =>
-                                onSizeChange(
-                                    val,
-                                    selectedLayer.height,
-                                )
+                                onSizeChange(val, selectedLayer.height)
                             }
                             onChange2={(val) =>
-                                onSizeChange(
-                                    selectedLayer.width,
-                                    val,
-                                )
+                                onSizeChange(selectedLayer.width, val)
                             }
                             className="mb-2"
                         />
