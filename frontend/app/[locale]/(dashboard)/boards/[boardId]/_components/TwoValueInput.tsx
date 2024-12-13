@@ -5,8 +5,8 @@ interface TwoValueInputProps {
     label2: string;
     value1: number;
     value2: number;
-    onChange1: (value: string) => void;
-    onChange2: (value: string) => void;
+    onChange1: (value: number) => void;
+    onChange2: (value: number) => void;
     className?: string;
 }
 
@@ -19,7 +19,7 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                     <input
                         type="number"
                         value={value1}
-                        onChange={(e) => onChange1(e.target.value)}
+                        onChange={(e) => onChange1(parseFloat(e.target.value))}
                         className="border rounded p-1 text-sm w-full"
                     />
                 </div>
@@ -28,7 +28,7 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                     <input
                         type="number"
                         value={value2}
-                        onChange={(e) => onChange2(e.target.value)}
+                        onChange={(e) => onChange2(parseFloat(e.target.value))}
                         className="border rounded p-1 text-sm w-full"
                     />
                 </div>

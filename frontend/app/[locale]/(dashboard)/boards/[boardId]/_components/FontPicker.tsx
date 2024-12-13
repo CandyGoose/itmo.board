@@ -15,7 +15,7 @@ interface FontPickerProps {
     fontName: string;
     onFontChange: (fontName: string) => void;
     fontSize: number;
-    onFontSizeChange: (size: string) => void;
+    onFontSizeChange: (size: number) => void;
 }
 
 export const FontPicker: React.FC<FontPickerProps> = memo(
@@ -27,7 +27,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                 MIN_FONT_SIZE,
                 Math.min(MAX_FONT_SIZE, parseInt(value, 10) || MIN_FONT_SIZE),
             );
-            onFontSizeChange(numericValue.toString());
+            onFontSizeChange(numericValue);
         };
 
         return (
@@ -69,7 +69,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                     <input
                         type="number"
                         value={fontSize}
-                        onChange={(e) => onFontSizeChange(e.target.value)}
+                        onChange={(e) => onFontSizeChange(parseInt(e.target.value, 10))}
                         onBlur={(e) => handleFontSizeBlur(e.target.value)}
                         className="border rounded p-1 text-sm w-full"
                         min={MIN_FONT_SIZE}

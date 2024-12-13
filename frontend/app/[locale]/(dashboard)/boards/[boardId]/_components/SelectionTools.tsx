@@ -61,54 +61,6 @@ export const SelectionTools = memo(
         const isNote = singleSelected && selectedLayer?.type === LayerType.Note;
         const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
 
-        // Handle changes
-        const handleColorChange = useCallback(
-            (color: Color) => {
-                onColorChange(color);
-                // Optionally, update the selected layer's color here
-                // Example:
-                // if (selectedLayer) {
-                //     updateLayerColor(selectedLayer.id, color);
-                // }
-            },
-            [onColorChange],
-        );
-
-        const handleTransparentChange = useCallback(
-            (checked: boolean) => {
-                onTransparentFillChange(checked);
-                // Optionally, update the selected layer's transparency here
-            },
-            [onTransparentFillChange],
-        );
-
-        const handleLineWidthChange = useCallback(
-            (val: string) => {
-                const width = parseInt(val, 10);
-                if (!isNaN(width)) {
-                    onLineWidthChange(width);
-                }
-            },
-            [onLineWidthChange],
-        );
-
-        const handleFontChange = useCallback(
-            (font: string) => {
-                onFontChange(font);
-            },
-            [onFontChange],
-        );
-
-        const handleFontSizeChange = useCallback(
-            (val: string) => {
-                const size = parseInt(val, 10);
-                if (!isNaN(size)) {
-                    onFontSizeChange(size);
-                }
-            },
-            [onFontSizeChange],
-        );
-
         const handleFormatChange = useCallback(
             (textFormatting: {
                 textFormat?: TextFormat[];
@@ -118,28 +70,6 @@ export const SelectionTools = memo(
                 onTextAlignChange?.(textFormatting.textAlign ?? fontAlign);
             },
             [onTextFormatChange, fontFormat, onTextAlignChange, fontAlign],
-        );
-
-        const handlePositionChange = useCallback(
-            (coordX: string, coordY: string) => {
-                const newX = parseFloat(coordX);
-                const newY = parseFloat(coordY);
-                if (!isNaN(newX) && !isNaN(newY)) {
-                    onPositionChange(newX, newY);
-                }
-            },
-            [onPositionChange],
-        );
-
-        const handleSizeChange = useCallback(
-            (widthVal: string, heightVal: string) => {
-                const newW = parseFloat(widthVal);
-                const newH = parseFloat(heightVal);
-                if (!isNaN(newW) && !isNaN(newH)) {
-                    onSizeChange(newW, newH);
-                }
-            },
-            [onSizeChange],
         );
 
         // If multiple selected, show nothing
@@ -160,7 +90,7 @@ export const SelectionTools = memo(
                 {(selectedLayer || !selectedLayer) && (
                     <>
                         <div className="mb-2">
-                            <ColorPicker onChangeAction={handleColorChange} />
+                            <ColorPicker onChangeAction={onColorChange} />
                             {!isPath && (
                                 <TransparentFillChecker
                                     transparentFill={
@@ -169,7 +99,7 @@ export const SelectionTools = memo(
                                             : transparentFill
                                     }
                                     onTransparentFillChange={
-                                        handleTransparentChange
+                                        onTransparentFillChange
                                     }
                                 />
                             )}
@@ -182,7 +112,7 @@ export const SelectionTools = memo(
                     <>
                         <LineWidthInput
                             lineWidth={selectedLayer?.lineWidth ?? lineWidth}
-                            onLineWidthChange={handleLineWidthChange}
+                            onLineWidthChange={onLineWidthChange}
                         />
                     </>
                 )}
@@ -196,14 +126,14 @@ export const SelectionTools = memo(
                             value1={selectedLayer.x}
                             value2={selectedLayer.y}
                             onChange1={(val) =>
-                                handlePositionChange(
+                                onPositionChange(
                                     val,
-                                    selectedLayer.y.toString(),
+                                    selectedLayer.y,
                                 )
                             }
                             onChange2={(val) =>
-                                handlePositionChange(
-                                    selectedLayer.x.toString(),
+                                onPositionChange(
+                                    selectedLayer.x,
                                     val,
                                 )
                             }
@@ -215,14 +145,14 @@ export const SelectionTools = memo(
                             value1={selectedLayer.width}
                             value2={selectedLayer.height}
                             onChange1={(val) =>
-                                handleSizeChange(
+                                onSizeChange(
                                     val,
-                                    selectedLayer.height.toString(),
+                                    selectedLayer.height,
                                 )
                             }
                             onChange2={(val) =>
-                                handleSizeChange(
-                                    selectedLayer.width.toString(),
+                                onSizeChange(
+                                    selectedLayer.width,
                                     val,
                                 )
                             }
@@ -238,9 +168,9 @@ export const SelectionTools = memo(
                             fontName={
                                 selectedLayer.fontName ?? fontName ?? 'Kalam'
                             }
-                            onFontChange={handleFontChange}
+                            onFontChange={onFontChange}
                             fontSize={selectedLayer.fontSize ?? fontSize ?? 14}
-                            onFontSizeChange={handleFontSizeChange}
+                            onFontSizeChange={onFontSizeChange}
                         />
                         <TextFormatPicker
                             textFormat={

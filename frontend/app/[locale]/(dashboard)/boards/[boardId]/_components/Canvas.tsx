@@ -600,7 +600,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         setSelection([...layerIds]);
     }, [layerIds]);
 
-    // TODO: move these functions to SelectionTools
+    // Functions for SelectionTools
     const setLayerColor = useCallback(
         (color: Color) => {
             selection.forEach((id) => {
