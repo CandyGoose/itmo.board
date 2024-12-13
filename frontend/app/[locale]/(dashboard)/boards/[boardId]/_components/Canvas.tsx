@@ -57,6 +57,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
     const [isPanning, setIsPanning] = useState(false);
+    const [moved, setMoved] = useState(false);
     const [lastPointerPosition, setLastPointerPosition] = useState({
         x: 0,
         y: 0,
@@ -501,6 +502,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                             y: prev.y + dy,
                         }));
                         setLastPointerPosition({ x: e.clientX, y: e.clientY });
+                        setMoved(true);
                     }
             }
         },
@@ -523,12 +525,13 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
 
     const onPointerUp = useCallback(
         (e: React.PointerEvent) => {
+            setIsPanning(false);
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
             if (
                 canvasState.mode === CanvasMode.None ||
                 canvasState.mode === CanvasMode.Pressing
             ) {
-                if (!isPanning) {
+                if (!moved) {
                     unselectLayers();
                 }
                 setCanvasState({
@@ -543,20 +546,9 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                     mode: CanvasMode.None,
                 });
             }
-            setIsPanning(false);
+            setMoved(false);
         },
-        [
-            camera,
-            canvasState,
-            editable,
-            insertLayer,
-            insertPath,
-            isPanning,
-            pencilDraft,
-            scale,
-            svgRect,
-            unselectLayers,
-        ],
+        [camera, canvasState, editable, insertLayer, insertPath, moved, pencilDraft, scale, svgRect, unselectLayers],
     );
 
     const onPointerLeave = useCallback(() => {
