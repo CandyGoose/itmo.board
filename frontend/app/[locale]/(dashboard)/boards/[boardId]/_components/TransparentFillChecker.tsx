@@ -10,7 +10,7 @@ export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> =
     memo(({ transparentFill, onTransparentFillChange }) => {
         const t = useTranslations('tools');
         return (
-            <div className="flex items-center mt-2">
+            <div className="flex items-center justify-center mt-1">
                 <input
                     type="checkbox"
                     checked={transparentFill}

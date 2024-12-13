@@ -70,7 +70,9 @@ const ToolbarToggleItem = memo(
         onChange: (value: string) => void;
     }) => (
         <Toolbar.ToggleItem
-            className="inline-flex h-[25px] items-center justify-center rounded bg-white px-[5px] text-[13px] hover:bg-violet3"
+            className="inline-flex h-[25px] items-center justify-center rounded px-[5px] text-[13px]
+            bg-white text-black hover:bg-gray-300
+            data-[state=on]:bg-gray-500 data-[state=on]:text-white"
             value={value}
             aria-label={ariaLabel}
             data-state={selected ? 'on' : 'off'}
