@@ -27,6 +27,7 @@
     "more": "больше",
     "rectangle": "квадрат",
     "ellipse": "эллипс",
-    "stickyNote": "заметка"
+    "stickyNote": "заметка",
+    "lineWidth": "толщина линии"
   }
 }
