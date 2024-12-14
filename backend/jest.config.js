@@ -1,6 +1,6 @@
 module.exports = {
     preset: 'ts-jest',
-    testEnvironment: 'jest-environment-jsdom',
+    testEnvironment: 'node',
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
     testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -15,4 +15,5 @@ module.exports = {
     },
     coverageDirectory: 'coverage',
     coverageReporters: ['json', 'lcov', 'text', 'clover'],
+    setupFiles: ["<rootDir>/jest.setup.js"]
 };
