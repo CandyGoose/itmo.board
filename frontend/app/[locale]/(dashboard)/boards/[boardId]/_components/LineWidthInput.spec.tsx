@@ -13,15 +13,17 @@ jest.mock('next-intl', () => ({
 }));
 
 describe('LineWidthInput', () => {
-
     const mockOnLineWidthChange = jest.fn();
 
-    const renderComponent = (lineWidth: number = 1, onLineWidthChange = mockOnLineWidthChange) => {
+    const renderComponent = (
+        lineWidth: number = 1,
+        onLineWidthChange = mockOnLineWidthChange,
+    ) => {
         render(
             <LineWidthInput
                 lineWidth={lineWidth}
                 onLineWidthChange={onLineWidthChange}
-            />
+            />,
         );
     };
 
@@ -90,13 +92,21 @@ describe('LineWidthInput', () => {
 
     it('updates the preview div height when lineWidth prop changes', () => {
         const { rerender } = render(
-            <LineWidthInput lineWidth={2} onLineWidthChange={mockOnLineWidthChange} />
+            <LineWidthInput
+                lineWidth={2}
+                onLineWidthChange={mockOnLineWidthChange}
+            />,
         );
 
         const previewDiv = screen.getByRole('presentation', { hidden: true });
         expect(previewDiv).toHaveStyle('height: 2px');
 
-        rerender(<LineWidthInput lineWidth={8} onLineWidthChange={mockOnLineWidthChange} />);
+        rerender(
+            <LineWidthInput
+                lineWidth={8}
+                onLineWidthChange={mockOnLineWidthChange}
+            />,
+        );
         expect(previewDiv).toHaveStyle('height: 8px');
     });
 });

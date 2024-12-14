@@ -6,8 +6,8 @@ interface TransparentFillCheckerProps {
     onTransparentFillChange: (checked: boolean) => void;
 }
 
-export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> = memo(
-    ({ transparentFill, onTransparentFillChange }) => {
+export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> =
+    memo(({ transparentFill, onTransparentFillChange }) => {
         const t = useTranslations('tools');
         return (
             <div className="flex items-center justify-center mt-1">
@@ -23,7 +23,6 @@ export const TransparentFillChecker: React.FC<TransparentFillCheckerProps> = mem
                 </label>
             </div>
         );
-    },
-);
+    });
 
 TransparentFillChecker.displayName = 'TransparentFillChecker';

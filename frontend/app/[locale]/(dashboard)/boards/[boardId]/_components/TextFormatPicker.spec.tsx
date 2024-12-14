@@ -20,7 +20,7 @@ describe('TextFormatPicker', () => {
     const renderComponent = (
         textFormat: TextFormat[] = [],
         textAlign: TextAlign = TextAlign.Left,
-        onFormatChange = mockOnFormatChange
+        onFormatChange = mockOnFormatChange,
     ) => {
         render(
             <Toolbar.Root>
@@ -29,7 +29,7 @@ describe('TextFormatPicker', () => {
                     textAlign={textAlign}
                     onFormatChange={onFormatChange}
                 />
-            </Toolbar.Root>
+            </Toolbar.Root>,
         );
     };
 
@@ -147,8 +147,12 @@ describe('TextFormatPicker', () => {
     it('renders the correct number of formatting and alignment buttons', () => {
         renderComponent();
 
-        const formattingButtons = screen.getAllByRole('button', { name: /Bold|Italic|Strike Through/ });
-        const alignmentButtons = screen.getAllByRole('radio', { name: /Left Aligned|Center Aligned|Right Aligned/ });
+        const formattingButtons = screen.getAllByRole('button', {
+            name: /Bold|Italic|Strike Through/,
+        });
+        const alignmentButtons = screen.getAllByRole('radio', {
+            name: /Left Aligned|Center Aligned|Right Aligned/,
+        });
 
         expect(formattingButtons).toHaveLength(3);
         expect(alignmentButtons).toHaveLength(3);
