@@ -122,6 +122,12 @@ export const Note = ({
         }
     }, [noteValue, fontSize]);
 
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.textContent = layer.value ?? null;
+        }
+    }, [layer.value]);
+
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
         if (textFormat.includes(TextFormat.Bold)) styles.fontWeight = 'bold';

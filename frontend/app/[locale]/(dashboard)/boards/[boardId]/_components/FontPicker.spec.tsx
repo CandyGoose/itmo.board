@@ -4,7 +4,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'; // Import userEvent
 import '@testing-library/jest-dom';
 import { FontPicker } from './FontPicker';
-import { MAX_FONT_SIZE, MIN_FONT_SIZE } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import {
+    MAX_FONT_SIZE,
+    MIN_FONT_SIZE,
+} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => {
@@ -29,11 +32,11 @@ const FontPickerWrapper: React.FC<{
     onFontChange?: jest.Mock;
     onFontSizeChange?: jest.Mock;
 }> = ({
-          initialFontName = 'Kalam',
-          initialFontSize = 12,
-          onFontChange = jest.fn(),
-          onFontSizeChange = jest.fn(),
-      }) => {
+    initialFontName = 'Kalam',
+    initialFontSize = 12,
+    onFontChange = jest.fn(),
+    onFontSizeChange = jest.fn(),
+}) => {
     const [fontName, setFontName] = useState(initialFontName);
     const [fontSize, setFontSize] = useState(initialFontSize);
 
@@ -61,7 +64,10 @@ describe('FontPicker', () => {
     const mockOnFontChange = jest.fn();
     const mockOnFontSizeChange = jest.fn();
 
-    const renderComponent = (props: {fontName? : string, fontSize? : number}) => {
+    const renderComponent = (props: {
+        fontName?: string;
+        fontSize?: number;
+    }) => {
         return render(
             <FontPickerWrapper
                 initialFontName={props.fontName}
@@ -69,7 +75,7 @@ describe('FontPicker', () => {
                 onFontChange={mockOnFontChange}
                 onFontSizeChange={mockOnFontSizeChange}
                 {...props}
-            />
+            />,
         );
     };
 
@@ -90,10 +96,18 @@ describe('FontPicker', () => {
         const select = screen.getByLabelText('Font');
         expect(select).toBeInTheDocument();
 
-        expect(screen.getByRole('option', { name: 'Kalam' })).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'Arial' })).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'Times New Roman' })).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'Courier New' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('option', { name: 'Kalam' }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('option', { name: 'Arial' }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('option', { name: 'Times New Roman' }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('option', { name: 'Courier New' }),
+        ).toBeInTheDocument();
     });
 
     it('select shows the correct initial font', () => {

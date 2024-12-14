@@ -20,8 +20,12 @@ describe('TransparentFillChecker Component', () => {
 
     const setup = (props = {}) => {
         const finalProps = { ...defaultProps, ...props };
-        const { container } = render(<TransparentFillChecker {...finalProps} />);
-        const checkbox = screen.getByRole('checkbox', { name: /transparent fill/i });
+        const { container } = render(
+            <TransparentFillChecker {...finalProps} />,
+        );
+        const checkbox = screen.getByRole('checkbox', {
+            name: /transparent fill/i,
+        });
         const label = screen.getByText('Transparent Fill');
         return { container, checkbox, label, props: finalProps };
     };
@@ -57,7 +61,9 @@ describe('TransparentFillChecker Component', () => {
         const { checkbox } = setup({ transparentFill: true });
         fireEvent.click(checkbox);
         expect(defaultProps.onTransparentFillChange).toHaveBeenCalledTimes(1);
-        expect(defaultProps.onTransparentFillChange).toHaveBeenCalledWith(false);
+        expect(defaultProps.onTransparentFillChange).toHaveBeenCalledWith(
+            false,
+        );
     });
 
     test('displays the correct translated label', () => {
