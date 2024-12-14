@@ -2,9 +2,9 @@ const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const boardRoutes = require('../views/board.view');
+const boardRoutes = require('../views/Board.view');
 const app = express();
-const Board = require('../models/board.model');
+const Board = require('../models/Board.model');
 
 let mongoServer;
 beforeAll(async () => {
