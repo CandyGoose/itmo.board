@@ -29,7 +29,7 @@ interface SelectionToolsProps {
     onSizeChange: (width: number, height: number) => void;
     transparentFill: boolean;
     onTransparentFillChange: (transparent: boolean) => void;
-    className: string;
+    className?: string;
 }
 
 export const SelectionTools = memo(
@@ -62,14 +62,12 @@ export const SelectionTools = memo(
         const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
 
         const handleFormatChange = useCallback(
-            (textFormatting: {
-                textFormat?: TextFormat[];
-                textAlign?: TextAlign;
-            }) => {
-                onTextFormatChange(textFormatting.textFormat ?? fontFormat);
-                onTextAlignChange?.(textFormatting.textAlign ?? fontAlign);
+            (format: { textFormat?: TextFormat[]; textAlign?: TextAlign }) => {
+                const { textFormat, textAlign } = format;
+                if (textFormat) onTextFormatChange(textFormat);
+                if (textAlign) onTextAlignChange(textAlign);
             },
-            [onTextFormatChange, fontFormat, onTextAlignChange, fontAlign],
+            [onTextFormatChange, onTextAlignChange],
         );
 
         // If multiple selected, show nothing
@@ -81,48 +79,41 @@ export const SelectionTools = memo(
             <Toolbar.Root
                 data-testid="selection-tools-container"
                 className={cn(
-                    `absolute p-3 rounded-xl bg-white shadow-md border flex select-none flex-col ${className}`,
+                    'absolute p-3 rounded-xl bg-white shadow-md border flex select-none flex-col',
+                    className,
                 )}
                 style={{ right: '8px', width: '200px' }}
                 aria-label="Formatting options"
             >
                 {/* Colors and fill */}
-                {(selectedLayer || !selectedLayer) && (
-                    <>
-                        <div className="mb-2">
-                            <ColorPicker onChangeAction={onColorChange} />
-                            {!isPath && (
-                                <TransparentFillChecker
-                                    transparentFill={
-                                        selectedLayer
-                                            ? selectedLayer.fill === undefined
-                                            : transparentFill
-                                    }
-                                    onTransparentFillChange={
-                                        onTransparentFillChange
-                                    }
-                                />
-                            )}
-                        </div>
-                    </>
-                )}
+                <div className="mb-2">
+                    <ColorPicker onChangeAction={onColorChange} />
+                    {!isPath && (
+                        <TransparentFillChecker
+                            transparentFill={
+                                selectedLayer
+                                    ? selectedLayer.fill === undefined
+                                    : transparentFill
+                            }
+                            onTransparentFillChange={onTransparentFillChange}
+                        />
+                    )}
+                </div>
 
                 {/* Line width */}
-                {(selectedLayer || !selectedLayer) && (
-                    <>
-                        <LineWidthInput
-                            lineWidth={selectedLayer?.lineWidth ?? lineWidth}
-                            onLineWidthChange={onLineWidthChange}
-                        />
-                    </>
-                )}
+                <div className="mb-2">
+                    <LineWidthInput
+                        lineWidth={selectedLayer?.lineWidth ?? lineWidth}
+                        onLineWidthChange={onLineWidthChange}
+                    />
+                </div>
 
                 {/* Coordinates and Size */}
                 {selectedLayer && (
                     <>
                         <TwoValueInput
-                            label1={'X'}
-                            label2={'Y'}
+                            label1="X"
+                            label2="Y"
                             value1={selectedLayer.x}
                             value2={selectedLayer.y}
                             onChange1={(val) =>

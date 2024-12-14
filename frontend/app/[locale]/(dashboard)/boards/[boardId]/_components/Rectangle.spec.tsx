@@ -54,6 +54,19 @@ describe('Rectangle', () => {
         expect(rectElement).toHaveAttribute('stroke', 'transparent');
     });
 
+    it('sets transparent fill color if layer does not have fill', () => {
+        const { container } = render(
+            <Rectangle
+                id="1"
+                layer={{ ...mockLayer, fill: undefined }}
+                onPointerDown={mockOnPointerDown}
+            />,
+        );
+
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('fill', 'transparent');
+    });
+
     it('calls onPointerDown when the rectangle is clicked', () => {
         const { container } = render(
             <Rectangle

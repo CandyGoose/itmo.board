@@ -36,7 +36,7 @@ describe('Ellipse', () => {
         expect(ellipseElement).toHaveAttribute('ry', '25');
         expect(ellipseElement).toHaveAttribute(
             'fill',
-            colorToCss(mockLayer.fill),
+            colorToCss(mockLayer.fill!),
         );
         expect(ellipseElement).toHaveAttribute('stroke', 'blue');
     });
@@ -52,6 +52,19 @@ describe('Ellipse', () => {
 
         const ellipseElement = container.querySelector('ellipse');
         expect(ellipseElement).toHaveAttribute('stroke', 'transparent');
+    });
+
+    it('sets transparent fill color if layer does not have fill', () => {
+        const { container } = render(
+            <Ellipse
+                id="1"
+                layer={{ ...mockLayer, fill: undefined }}
+                onPointerDown={mockOnPointerDown}
+            />,
+        );
+
+        const ellipseElement = container.querySelector('ellipse');
+        expect(ellipseElement).toHaveAttribute('fill', 'transparent');
     });
 
     it('calls onPointerDown when the ellipse is clicked', () => {

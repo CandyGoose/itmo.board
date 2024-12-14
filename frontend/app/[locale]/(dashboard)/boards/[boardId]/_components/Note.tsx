@@ -124,7 +124,11 @@ export const Note = ({
 
     useEffect(() => {
         if (inputRef.current) {
-            inputRef.current.textContent = layer.value ?? null;
+            if (layer.value && layer.value !== '') {
+                inputRef.current.textContent = layer.value;
+            } else {
+                inputRef.current.textContent = 'Text';
+            }
         }
     }, [layer.value]);
 
