@@ -12,7 +12,7 @@ import { FontPicker } from './FontPicker';
 import { TextFormatPicker } from './TextFormatPicker';
 import { useTranslations } from 'next-intl';
 
-interface SelectionToolsProps {
+export interface SelectionToolsProps {
     selectedLayers: Layer[];
     onColorChange: (color: Color) => void;
     lineWidth: number;
