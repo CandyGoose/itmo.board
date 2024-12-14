@@ -33,8 +33,11 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
         return (
             <>
                 <div className="mb-1">
-                    <label className="text-sm mb-1 block">{t('font')}</label>
+                    <label className="text-sm mb-1 block" htmlFor="font-picker">
+                        {t('font')}
+                    </label>
                     <select
+                        id="font-picker"
                         value={fontName}
                         onChange={(e) => onFontChange(e.target.value)}
                         className="border rounded p-1 text-sm w-full"
@@ -63,12 +66,16 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
 
                 {/* Font size */}
                 <div className="mb-2">
-                    <label className="text-sm mb-1 block">
+                    <label
+                        className="text-sm mb-1 block"
+                        htmlFor="font-size-input"
+                    >
                         {t('fontSize')}
                     </label>
                     <input
+                        id="font-size-input"
                         type="number"
-                        value={fontSize}
+                        value={isNaN(fontSize) ? '' : fontSize}
                         onChange={(e) =>
                             onFontSizeChange(parseInt(e.target.value, 10))
                         }

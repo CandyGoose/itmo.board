@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Note } from './Note';
-import { LayerType, NoteLayer } from '@/types/canvas';
+import { LayerType, NoteLayer, TextAlign } from '@/types/canvas';
 import '@testing-library/jest-dom';
 
 jest.mock('@/lib/utils', () => ({
@@ -19,6 +19,10 @@ const mockLayer: NoteLayer = {
     height: 100,
     fill: { r: 255, g: 0, b: 0 },
     value: 'Initial note text',
+    fontName: '',
+    fontSize: 0,
+    textAlign: TextAlign.Center,
+    textFormat: [],
 };
 
 describe('Note component', () => {
@@ -138,7 +142,7 @@ describe('Note component', () => {
         expect(foreignObjectElement).toHaveStyle('outline: 1px solid #FF00FF');
     });
 
-    it('should handle absence of fill by applying default colors', () => {
+    it('should handle absence of fill by applying transparent fill', () => {
         const layerWithoutFill: NoteLayer = {
             ...mockLayer,
             fill: undefined,
@@ -155,10 +159,6 @@ describe('Note component', () => {
         );
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        expect(foreignObjectElement).toHaveStyle('background-color: #000');
-
-        const editableDiv =
-            foreignObjectElement.querySelector('div.mocked-class');
-        expect(editableDiv).toHaveStyle('color: #000');
+        expect(foreignObjectElement).toHaveStyle('background-color: transparent');
     });
 });

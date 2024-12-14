@@ -21,9 +21,12 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
 
         return (
             <div className="flex flex-col mb-2">
-                <label className="text-sm mb-1">{t('lineWidth')}</label>
+                <label className="text-sm mb-1" htmlFor="line-width-input">
+                    {t('lineWidth')}
+                </label>
                 <div className="flex items-center">
                     <input
+                        id="line-width-input"
                         type="number"
                         value={lineWidth}
                         onChange={handleChange}
@@ -31,6 +34,7 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                         min={1}
                     />
                     <div
+                        role="presentation"
                         className="bg-black w-1/3"
                         style={{ height: `${lineWidth}px` }}
                     />
