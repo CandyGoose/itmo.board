@@ -111,7 +111,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         };
 
         window.addEventListener('resize', handleResize);
-
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -154,48 +153,41 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     }, [selection]);
 
     const insertLayer = useCallback(
-        (layerType: LayerType, position: { x: number; y: number }) => {
+        (layerType: LayerType, position: Point) => {
             const id = nanoid();
-
             let layer: Layer;
+
+            const baseProps = {
+                id,
+                x: position.x,
+                y: position.y,
+                width: 100,
+                height: 100,
+                fill: transparentFill ? undefined : lastUsedColor,
+            };
 
             switch (layerType) {
                 case LayerType.Rectangle:
                     layer = {
-                        id,
+                        ...baseProps,
                         type: LayerType.Rectangle,
-                        x: position.x,
-                        y: position.y,
-                        height: 100,
-                        width: 100,
-                        fill: transparentFill ? undefined : lastUsedColor,
                     } as RectangleLayer;
                     break;
                 case LayerType.Ellipse:
                     layer = {
-                        id,
+                        ...baseProps,
                         type: LayerType.Ellipse,
-                        x: position.x,
-                        y: position.y,
-                        height: 100,
-                        width: 100,
-                        fill: transparentFill ? undefined : lastUsedColor,
                     } as EllipseLayer;
                     break;
                 case LayerType.Note:
                     layer = {
-                        id,
-                        type: layerType,
-                        x: position.x,
-                        y: position.y,
-                        height: 100,
-                        width: 100,
-                        fill: transparentFill ? undefined : lastUsedColor,
+                        ...baseProps,
+                        type: LayerType.Note,
                         value: '',
-                        fontName: fontName,
-                        fontSize: fontSize,
-                        textAlign: textAlign,
-                        textFormat: textFormat,
+                        fontName,
+                        fontSize,
+                        textAlign,
+                        textFormat,
                     } as NoteLayer;
                     break;
                 default:
@@ -223,8 +215,8 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 return;
 
             const offset = {
-                x: point.x - canvasState.current.x,
-                y: point.y - canvasState.current.y,
+                x: point.x - (canvasState.current?.x ?? 0),
+                y: point.y - (canvasState.current?.y ?? 0),
             };
 
             selection.forEach((id) => {
@@ -253,7 +245,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             if (!editable) return;
 
             const read_layers = new Map(layers) as ReadonlyMap<string, Layer>;
-
             setCanvasState({
                 mode: CanvasMode.SelectionNet,
                 origin,
@@ -266,7 +257,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 origin,
                 current,
             );
-
             setSelection(selectedLayerIds);
         },
         [editable, layerIds, layers],
@@ -276,7 +266,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const startMultiSelection = useCallback(
         (current: Point, origin: Point) => {
             if (!editable) return;
-
             if (
                 Math.abs(current.x - origin.x) +
                     Math.abs(current.y - origin.y) >
@@ -338,9 +327,12 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const resizeSelectedLayers = useCallback(
         (currentPoint: Point) => {
             if (canvasState.mode !== CanvasMode.Resizing) return;
-
             const { initialBounds, corner } = canvasState;
-            const newBounds = resizeBounds(initialBounds, corner, currentPoint);
+            const newBounds = resizeBounds(
+                initialBounds!,
+                corner!,
+                currentPoint,
+            );
 
             // Assuming only one selected layer for resizing
             if (selection.length > 0) {
@@ -359,7 +351,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const onResizeHandlePointerDown = useCallback(
         (corner: Side, initialBounds: XYWH) => {
             if (!editable) return;
-            setSelection([selection[0]]); // Select only the layer being resized
+            setSelection([selection[0]]); // Only the first selected layer is resized
             setCanvasState({
                 mode: CanvasMode.Resizing,
                 initialBounds,
@@ -373,7 +365,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     const onWheel = useCallback(
         (e: React.WheelEvent) => {
             e.preventDefault();
-
             const { clientX, clientY, deltaY } = e;
             const zoomIntensity = 0.001;
             const newScale = Math.min(
@@ -413,7 +404,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             const isSelected = selection.includes(layerId);
             const newSelection = isSelected ? selection : [layerId];
             setSelection(newSelection);
-            // Start translating
             setCanvasState({ mode: CanvasMode.Translating, current: point });
         },
         [canvasState, editable, camera, scale, svgRect, selection],
@@ -431,7 +421,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             }
             if (e.button === 0) {
                 if (e.shiftKey) {
-                    // Start selection net
                     setCanvasState({
                         mode: CanvasMode.SelectionNet,
                         origin: point,
@@ -479,10 +468,10 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
 
             switch (canvasState.mode) {
                 case CanvasMode.Pressing:
-                    startMultiSelection(point, canvasState.origin);
+                    startMultiSelection(point, canvasState.origin!);
                     break;
                 case CanvasMode.SelectionNet:
-                    updateSelectionNet(point, canvasState.origin);
+                    updateSelectionNet(point, canvasState.origin!);
                     break;
                 case CanvasMode.Translating:
                     translateSelectedLayers(point);
@@ -531,20 +520,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 canvasState.mode === CanvasMode.None ||
                 canvasState.mode === CanvasMode.Pressing
             ) {
-                if (!moved) {
-                    unselectLayers();
-                }
-                setCanvasState({
-                    mode: CanvasMode.None,
-                });
+                if (!moved) unselectLayers();
+                setCanvasState({ mode: CanvasMode.None });
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
                 if (pencilDraft) insertPath();
             } else if (canvasState.mode === CanvasMode.Inserting && editable) {
-                insertLayer(canvasState.layerType, point);
+                insertLayer(canvasState.layerType!, point);
             } else {
-                setCanvasState({
-                    mode: CanvasMode.None,
-                });
+                setCanvasState({ mode: CanvasMode.None });
             }
             setMoved(false);
         },
@@ -590,7 +573,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
         }));
 
         newLayers.forEach((newLayer) => addLayer(newLayer));
-
         const newLayerIds = newLayers.map((layer) => layer.id);
         setSelection(newLayerIds);
         setPasteCount((prevCount) => prevCount + 1);
@@ -670,35 +652,28 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 case 'Delete':
                     deleteLayers();
                     break;
-                case 'c': {
+                case 'c':
                     if (e.ctrlKey || e.metaKey) {
                         copyLayers();
-                        break;
                     }
                     break;
-                }
-                case 'v': {
+                case 'v':
                     if (e.ctrlKey || e.metaKey) {
                         pasteLayers();
-                        break;
                     }
                     break;
-                }
-                case 'a': {
+                case 'a':
                     if (e.ctrlKey || e.metaKey) {
                         e.preventDefault();
                         selectAllLayers();
-                        break;
                     }
                     break;
-                }
                 default:
                     break;
             }
         }
 
         window.addEventListener('keydown', onKeyDown);
-
         return () => {
             window.removeEventListener('keydown', onKeyDown);
         };
@@ -725,13 +700,14 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     return (
         <main
             className={cn('h-full w-full relative bg-neutral-100 touch-none')}
+            data-testid="canvas-main"
         >
             {/* Container for aligning buttons in the top-right corner */}
             <div className="absolute top-2 right-2 flex items-center gap-2">
                 <StylesButton
                     id="styles-button"
                     activeColor={lastUsedColor}
-                    onClick={toggleSelectionTools} // Use toggleSelectionTools to control visibility
+                    onClick={toggleSelectionTools}
                     className="h-12 w-30 bg-white rounded-md shadow-md flex items-center justify-center"
                 />
             </div>
@@ -746,76 +722,73 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 moveForward={handleMoveForward}
                 moveBackward={handleMoveBackward}
             />
-            {editable && (
-                <>
-                    {/* If showSelectionTools and no selection or single selection */}
-                    {showSelectionTools &&
-                        (selection.length === 0 || selection.length === 1) && (
-                            <SelectionTools
-                                selectedLayers={
-                                    selection
-                                        .map((id) => getLayer(id))
-                                        .filter(Boolean) as Layer[]
-                                }
-                                onColorChange={
-                                    selection.length === 1
-                                        ? setLayerColor
-                                        : setLastUsedColor
-                                }
-                                lineWidth={lineWidth}
-                                onLineWidthChange={
-                                    selection.length === 1
-                                        ? setLayerLineWidth
-                                        : setLineWidth
-                                }
-                                fontName={fontName}
-                                onFontChange={
-                                    selection.length === 1
-                                        ? setLayerFont
-                                        : setFontName
-                                }
-                                fontSize={fontSize}
-                                onFontSizeChange={
-                                    selection.length === 1
-                                        ? setLayerFontSize
-                                        : setFontSize
-                                }
-                                fontAlign={textAlign}
-                                onTextAlignChange={
-                                    selection.length === 1
-                                        ? setLayerTextAlign
-                                        : setTextAlign
-                                }
-                                fontFormat={textFormat}
-                                onTextFormatChange={
-                                    selection.length === 1
-                                        ? setLayerTextFormat
-                                        : setTextFormat
-                                }
-                                onPositionChange={(x, y) => {
-                                    if (selection.length === 1) {
-                                        updateLayer(selection[0], { x, y });
-                                    }
-                                }}
-                                onSizeChange={(width, height) => {
-                                    if (selection.length === 1) {
-                                        updateLayer(selection[0], {
-                                            width,
-                                            height,
-                                        });
-                                    }
-                                }}
-                                transparentFill={transparentFill}
-                                onTransparentFillChange={
-                                    selection.length === 1
-                                        ? setLayerTransparent
-                                        : setTransparentFill
-                                }
-                                className="top-[65px]"
-                            />
-                        )}
-                </>
-            )}
+
+            {editable &&
+                showSelectionTools &&
+                (selection.length === 0 || selection.length === 1) && (
+                    <SelectionTools
+                        selectedLayers={
+                            selection
+                                .map((id) => getLayer(id))
+                                .filter(Boolean) as Layer[]
+                        }
+                        onColorChange={
+                            selection.length === 1
+                                ? setLayerColor
+                                : setLastUsedColor
+                        }
+                        lineWidth={lineWidth}
+                        onLineWidthChange={
+                            selection.length === 1
+                                ? setLayerLineWidth
+                                : setLineWidth
+                        }
+                        fontName={fontName}
+                        onFontChange={
+                            selection.length === 1 ? setLayerFont : setFontName
+                        }
+                        fontSize={fontSize}
+                        onFontSizeChange={
+                            selection.length === 1
+                                ? setLayerFontSize
+                                : setFontSize
+                        }
+                        fontAlign={textAlign}
+                        onTextAlignChange={
+                            selection.length === 1
+                                ? setLayerTextAlign
+                                : setTextAlign
+                        }
+                        fontFormat={textFormat}
+                        onTextFormatChange={
+                            selection.length === 1
+                                ? setLayerTextFormat
+                                : setTextFormat
+                        }
+                        onPositionChange={(x, y) => {
+                            if (selection.length === 1) {
+                                updateLayer(selection[0], { x, y });
+                            }
+                        }}
+                        onSizeChange={(width, height) => {
+                            if (selection.length === 1) {
+                                updateLayer(selection[0], {
+                                    width,
+                                    height,
+                                });
+                            }
+                        }}
+                        transparentFill={transparentFill}
+                        onTransparentFillChange={
+                            selection.length === 1
+                                ? setLayerTransparent
+                                : setTransparentFill
+                        }
+                        className="top-[65px]"
+                        data-testid="selection-tools"
+                    />
+                )}
+
             <svg
                 ref={svgRef}
                 data-testid="svg-element"
@@ -827,7 +800,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 onPointerUp={onPointerUp}
                 tabIndex={0}
             >
-                {/* Render the dynamic grid */}
                 {svgRect && (
                     <Grid
                         camera={camera}
@@ -849,7 +821,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                         />
                     ))}
 
-                    {/* Render the temporary pencil draft as a preview */}
                     {pencilDraft && pencilDraft.length >= 1 && (
                         <polyline
                             points={pencilDraft
@@ -858,7 +829,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                             stroke={colorToCss(lastUsedColor)}
                             fill="none"
                             strokeWidth={lineWidth}
-                            strokeDasharray="4 2" // Dashed line for distinction
+                            strokeDasharray="4 2"
                         />
                     )}
 
@@ -870,8 +841,8 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                     />
 
                     {canvasState.mode === CanvasMode.SelectionNet &&
-                        canvasState.current != null &&
-                        canvasState.origin != null && (
+                        canvasState.current &&
+                        canvasState.origin && (
                             <rect
                                 className="fill-blue-500/5 stroke-blue-500 stroke-1"
                                 x={Math.min(

@@ -2,7 +2,7 @@ import React, { FC, useRef } from 'react';
 import { colorToCss } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 
-interface StylesButtonProps {
+export interface StylesButtonProps {
     id: string;
     activeColor: { r: number; g: number; b: number };
     onClick: () => void;
