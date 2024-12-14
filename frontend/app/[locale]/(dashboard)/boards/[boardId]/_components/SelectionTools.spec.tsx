@@ -15,6 +15,16 @@ jest.mock('./ColorPicker', () => ({
     )),
 }));
 
+jest.mock('next-intl', () => ({
+    useTranslations: () => (key: string) => {
+        const messages: { [key: string]: string } = {
+            width: 'Width',
+            height: 'Height',
+        };
+        return messages[key];
+    },
+}));
+
 describe('SelectionTools', () => {
     it('calls setLastUsedColor when a color is selected', () => {
         const mockSetLastUsedColor = jest.fn();
