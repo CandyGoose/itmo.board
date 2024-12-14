@@ -6,7 +6,7 @@ const {
     deleteBoard,
     getById,
     renameBoard,
-} = require('../controllers/board');
+} = require('../controllers/Board');
 
 module.exports = function (app) {
     //GET
