@@ -10,7 +10,10 @@ let mongoServer;
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(mongoUri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
     app.use(express.json());
     boardRoutes(app);
 });
@@ -44,9 +47,7 @@ describe('Board Controller Tests', () => {
     });
 
     it('should get all boards', async () => {
-        const response = await request(app)
-            .get('/boards')
-            .expect(200);
+        const response = await request(app).get('/boards').expect(200);
 
         expect(Array.isArray(response.body)).toBe(true);
         expect(response.body.length).toBeGreaterThan(0);
@@ -63,7 +64,9 @@ describe('Board Controller Tests', () => {
 
     it('should return 500 for getById when DB fails', async () => {
         // Симулируем ошибку при поиске по ID
-        jest.spyOn(Board, 'findOne').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(Board, 'findOne').mockRejectedValue(
+            new Error('Database error'),
+        );
 
         const response = await request(app)
             .get(`/boards/${boardId}`)
@@ -74,7 +77,9 @@ describe('Board Controller Tests', () => {
 
     it('should return 500 for createBoard when DB fails', async () => {
         // Симулируем ошибку при создании доски
-        jest.spyOn(Board, 'create').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(Board, 'create').mockRejectedValue(
+            new Error('Database error'),
+        );
 
         const newBoard = {
             title: 'Test Board',
@@ -93,7 +98,9 @@ describe('Board Controller Tests', () => {
 
     it('should return 500 for updateBoard when DB fails', async () => {
         // Симулируем ошибку при обновлении доски
-        jest.spyOn(Board, 'updateOne').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(Board, 'updateOne').mockRejectedValue(
+            new Error('Database error'),
+        );
 
         const updatedBoard = {
             title: 'Updated Test Board',
@@ -112,7 +119,9 @@ describe('Board Controller Tests', () => {
 
     it('should return 500 for deleteBoard when DB fails', async () => {
         // Симулируем ошибку при удалении доски
-        jest.spyOn(Board, 'deleteOne').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(Board, 'deleteOne').mockRejectedValue(
+            new Error('Database error'),
+        );
 
         const response = await request(app)
             .delete(`/boards/${boardId}`)
@@ -123,7 +132,9 @@ describe('Board Controller Tests', () => {
 
     it('should return 500 for renameBoard when DB fails', async () => {
         // Симулируем ошибку при переименовании доски
-        jest.spyOn(Board, 'updateOne').mockRejectedValue(new Error('Database error'));
+        jest.spyOn(Board, 'updateOne').mockRejectedValue(
+            new Error('Database error'),
+        );
 
         const updatedTitle = {
             title: 'Renamed Board',

@@ -1,6 +1,14 @@
-const { getAll, createBoard, getByOrgId, updateBoard, deleteBoard, getById, renameBoard } = require("../controllers/board")
+const {
+    getAll,
+    createBoard,
+    getByOrgId,
+    updateBoard,
+    deleteBoard,
+    getById,
+    renameBoard,
+} = require('../controllers/board');
 
-module.exports = function(app){
+module.exports = function (app) {
     //GET
     app.get('/boards', getAll);
     app.get('/boards/:userId/:orgId', getByOrgId);
@@ -9,11 +17,10 @@ module.exports = function(app){
     //POST
     app.post('/boards', createBoard);
 
-    //PUT   
-    app.put('/boards/:id', updateBoard)
-    app.put('/boards/title/:id', renameBoard)
+    //PUT
+    app.put('/boards/:id', updateBoard);
+    app.put('/boards/title/:id', renameBoard);
 
     //DELETE
     app.delete('/boards/:id', deleteBoard);
-}
-
+};

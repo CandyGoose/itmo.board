@@ -8,19 +8,27 @@ require('dotenv').config();
 const app = express();
 const allowedOrigins = ['http://localhost:3000'];
 
-app.use(cors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+    cors({
+        origin: allowedOrigins,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    }),
+);
 
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", 'http://localhost:3000');
-    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers");
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Private-Network", true);
-    res.setHeader("Access-Control-Max-Age", 7200);
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE',
+    );
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers',
+    );
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Private-Network', true);
+    res.setHeader('Access-Control-Max-Age', 7200);
     next();
 });
 
@@ -58,7 +66,9 @@ describe('Server API', () => {
             .get('/test')
             .set('Origin', 'http://localhost:3000');
         expect(res.status).toBe(200);
-        expect(res.headers['access-control-allow-origin']).toBe('http://localhost:3000');
+        expect(res.headers['access-control-allow-origin']).toBe(
+            'http://localhost:3000',
+        );
     });
 
     it('should return 404 for unknown routes', async () => {
