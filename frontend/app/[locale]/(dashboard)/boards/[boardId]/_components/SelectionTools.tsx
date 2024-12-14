@@ -64,7 +64,7 @@ export const SelectionTools = memo(
         const handleFormatChange = useCallback(
             (format: { textFormat?: TextFormat[]; textAlign?: TextAlign }) => {
                 onTextFormatChange(format.textFormat ?? fontFormat);
-                onTextAlignChange(format.textAlign?? fontAlign);
+                onTextAlignChange(format.textAlign ?? fontAlign);
             },
             [onTextFormatChange, fontFormat, onTextAlignChange, fontAlign],
         );

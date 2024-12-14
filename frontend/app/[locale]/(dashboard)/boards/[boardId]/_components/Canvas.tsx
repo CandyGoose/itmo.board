@@ -364,7 +364,7 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
     // Event handlers
     const onWheel = useCallback(
         (e: React.WheelEvent) => {
-            e.preventDefault();
+            e.stopPropagation();
             const { clientX, clientY, deltaY } = e;
             const zoomIntensity = 0.001;
             const newScale = Math.min(

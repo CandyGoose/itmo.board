@@ -22,30 +22,28 @@ export const calculateFontSize = (
     width: number,
     height: number,
     text: string,
+    initialFontSize = 72,
+    fontName = 'Kalam',
 ) => {
-    const scaleFactor = 0.15;
-
-    const fontSizeBasedOnHeight = height * scaleFactor;
-    const fontSizeBasedOnWidth = width * scaleFactor;
-
-    let fontSize = Math.min(
-        fontSizeBasedOnHeight,
-        fontSizeBasedOnWidth,
-        MAX_FONT_SIZE,
-    );
+    let fontSize = Math.min(initialFontSize, MAX_FONT_SIZE);
 
     const testElement = document.createElement('div');
-    testElement.style.fontFamily = 'Kalam';
+    testElement.style.fontFamily = fontName;
     testElement.style.position = 'absolute';
     testElement.style.visibility = 'hidden';
     testElement.style.whiteSpace = 'normal';
-    testElement.style.fontSize = `${fontSize}px`;
     testElement.style.width = `${width}px`;
     testElement.style.wordBreak = 'break-word';
     testElement.textContent = text;
     document.body.appendChild(testElement);
 
-    while (testElement.offsetHeight > height && fontSize >= MIN_FONT_SIZE) {
+    testElement.style.fontSize = `${fontSize}px`;
+
+    while (
+        (testElement.offsetHeight > height ||
+            testElement.scrollWidth > width) &&
+        fontSize > MIN_FONT_SIZE
+    ) {
         fontSize -= 1;
         testElement.style.fontSize = `${fontSize}px`;
     }
@@ -75,13 +73,13 @@ export const Note = ({
         fill,
         value = 'Text',
         fontName,
-        fontSize: initialFontSize,
+        fontSize,
         textAlign,
         textFormat,
     } = layer;
 
     const [noteValue, setNoteValue] = useState(value);
-    const [fontSize, setFontSize] = useState(initialFontSize);
+    const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +104,10 @@ export const Note = ({
     );
 
     useEffect(() => {
+        setCurrFontSize(fontSize);
+    }, [fontSize]);
+
+    useEffect(() => {
         if (containerRef.current) {
             const contentWidth = containerRef.current.offsetWidth;
             const contentHeight = containerRef.current.offsetHeight;
@@ -114,21 +116,22 @@ export const Note = ({
                 contentWidth,
                 contentHeight,
                 noteValue,
+                fontSize,
+                fontName,
             );
 
-            if (newFontSize !== fontSize) {
-                setFontSize(newFontSize);
+            if (newFontSize !== currFontSize) {
+                setCurrFontSize(newFontSize);
             }
         }
-    }, [noteValue, fontSize]);
+    }, [noteValue, width, height, currFontSize, fontSize, fontName]);
 
     useEffect(() => {
         if (inputRef.current) {
-            if (layer.value && layer.value !== '') {
-                inputRef.current.textContent = layer.value;
-            } else {
-                inputRef.current.textContent = 'Text';
-            }
+            const val =
+                layer.value && layer.value !== '' ? layer.value : 'Text';
+            inputRef.current.textContent = val;
+            setNoteValue(val);
         }
     }, [layer.value]);
 
@@ -152,7 +155,7 @@ export const Note = ({
 
     const textStyle = useMemo<CSSProperties>(
         () => ({
-            fontSize: `${fontSize}px`,
+            fontSize: `${currFontSize}px`,
             color: textColor,
             fontFamily: fontName,
             ...applyTextAlign,
@@ -160,7 +163,7 @@ export const Note = ({
             whiteSpace: 'normal',
             wordBreak: 'break-word',
         }),
-        [fontSize, textColor, fontName, applyTextAlign, applyTextFormat],
+        [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
 
     return (
