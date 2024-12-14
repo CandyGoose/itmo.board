@@ -34,7 +34,10 @@ describe('Rectangle', () => {
         expect(rectElement).toHaveAttribute('width', '100');
         expect(rectElement).toHaveAttribute('height', '50');
         expect(rectElement).toHaveStyle('transform: translate(10px, 20px)');
-        expect(rectElement).toHaveAttribute('fill', colorToCss(mockLayer.fill));
+        expect(rectElement).toHaveAttribute(
+            'fill',
+            colorToCss(mockLayer.fill!),
+        );
         expect(rectElement).toHaveAttribute('stroke', 'blue');
     });
 
