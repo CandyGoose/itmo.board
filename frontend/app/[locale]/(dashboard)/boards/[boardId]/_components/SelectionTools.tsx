@@ -63,11 +63,10 @@ export const SelectionTools = memo(
 
         const handleFormatChange = useCallback(
             (format: { textFormat?: TextFormat[]; textAlign?: TextAlign }) => {
-                const { textFormat, textAlign } = format;
-                if (textFormat) onTextFormatChange(textFormat);
-                if (textAlign) onTextAlignChange(textAlign);
+                onTextFormatChange(format.textFormat ?? fontFormat);
+                onTextAlignChange(format.textAlign?? fontAlign);
             },
-            [onTextFormatChange, onTextAlignChange],
+            [onTextFormatChange, fontFormat, onTextAlignChange, fontAlign],
         );
 
         // If multiple selected, show nothing
