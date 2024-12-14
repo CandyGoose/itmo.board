@@ -13,10 +13,13 @@ interface TwoValueInputProps {
 export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
     ({ label1, label2, value1, value2, onChange1, onChange2, className }) => {
         return (
-            <div className={`flex gap-4 items-center ${className}`}>
+            <div className={`flex gap-4 items-center ${className || ''}`}>
                 <div className="flex flex-col w-1/2">
-                    <label className="text-sm">{label1}</label>
+                    <label className="text-sm" htmlFor="input1">
+                        {label1}
+                    </label>
                     <input
+                        id="input1"
                         type="number"
                         value={value1}
                         onChange={(e) => onChange1(parseFloat(e.target.value))}
@@ -24,8 +27,11 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                     />
                 </div>
                 <div className="flex flex-col w-1/2">
-                    <label className="text-sm">{label2}</label>
+                    <label className="text-sm" htmlFor="input2">
+                        {label2}
+                    </label>
                     <input
+                        id="input2"
                         type="number"
                         value={value2}
                         onChange={(e) => onChange2(parseFloat(e.target.value))}
