@@ -15,7 +15,7 @@ export const Ellipse = ({
     onPointerDown,
     selectionColor,
 }: EllipseProps) => {
-    const fillColor = layer.fill ? colorToCss(layer.fill) : '#000';
+    const fillColor = layer.fill ? colorToCss(layer.fill) : 'transparent';
     const strokeColor = selectionColor || 'transparent';
     const cx = layer.width / 2;
     const cy = layer.height / 2;

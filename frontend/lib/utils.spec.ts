@@ -4,6 +4,7 @@ import {
     cn,
     colorToCss,
     findIntersectingLayersWithRectangle,
+    getContrastingTextColor,
     getSvgPathFromStroke,
     optimizeStroke,
     parseColor,
@@ -936,6 +937,58 @@ describe('Utility Functions', () => {
                 width: 10,
                 height: 100,
             });
+        });
+    });
+
+    describe('getContrastingTextColor', () => {
+        it('should return black for colors with luminance greater than 182', () => {
+            const color: Color = { r: 200, g: 200, b: 200 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('black');
+        });
+
+        it('should return white for colors with luminance less than or equal to 182', () => {
+            const color: Color = { r: 50, g: 50, b: 50 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('white');
+        });
+
+        it('should handle high red values correctly', () => {
+            const color: Color = { r: 255, g: 0, b: 0 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('white');
+        });
+
+        it('should handle high green values correctly', () => {
+            const color: Color = { r: 0, g: 255, b: 0 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('white');
+        });
+
+        it('should handle high blue values correctly', () => {
+            const color: Color = { r: 0, g: 0, b: 255 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('white');
+        });
+
+        it('should handle edge cases with minimum RGB values', () => {
+            const color: Color = { r: 0, g: 0, b: 0 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('white');
+        });
+
+        it('should handle edge cases with maximum RGB values', () => {
+            const color: Color = { r: 255, g: 255, b: 255 };
+            const result = getContrastingTextColor(color);
+            expect(result).toBe('black');
+        });
+
+        it('should handle non-integer RGB values gracefully', () => {
+            const color: Color = { r: 123.45, g: 67.89, b: 210.11 };
+            const luminance = 0.299 * 123.45 + 0.587 * 67.89 + 0.114 * 210.11;
+            const expected = luminance > 182 ? 'black' : 'white';
+            const result = getContrastingTextColor(color);
+            expect(result).toBe(expected);
         });
     });
 
