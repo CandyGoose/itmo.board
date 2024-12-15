@@ -27,6 +27,12 @@
     "more": "больше",
     "rectangle": "квадрат",
     "ellipse": "эллипс",
-    "stickyNote": "заметка"
+    "stickyNote": "заметка",
+    "lineWidth": "Толщина линии",
+    "transparentFill": "Прозрачный фон",
+    "width": "Ширина",
+    "height": "Высота",
+    "font": "Шрифт",
+    "fontSize": "Размер шрифта"
   }
 }

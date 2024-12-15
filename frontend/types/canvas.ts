@@ -17,6 +17,19 @@ export const enum LayerType {
     Note,
 }
 
+export const enum TextAlign {
+    Left,
+    Center,
+    Right,
+}
+
+export const enum TextFormat {
+    None,
+    Bold,
+    Italic,
+    Strike,
+}
+
 export type RectangleLayer = {
     id: string;
     type: LayerType.Rectangle;
@@ -24,8 +37,9 @@ export type RectangleLayer = {
     y: number;
     height: number;
     width: number;
-    fill: Color;
+    fill?: Color;
     value?: string;
+    lineWidth?: number;
 };
 
 export type EllipseLayer = {
@@ -35,8 +49,9 @@ export type EllipseLayer = {
     y: number;
     height: number;
     width: number;
-    fill: Color;
+    fill?: Color;
     value?: string;
+    lineWidth?: number;
 };
 
 export type NoteLayer = {
@@ -48,6 +63,11 @@ export type NoteLayer = {
     width: number;
     fill?: Color;
     value?: string;
+    lineWidth?: number;
+    fontName: string;
+    fontSize: number;
+    textAlign: TextAlign;
+    textFormat: TextFormat[];
 };
 
 export type PathLayer = {
@@ -60,6 +80,7 @@ export type PathLayer = {
     fill: Color;
     points: number[][];
     value?: string;
+    lineWidth: number;
 };
 
 export type Point = {
