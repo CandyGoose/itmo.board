@@ -84,7 +84,7 @@ describe('BoardCard Component', () => {
     test('navigates to board on click', async () => {
         render(<BoardCard {...defaultProps} />);
 
-        const card = screen.getByRole('button');
+        const card = screen.getByTestId(`board-card-${defaultProps.id}`);
         fireEvent.click(card);
 
         expect(mockPush).toHaveBeenCalledWith(`boards/${defaultProps.id}`);
@@ -93,7 +93,6 @@ describe('BoardCard Component', () => {
     test('sets loading state during navigation', async () => {
         render(<BoardCard {...defaultProps} />);
 
-        // Update the test ID to match the element in your component
         const card = screen.getByTestId('board-card-1');
 
         await act(async () => {
@@ -105,7 +104,6 @@ describe('BoardCard Component', () => {
     });
 
     test('displays "Teammate" when authorId does not match UserID and user is null', async () => {
-        // Mock useClerk to return null for the user
         mockUseClerk.mockReturnValue({ user: null });
 
         render(<BoardCard {...defaultProps} authorId="456" />);
