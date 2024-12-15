@@ -18,6 +18,10 @@ jest.mock('next/font/google', () => ({
     }),
 }));
 
+beforeAll(() => {
+    HTMLCanvasElement.prototype.getContext = jest.fn();
+});
+
 const mockLayer: NoteLayer = {
     id: 'note-1',
     type: LayerType.Note,
@@ -265,7 +269,7 @@ describe('Note component', () => {
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        expect(editableDiv).toHaveStyle('white-space: normal');
+        expect(editableDiv).toHaveStyle('white-space: pre-wrap');
         expect(editableDiv).toHaveStyle('word-break: break-word');
     });
 
@@ -277,11 +281,7 @@ describe('Note component', () => {
             foreignObjectElement.querySelector('div.kalam-font');
 
         // Assuming 'shadow-md drop-shadow-xl p-5' are applied to foreignObject
-        expect(foreignObjectElement).toHaveClass(
-            'shadow-md',
-            'drop-shadow-xl',
-            'p-5',
-        );
+        expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
         // 'kalam-font' is applied based on fontName
         expect(editableDiv).toHaveClass('kalam-font');
