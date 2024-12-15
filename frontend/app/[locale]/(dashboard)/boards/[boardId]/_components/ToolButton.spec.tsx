@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ToolButton } from './ToolButton';
 import { Plus } from 'lucide-react';
 import '@testing-library/jest-dom';
+
 describe('ToolButton', () => {
     const mockOnClick = jest.fn();
     beforeEach(() => {

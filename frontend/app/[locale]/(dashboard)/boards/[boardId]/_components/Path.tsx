@@ -11,6 +11,7 @@ export interface PathProps {
     fill: string;
     onPointerDown?: (e: React.PointerEvent) => void;
     stroke?: string;
+    lineWidth?: number;
 }
 
 export const getStrokeOptions = {
@@ -30,12 +31,16 @@ export const Path = memo(
         fill,
         onPointerDown,
         stroke,
+        lineWidth,
     }: PathProps) => {
         const strokePath = useMemo(() => {
-            const stroke = getStroke(points, getStrokeOptions);
+            const stroke = getStroke(points, {
+                ...getStrokeOptions,
+                size: lineWidth ?? getStrokeOptions.size,
+            });
             const optimizedStroke = optimizeStroke(stroke);
             return getSvgPathFromStroke(optimizedStroke);
-        }, [points]);
+        }, [lineWidth, points]);
 
         const originalBoundingBox = useMemo(() => {
             const xs = points.map((p) => p[0]);
@@ -67,7 +72,7 @@ export const Path = memo(
                 y={y}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={1}
+                strokeWidth={0.5}
             />
         );
     },
