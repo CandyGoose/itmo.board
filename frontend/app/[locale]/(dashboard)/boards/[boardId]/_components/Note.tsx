@@ -18,6 +18,51 @@ const font = Kalam({
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
+function doesTextFit(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    width: number,
+    height: number,
+    fontSize: number,
+    fontName: string,
+) {
+    ctx.font = `${fontSize}px ${fontName}`;
+    const lineHeight = fontSize * 1.5;
+
+    const words = text.split(/\s+/);
+    let currentLine = '';
+    let lines = 1;
+    let maxLineWidth = 0;
+
+    for (let i = 0; i < words.length; i++) {
+        const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+
+        if (testWidth > width) {
+            // Break line
+            currentLine = words[i];
+            lines++;
+            const newMetrics = ctx.measureText(currentLine);
+            maxLineWidth = Math.max(maxLineWidth, newMetrics.width);
+            if (lines * lineHeight > height) {
+                return false;
+            }
+        } else {
+            currentLine = testLine;
+            maxLineWidth = Math.max(maxLineWidth, testWidth);
+        }
+
+        if (maxLineWidth > width) {
+            return false;
+        }
+    }
+
+    // Final check of total height
+    const totalHeight = lines * lineHeight;
+    return totalHeight <= height;
+}
+
 export const calculateFontSize = (
     width: number,
     height: number,
@@ -25,31 +70,25 @@ export const calculateFontSize = (
     initialFontSize = 72,
     fontName = 'Kalam',
 ) => {
-    let fontSize = Math.min(initialFontSize, MAX_FONT_SIZE);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return MIN_FONT_SIZE; // fallback
 
-    const testElement = document.createElement('div');
-    testElement.style.fontFamily = fontName;
-    testElement.style.position = 'absolute';
-    testElement.style.visibility = 'hidden';
-    testElement.style.whiteSpace = 'normal';
-    testElement.style.width = `${width}px`;
-    testElement.style.wordBreak = 'break-word';
-    testElement.textContent = text;
-    document.body.appendChild(testElement);
+    let low = MIN_FONT_SIZE;
+    let high = Math.min(initialFontSize, MAX_FONT_SIZE);
+    let bestFit = low;
 
-    testElement.style.fontSize = `${fontSize}px`;
-
-    while (
-        (testElement.offsetHeight > height ||
-            testElement.scrollWidth > width) &&
-        fontSize > MIN_FONT_SIZE
-    ) {
-        fontSize -= 1;
-        testElement.style.fontSize = `${fontSize}px`;
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        if (doesTextFit(ctx, text, width, height, mid, fontName)) {
+            bestFit = mid;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
 
-    document.body.removeChild(testElement);
-    return fontSize;
+    return bestFit;
 };
 
 interface NoteProps {
@@ -160,7 +199,7 @@ export const Note = ({
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
-            whiteSpace: 'normal',
+            whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
         }),
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
@@ -177,7 +216,7 @@ export const Note = ({
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
             }}
-            className="shadow-md drop-shadow-xl p-5"
+            className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
         >
             <div
