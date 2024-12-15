@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Provider, ErrorBoundary } from '@rollbar/react';
 import { NextIntlClientProvider } from 'next-intl';
+import { Toaster } from "@/components/ui/Sonner";
 import { getMessages } from 'next-intl/server';
 import { ModalProvider } from '@/providers/ModalProvider';
 import YandexMetrika from '@/metrika/YandexMetrika';
@@ -33,6 +34,7 @@ export default async function LocaleLayout({
                             <body>
                                 {children}
                                 <ModalProvider />
+                                <Toaster />
                             </body>
                         </ClerkProvider>
                     </ErrorBoundary>
