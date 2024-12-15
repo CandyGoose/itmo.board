@@ -1,76 +1,90 @@
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import { Toggle } from './Toggle'
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { Toggle } from './Toggle';
 
 describe('Toggle Component', () => {
     test('renders Toggle with default props', () => {
-        render(<Toggle data-testid="toggle" />)
+        render(<Toggle data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toBeInTheDocument()
-        expect(toggleButton).toHaveClass('inline-flex', 'bg-transparent', 'h-10', 'px-3')
-        expect(toggleButton).toHaveAttribute('aria-pressed', 'false')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toBeInTheDocument();
+        expect(toggleButton).toHaveClass(
+            'inline-flex',
+            'bg-transparent',
+            'h-10',
+            'px-3',
+        );
+        expect(toggleButton).toHaveAttribute('aria-pressed', 'false');
+    });
 
     test('renders Toggle with variant="outline"', () => {
-        render(<Toggle variant="outline" data-testid="toggle" />)
+        render(<Toggle variant="outline" data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toHaveClass('border', 'border-input', 'bg-transparent')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toHaveClass(
+            'border',
+            'border-input',
+            'bg-transparent',
+        );
+    });
 
     test('renders Toggle with size="sm"', () => {
-        render(<Toggle size="sm" data-testid="toggle" />)
+        render(<Toggle size="sm" data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toHaveClass('h-9', 'px-2.5')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toHaveClass('h-9', 'px-2.5');
+    });
 
     test('renders Toggle with size="lg"', () => {
-        render(<Toggle size="lg" data-testid="toggle" />)
+        render(<Toggle size="lg" data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toHaveClass('h-11', 'px-5')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toHaveClass('h-11', 'px-5');
+    });
 
     test('toggles state on click', () => {
-        render(<Toggle data-testid="toggle" />)
+        render(<Toggle data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
+        const toggleButton = screen.getByTestId('toggle');
 
-        expect(toggleButton).toHaveAttribute('aria-pressed', 'false')
+        expect(toggleButton).toHaveAttribute('aria-pressed', 'false');
 
-        fireEvent.click(toggleButton)
-        expect(toggleButton).toHaveAttribute('aria-pressed', 'true')
+        fireEvent.click(toggleButton);
+        expect(toggleButton).toHaveAttribute('aria-pressed', 'true');
 
-        fireEvent.click(toggleButton)
-        expect(toggleButton).toHaveAttribute('aria-pressed', 'false')
-        expect(toggleButton).toHaveClass('bg-transparent')
-    })
+        fireEvent.click(toggleButton);
+        expect(toggleButton).toHaveAttribute('aria-pressed', 'false');
+        expect(toggleButton).toHaveClass('bg-transparent');
+    });
 
     test('applies additional className', () => {
-        render(<Toggle className="custom-class" data-testid="toggle" />)
+        render(<Toggle className="custom-class" data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toHaveClass('custom-class')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toHaveClass('custom-class');
+    });
 
     test('is disabled when disabled prop is true', () => {
-        render(<Toggle disabled data-testid="toggle" />)
+        render(<Toggle disabled data-testid="toggle" />);
 
-        const toggleButton = screen.getByTestId('toggle')
-        expect(toggleButton).toBeDisabled()
-        expect(toggleButton).toHaveClass('disabled:pointer-events-none', 'disabled:opacity-50')
-    })
+        const toggleButton = screen.getByTestId('toggle');
+        expect(toggleButton).toBeDisabled();
+        expect(toggleButton).toHaveClass(
+            'disabled:pointer-events-none',
+            'disabled:opacity-50',
+        );
+    });
 
     test('matches snapshot for default Toggle', () => {
-        const { asFragment } = render(<Toggle data-testid="toggle" />)
-        expect(asFragment()).toMatchSnapshot()
-    })
+        const { asFragment } = render(<Toggle data-testid="toggle" />);
+        expect(asFragment()).toMatchSnapshot();
+    });
 
     test('matches snapshot for outline variant and lg size', () => {
-        const { asFragment } = render(<Toggle variant="outline" size="lg" data-testid="toggle" />)
-        expect(asFragment()).toMatchSnapshot()
-    })
-})
+        const { asFragment } = render(
+            <Toggle variant="outline" size="lg" data-testid="toggle" />,
+        );
+        expect(asFragment()).toMatchSnapshot();
+    });
+});
