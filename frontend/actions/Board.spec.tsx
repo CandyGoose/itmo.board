@@ -1,6 +1,12 @@
 import axios, { AxiosError } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { Board, createBoard, deleteBoard, getAllBoards, renameBoard } from './Board';
+import {
+    Board,
+    createBoard,
+    deleteBoard,
+    getAllBoards,
+    renameBoard,
+} from './Board';
 
 describe('boardService', () => {
     let mock: MockAdapter;
@@ -122,18 +128,26 @@ describe('boardService', () => {
 
     describe('renameBoard', () => {
         it('should rename the board and return the updated response', async () => {
-            const mockResponse = { message: 'Board title updated successfully' };
+            const mockResponse = {
+                message: 'Board title updated successfully',
+            };
 
-            mock.onPut(`${process.env.NEXT_PUBLIC_API_URL}/boards/title/1`).reply(200, mockResponse);
+            mock.onPut(
+                `${process.env.NEXT_PUBLIC_API_URL}/boards/title/1`,
+            ).reply(200, mockResponse);
 
             const response = await renameBoard('1', 'New Title');
 
             expect(response.data).toEqual(mockResponse);
-            expect(response.data.message).toBe('Board title updated successfully');
+            expect(response.data.message).toBe(
+                'Board title updated successfully',
+            );
         });
 
         it('should handle error when renaming the board', async () => {
-            mock.onPut(`${process.env.NEXT_PUBLIC_API_URL}/boards/title/1`).reply(500);
+            mock.onPut(
+                `${process.env.NEXT_PUBLIC_API_URL}/boards/title/1`,
+            ).reply(500);
 
             try {
                 await renameBoard('1', 'New Title');
@@ -148,7 +162,10 @@ describe('boardService', () => {
         it('should delete the board and return success message', async () => {
             const mockResponse = { message: 'Board deleted successfully' };
 
-            mock.onDelete(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(200, mockResponse);
+            mock.onDelete(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                200,
+                mockResponse,
+            );
 
             const response = await deleteBoard('1');
 
@@ -157,7 +174,9 @@ describe('boardService', () => {
         });
 
         it('should handle error when deleting the board', async () => {
-            mock.onDelete(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(500);
+            mock.onDelete(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                500,
+            );
 
             try {
                 await deleteBoard('1');
