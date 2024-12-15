@@ -43,7 +43,7 @@ describe('Toggle Component', () => {
 
         fireEvent.click(toggleButton)
         expect(toggleButton).toHaveAttribute('aria-pressed', 'true')
-        
+
         fireEvent.click(toggleButton)
         expect(toggleButton).toHaveAttribute('aria-pressed', 'false')
         expect(toggleButton).toHaveClass('bg-transparent')
