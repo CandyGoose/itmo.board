@@ -19,6 +19,13 @@ export async function getAllBoards(
     return res.data ? res.data : undefined;
 }
 
+export async function getBoardById(boardId: string): Promise<Board> {
+    const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/boards/${boardId}`,
+    );
+    return res.data ? res.data : undefined;
+}
+
 export async function createBoard(userId: string, orgId: string) {
     const boards = await getAllBoards(userId, orgId);
     const response = await axios.post(
@@ -39,5 +46,11 @@ export async function renameBoard(id: string, title: string) {
         {
             title: title,
         },
+    );
+}
+
+export async function deleteBoard(id: string) {
+    return await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/boards/${id}`,
     );
 }
