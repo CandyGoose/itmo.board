@@ -36,6 +36,7 @@ export const LayerPreview = memo(
                         height={layer.height}
                         fill={layer.fill ? colorToCss(layer.fill) : '#000'}
                         stroke={selectionColor}
+                        lineWidth={layer.lineWidth}
                     />
                 );
             case LayerType.Ellipse:

@@ -61,7 +61,7 @@ describe('Path Component', () => {
         expect(pathElement).toBeInTheDocument();
         expect(pathElement).toHaveAttribute('fill', 'red');
         expect(pathElement).toHaveAttribute('stroke', 'blue');
-        expect(pathElement).toHaveAttribute('stroke-width', '1');
+        expect(pathElement).toHaveAttribute('stroke-width', '0.5');
         expect(pathElement).toHaveAttribute('d', mockSvgPath);
         expect(pathElement.getAttribute('style')).toContain(
             'transform: translate(50px, 100px)',

@@ -1,13 +1,13 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { Ellipse } from './Ellipse';
-import { EllipseLayer, LayerType } from '@/types/canvas';
+import { Rectangle } from './Rectangle';
+import { LayerType, RectangleLayer } from '@/types/canvas';
 import '@testing-library/jest-dom';
 import { colorToCss } from '@/lib/utils';
 
-const mockLayer: EllipseLayer = {
+const mockLayer: RectangleLayer = {
     id: '1',
-    type: LayerType.Ellipse,
+    type: LayerType.Rectangle,
     x: 10,
     y: 20,
     width: 100,
@@ -17,10 +17,10 @@ const mockLayer: EllipseLayer = {
 
 const mockOnPointerDown = jest.fn();
 
-describe('Ellipse', () => {
-    it('renders ellipse with correct props', () => {
+describe('Rectangle', () => {
+    it('renders rectangle with correct props', () => {
         const { container } = render(
-            <Ellipse
+            <Rectangle
                 id="1"
                 layer={mockLayer}
                 onPointerDown={mockOnPointerDown}
@@ -28,48 +28,48 @@ describe('Ellipse', () => {
             />,
         );
 
-        const ellipseElement = container.querySelector('ellipse');
-        expect(ellipseElement).toBeInTheDocument();
-        expect(ellipseElement).toHaveAttribute('cx', '50');
-        expect(ellipseElement).toHaveAttribute('cy', '25');
-        expect(ellipseElement).toHaveAttribute('rx', '50');
-        expect(ellipseElement).toHaveAttribute('ry', '25');
-        expect(ellipseElement).toHaveAttribute(
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('x', '0');
+        expect(rectElement).toHaveAttribute('y', '0');
+        expect(rectElement).toHaveAttribute('width', '100');
+        expect(rectElement).toHaveAttribute('height', '50');
+        expect(rectElement).toHaveStyle('transform: translate(10px, 20px)');
+        expect(rectElement).toHaveAttribute(
             'fill',
             colorToCss(mockLayer.fill!),
         );
-        expect(ellipseElement).toHaveAttribute('stroke', 'blue');
+        expect(rectElement).toHaveAttribute('stroke', 'blue');
     });
 
     it('sets transparent stroke color if selectionColor is not provided', () => {
         const { container } = render(
-            <Ellipse
+            <Rectangle
                 id="1"
                 layer={mockLayer}
                 onPointerDown={mockOnPointerDown}
             />,
         );
 
-        const ellipseElement = container.querySelector('ellipse');
-        expect(ellipseElement).toHaveAttribute('stroke', 'transparent');
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('stroke', 'transparent');
     });
 
     it('sets transparent fill color if layer does not have fill', () => {
         const { container } = render(
-            <Ellipse
+            <Rectangle
                 id="1"
                 layer={{ ...mockLayer, fill: undefined }}
                 onPointerDown={mockOnPointerDown}
             />,
         );
 
-        const ellipseElement = container.querySelector('ellipse');
-        expect(ellipseElement).toHaveAttribute('fill', 'transparent');
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toHaveAttribute('fill', 'transparent');
     });
 
-    it('calls onPointerDown when the ellipse is clicked', () => {
+    it('calls onPointerDown when the rectangle is clicked', () => {
         const { container } = render(
-            <Ellipse
+            <Rectangle
                 id="1"
                 layer={mockLayer}
                 onPointerDown={mockOnPointerDown}
@@ -77,10 +77,10 @@ describe('Ellipse', () => {
             />,
         );
 
-        const ellipseElement = container.querySelector('ellipse');
-        expect(ellipseElement).toBeInTheDocument();
+        const rectElement = container.querySelector('rect');
+        expect(rectElement).toBeInTheDocument();
 
-        fireEvent.pointerDown(ellipseElement!);
+        fireEvent.pointerDown(rectElement!);
 
         expect(mockOnPointerDown).toHaveBeenCalledTimes(1);
         expect(mockOnPointerDown).toHaveBeenCalledWith(expect.any(Object), '1');

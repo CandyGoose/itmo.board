@@ -1,50 +1,94 @@
 import { Kalam } from 'next/font/google';
-import { ContentEditableEvent } from 'react-contenteditable';
-import { NoteLayer } from '@/types/canvas';
+import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect } from 'react';
+import {
+    useState,
+    useRef,
+    useEffect,
+    CSSProperties,
+    useCallback,
+    useMemo,
+} from 'react';
 
 const font = Kalam({
     subsets: ['latin'],
     weight: ['400'],
 });
 
+export const MIN_FONT_SIZE = 7;
+export const MAX_FONT_SIZE = 72;
+
+function doesTextFit(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    width: number,
+    height: number,
+    fontSize: number,
+    fontName: string,
+) {
+    ctx.font = `${fontSize}px ${fontName}`;
+    const lineHeight = fontSize * 1.5;
+
+    const words = text.split(/\s+/);
+    let currentLine = '';
+    let lines = 1;
+    let maxLineWidth = 0;
+
+    for (let i = 0; i < words.length; i++) {
+        const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+
+        if (testWidth > width) {
+            // Break line
+            currentLine = words[i];
+            lines++;
+            const newMetrics = ctx.measureText(currentLine);
+            maxLineWidth = Math.max(maxLineWidth, newMetrics.width);
+            if (lines * lineHeight > height) {
+                return false;
+            }
+        } else {
+            currentLine = testLine;
+            maxLineWidth = Math.max(maxLineWidth, testWidth);
+        }
+
+        if (maxLineWidth > width) {
+            return false;
+        }
+    }
+
+    // Final check of total height
+    const totalHeight = lines * lineHeight;
+    return totalHeight <= height;
+}
+
 export const calculateFontSize = (
     width: number,
     height: number,
     text: string,
+    initialFontSize = 72,
+    fontName = 'Kalam',
 ) => {
-    const maxFontSize = 72;
-    const minFontSize = 7;
-    const scaleFactor = 0.15;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return MIN_FONT_SIZE; // fallback
 
-    const fontSizeBasedOnHeight = height * scaleFactor;
-    const fontSizeBasedOnWidth = width * scaleFactor;
+    let low = MIN_FONT_SIZE;
+    let high = Math.min(initialFontSize, MAX_FONT_SIZE);
+    let bestFit = low;
 
-    let fontSize = Math.min(
-        fontSizeBasedOnHeight,
-        fontSizeBasedOnWidth,
-        maxFontSize,
-    );
-
-    const testElement = document.createElement('div');
-    testElement.style.fontFamily = 'Kalam';
-    testElement.style.position = 'absolute';
-    testElement.style.visibility = 'hidden';
-    testElement.style.whiteSpace = 'normal';
-    testElement.style.fontSize = `${fontSize}px`;
-    testElement.style.width = `${width}px`;
-    testElement.style.wordBreak = 'break-word';
-    testElement.textContent = text;
-    document.body.appendChild(testElement);
-
-    while (testElement.offsetHeight > height && fontSize >= minFontSize) {
-        fontSize -= 1;
-        testElement.style.fontSize = `${fontSize}px`;
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        if (doesTextFit(ctx, text, width, height, mid, fontName)) {
+            bestFit = mid;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
     }
 
-    document.body.removeChild(testElement);
-    return fontSize;
+    return bestFit;
 };
 
 interface NoteProps {
@@ -60,24 +104,47 @@ export const Note = ({
     id,
     selectionColor,
 }: NoteProps) => {
-    const { x, y, width, height, fill, value } = layer;
-    const [noteValue, setNoteValue] = useState(value || 'Text');
-    const [fontSize, setFontSize] = useState(72);
+    const {
+        x,
+        y,
+        width,
+        height,
+        fill,
+        value = 'Text',
+        fontName,
+        fontSize,
+        textAlign,
+        textFormat,
+    } = layer;
+
+    const [noteValue, setNoteValue] = useState(value);
+    const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
-    const handleContentChange = (e: ContentEditableEvent) => {
-        if (inputRef.current) {
-            inputRef.current.textContent = e.currentTarget.textContent;
-        }
-        setNoteValue(e.currentTarget.textContent || '');
-    };
+    const handleContentChange = useCallback(
+        (e: React.FormEvent<HTMLDivElement>) => {
+            setNoteValue(e.currentTarget.textContent || '');
+        },
+        [],
+    );
 
-    const textColor = fill ? getContrastingTextColor(fill) : '#000';
-    const backgroundColor = fill ? colorToCss(fill) : '#000';
-    const outlineStyle = selectionColor
-        ? `1px solid ${selectionColor}`
-        : 'none';
+    const textColor = useMemo(
+        () => (fill ? getContrastingTextColor(fill) : '#000'),
+        [fill],
+    );
+    const backgroundColor = useMemo(
+        () => (fill ? colorToCss(fill) : 'transparent'),
+        [fill],
+    );
+    const outlineStyle = useMemo(
+        () => (selectionColor ? `1px solid ${selectionColor}` : 'none'),
+        [selectionColor],
+    );
+
+    useEffect(() => {
+        setCurrFontSize(fontSize);
+    }, [fontSize]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -88,13 +155,55 @@ export const Note = ({
                 contentWidth,
                 contentHeight,
                 noteValue,
+                fontSize,
+                fontName,
             );
 
-            if (newFontSize !== fontSize) {
-                setFontSize(() => newFontSize);
+            if (newFontSize !== currFontSize) {
+                setCurrFontSize(newFontSize);
             }
         }
-    }, [noteValue, fontSize, width, height]);
+    }, [noteValue, width, height, currFontSize, fontSize, fontName]);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            const val =
+                layer.value && layer.value !== '' ? layer.value : 'Text';
+            inputRef.current.textContent = val;
+            setNoteValue(val);
+        }
+    }, [layer.value]);
+
+    const applyTextFormat = useMemo<CSSProperties>(() => {
+        const styles: CSSProperties = {};
+        if (textFormat.includes(TextFormat.Bold)) styles.fontWeight = 'bold';
+        if (textFormat.includes(TextFormat.Italic)) styles.fontStyle = 'italic';
+        if (textFormat.includes(TextFormat.Strike))
+            styles.textDecoration = 'line-through';
+        return styles;
+    }, [textFormat]);
+
+    const applyTextAlign = useMemo<CSSProperties>(() => {
+        const alignmentMap: Record<TextAlign, CSSProperties['textAlign']> = {
+            [TextAlign.Left]: 'start',
+            [TextAlign.Center]: 'center',
+            [TextAlign.Right]: 'end',
+        };
+        return { textAlign: alignmentMap[textAlign] || 'center' };
+    }, [textAlign]);
+
+    const textStyle = useMemo<CSSProperties>(
+        () => ({
+            fontSize: `${currFontSize}px`,
+            color: textColor,
+            fontFamily: fontName,
+            ...applyTextAlign,
+            ...applyTextFormat,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+        }),
+        [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
+    );
 
     return (
         <foreignObject
@@ -107,26 +216,24 @@ export const Note = ({
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
             }}
-            className="shadow-md drop-shadow-xl p-5"
+            className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center text-center"
+                className="h-full w-full flex flex-col items-center justify-center"
+                style={{
+                    backgroundColor: backgroundColor,
+                }}
             >
                 <div
                     contentEditable
                     ref={inputRef}
                     className={cn(
-                        'h-full w-full flex flex-col items-center justify-center text-center outline-none',
-                        font.className,
+                        'h-full w-full flex flex-col justify-center outline-none',
+                        fontName === 'Kalam' ? font.className : '',
                     )}
-                    style={{
-                        fontSize: `${fontSize}px`,
-                        color: textColor,
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                    }}
+                    style={textStyle}
                     onInput={handleContentChange}
                 />
             </div>
