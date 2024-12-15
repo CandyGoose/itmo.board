@@ -3,37 +3,34 @@ import '@testing-library/jest-dom';
 import { Actions } from './Action';
 import { useRenameModal } from '@/store/useRenameModal';
 import userEvent from "@testing-library/user-event";
+import {useRouter} from "next/navigation";
+
+jest.mock('next/navigation', () => ({
+    useRouter: jest.fn(),
+}));
 
 jest.mock('@/store/useRenameModal', () => ({
     useRenameModal: jest.fn(),
 }));
 
 jest.mock('lucide-react', () => ({
+    Link2: () => <svg data-testid="link2-icon" />,
     Pencil: () => <svg data-testid="pencil-icon" />,
-}));
-
-jest.mock('@radix-ui/react-portal', () => ({
-    __esModule: true,
-    Portal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
-
-jest.mock('@/store/useRenameModal', () => ({
-    useRenameModal: jest.fn(),
+    Trash2: () => <svg data-testid="trash2-icon" />,
 }));
 
 describe('Actions Component', () => {
     const onOpenMock = jest.fn();
+    const mockPush = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
         (useRenameModal as unknown as jest.Mock).mockReturnValue({
             onOpen: onOpenMock,
         });
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
+        (useRouter as jest.Mock).mockReturnValue({
+            push: mockPush,
+        });
     });
 
     test('отображает содержимое меню при клике на триггер', async () => {
@@ -49,10 +46,10 @@ describe('Actions Component', () => {
         const menuContent = await screen.findByRole('menu');
         expect(menuContent).toBeInTheDocument();
 
-        const menuItem = within(menuContent).getByRole('menuitem', { name: 'Rename' });
+        const menuItem = within(menuContent).getByRole('menuitem', { name: 'Copy link' });
         expect(menuItem).toBeInTheDocument();
 
-        const icon = within(menuItem).getByTestId('pencil-icon');
+        const icon = within(menuItem).getByTestId('link2-icon');
         expect(icon).toBeInTheDocument();
     });
 
