@@ -34,7 +34,10 @@ export async function createBoard(userId: string, orgId: string) {
 }
 
 export async function renameBoard(id: string, title: string) {
-    return await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/boards/title/${id}`, {
-        title: title
-    })
+    return await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/boards/title/${id}`,
+        {
+            title: title,
+        },
+    );
 }
