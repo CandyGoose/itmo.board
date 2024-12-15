@@ -66,7 +66,7 @@ export const RenameModal = () => {
                         }
                     />
                     <DialogFooter>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button type="button" variant="outline">
                                 Cancel
                             </Button>
