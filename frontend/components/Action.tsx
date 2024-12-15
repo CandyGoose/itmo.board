@@ -17,6 +17,7 @@ interface ActionsProps {
     id: string;
     title: string;
     disable?: boolean | false;
+    defaultOpen?: boolean;
 }
 
 export const Actions = ({
@@ -26,11 +27,12 @@ export const Actions = ({
     id,
     title,
     disable,
+    defaultOpen,
 }: ActionsProps) => {
     const { onOpen } = useRenameModal();
 
     return (
-        <DropdownMenu>
+        <DropdownMenu defaultOpen={defaultOpen}>
             <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
             <DropdownMenuContent
                 onClick={(e) => e.stopPropagation()}
@@ -40,6 +42,7 @@ export const Actions = ({
             >
                 <DropdownMenuItem
                     onClick={() => onOpen(id, title)}
+                    data-testid="rename-item"
                     className="p-3 cursor-pointer flex-1"
                     disabled={disable}
                 >
