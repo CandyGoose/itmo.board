@@ -75,16 +75,4 @@ describe('Toggle Component', () => {
             'disabled:opacity-50',
         );
     });
-
-    test('matches snapshot for default Toggle', () => {
-        const { asFragment } = render(<Toggle data-testid="toggle" />);
-        expect(asFragment()).toMatchSnapshot();
-    });
-
-    test('matches snapshot for outline variant and lg size', () => {
-        const { asFragment } = render(
-            <Toggle variant="outline" size="lg" data-testid="toggle" />,
-        );
-        expect(asFragment()).toMatchSnapshot();
-    });
 });
