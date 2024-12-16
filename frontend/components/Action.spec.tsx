@@ -1,9 +1,9 @@
-import {render, screen, fireEvent, within} from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Actions } from './Action';
 import { useRenameModal } from '@/store/useRenameModal';
-import userEvent from "@testing-library/user-event";
-import {useRouter} from "next/navigation";
+import userEvent from '@testing-library/user-event';
+import { useRouter } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
@@ -37,7 +37,7 @@ describe('Actions Component', () => {
         render(
             <Actions id="123" title="Test Title">
                 <button data-testid="trigger">Open Actions</button>
-            </Actions>
+            </Actions>,
         );
 
         const trigger = screen.getByTestId('trigger');
@@ -46,7 +46,9 @@ describe('Actions Component', () => {
         const menuContent = await screen.findByRole('menu');
         expect(menuContent).toBeInTheDocument();
 
-        const menuItem = within(menuContent).getByRole('menuitem', { name: 'Copy link' });
+        const menuItem = within(menuContent).getByRole('menuitem', {
+            name: 'Copy link',
+        });
         expect(menuItem).toBeInTheDocument();
 
         const icon = within(menuItem).getByTestId('link2-icon');
@@ -57,7 +59,7 @@ describe('Actions Component', () => {
         render(
             <Actions id="123" title="Test Title" disable={true} defaultOpen>
                 <button data-testid="trigger">Open Actions</button>
-            </Actions>
+            </Actions>,
         );
 
         const menuItem = screen.getByTestId('rename-item');
@@ -73,7 +75,7 @@ describe('Actions Component', () => {
                 <Actions id="123" title="Test Title" defaultOpen>
                     <button data-testid="trigger">Open Actions</button>
                 </Actions>
-            </div>
+            </div>,
         );
 
         const menuItem = screen.getByTestId('rename-item');

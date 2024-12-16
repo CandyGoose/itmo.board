@@ -39,11 +39,11 @@ describe('RenameModal', () => {
         render(<RenameModal />);
 
         expect(
-            screen.getByRole('heading', { name: /edit board title/i })
+            screen.getByRole('heading', { name: /edit board title/i }),
         ).toBeInTheDocument();
 
         expect(
-            screen.getByText(/enter a new title for this board/i)
+            screen.getByText(/enter a new title for this board/i),
         ).toBeInTheDocument();
 
         const input = screen.getByRole('textbox');
@@ -96,6 +96,8 @@ describe('RenameModal', () => {
             expect(renameBoard).toHaveBeenCalledWith('1', 'New Board Title');
         });
 
-        expect(screen.queryByText(/failed to renamed board\./i)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(/failed to renamed board\./i),
+        ).not.toBeInTheDocument();
     });
 });

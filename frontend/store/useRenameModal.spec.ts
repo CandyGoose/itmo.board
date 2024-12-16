@@ -17,7 +17,10 @@ describe('useRenameModal hook', () => {
         });
 
         expect(result.current.isOpen).toBe(true);
-        expect(result.current.initialValues).toEqual({ id: '123', title: 'Test Title' });
+        expect(result.current.initialValues).toEqual({
+            id: '123',
+            title: 'Test Title',
+        });
     });
 
     test('закрывает модальное окно и сбрасывает значения', () => {
@@ -50,6 +53,9 @@ describe('useRenameModal hook', () => {
         });
 
         expect(result.current.isOpen).toBe(true);
-        expect(result.current.initialValues).toEqual({ id: '456', title: 'Title 2' });
+        expect(result.current.initialValues).toEqual({
+            id: '456',
+            title: 'Title 2',
+        });
     });
 });
