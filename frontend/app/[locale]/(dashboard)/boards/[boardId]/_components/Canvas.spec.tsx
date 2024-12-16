@@ -120,26 +120,40 @@ jest.mock('next-intl', () => ({
 
 jest.mock(
     '@/app/[locale]/(dashboard)/boards/[boardId]/_components/SelectionBox',
-    () => ({
-        SelectionBox: ({ onResizeHandlePointerDown, isShowingHandles }) => {
-            if (!isShowingHandles) return null;
-            return (
-                <div data-testid="selection-box">
-                    <div
-                        data-testid="resize-handle-corner"
-                        onPointerDown={() =>
-                            onResizeHandlePointerDown('bottom-right', {
-                                x: 50,
-                                y: 50,
-                                width: 100,
-                                height: 100,
-                            })
-                        }
-                    />
-                </div>
-            );
-        },
-    }),
+    () => {
+        interface SelectionBoxProps {
+            onResizeHandlePointerDown: (
+                corner: string,
+                bounds: { x: number; y: number; width: number; height: number },
+            ) => void;
+            isShowingHandles: boolean;
+        }
+
+        return {
+            SelectionBox: ({
+                               onResizeHandlePointerDown,
+                               isShowingHandles,
+                           }: SelectionBoxProps) => {
+                if (!isShowingHandles) return null;
+
+                return (
+                    <div data-testid="selection-box">
+                        <div
+                            data-testid="resize-handle-corner"
+                            onPointerDown={() =>
+                                onResizeHandlePointerDown('bottom-right', {
+                                    x: 50,
+                                    y: 50,
+                                    width: 100,
+                                    height: 100,
+                                })
+                            }
+                        />
+                    </div>
+                );
+            },
+        };
+    },
 );
 
 jest.mock('./SelectionTools', () => ({
@@ -214,11 +228,24 @@ jest.mock('./SelectionTools', () => ({
 }));
 
 jest.mock('./StylesButton', () => ({
-    StylesButton: ({ onClick, ...props }: StylesButtonProps) => (
-        <button data-testid="styles-button" onClick={onClick} {...props}>
-            Styles
-        </button>
-    ),
+    StylesButton: ({ onClick, activeColor, ...props }: StylesButtonProps) => {
+        // Преобразование цвета в строку
+        const backgroundColor =
+            typeof activeColor === 'string'
+                ? activeColor // 'transparent'
+                : `rgb(${activeColor.r}, ${activeColor.g}, ${activeColor.b})`;
+
+        return (
+            <button
+                data-testid="styles-button"
+                onClick={onClick}
+                style={{ backgroundColor }}
+                {...props}
+            >
+                Styles
+            </button>
+        );
+    },
 }));
 
 describe('Canvas Component', () => {
@@ -257,7 +284,7 @@ describe('Canvas Component', () => {
 
     const renderCanvas = (props = {}, storeOverrides = {}): RenderResult => {
         mockUseCanvasStoreHook(storeOverrides);
-        return render(<Canvas {...props} />);
+        return render(<Canvas boardId="test-board-id" {...props} />);
     };
 
     const selectLayer = (
