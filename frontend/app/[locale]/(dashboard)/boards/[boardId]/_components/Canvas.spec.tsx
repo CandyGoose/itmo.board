@@ -131,9 +131,9 @@ jest.mock(
 
         return {
             SelectionBox: ({
-                               onResizeHandlePointerDown,
-                               isShowingHandles,
-                           }: SelectionBoxProps) => {
+                onResizeHandlePointerDown,
+                isShowingHandles,
+            }: SelectionBoxProps) => {
                 if (!isShowingHandles) return null;
 
                 return (
@@ -246,7 +246,7 @@ jest.mock('./StylesButton', () => ({
             </button>
         );
     },
-}))
+}));
 
 jest.mock('@clerk/nextjs', () => ({
     useOrganization: jest.fn(() => ({ membership: true })),
@@ -272,7 +272,6 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('Canvas Component', () => {
-
     const mockUseTranslations = useTranslations as jest.Mock;
     mockUseTranslations.mockImplementation(() => () => 'a');
 
@@ -810,7 +809,9 @@ describe('Canvas Component', () => {
 
     describe('SelectionTools', () => {
         it('toggles SelectionTools by clicking the StylesButton', () => {
-            const { getByTestId, queryByTestId } = renderCanvas({ boardId: 'test-board-id'  });
+            const { getByTestId, queryByTestId } = renderCanvas({
+                boardId: 'test-board-id',
+            });
             const stylesButton = getByTestId('styles-button');
 
             expect(queryByTestId('selection-tools')).toBeNull();
@@ -824,7 +825,7 @@ describe('Canvas Component', () => {
         });
 
         it('shows SelectionTools when a single layer is selected and styles button is clicked', () => {
-            const { getByTestId } = renderCanvas({ boardId: 'test-board-id'  });
+            const { getByTestId } = renderCanvas({ boardId: 'test-board-id' });
             selectLayer('layer1', getByTestId);
 
             const stylesButton = getByTestId('styles-button');
@@ -838,7 +839,7 @@ describe('Canvas Component', () => {
                 updateLayer: updateLayerMock,
             };
             const { getByTestId } = renderCanvas(
-                { boardId: 'test-board-id'  },
+                { boardId: 'test-board-id' },
                 storeOverrides,
             );
 
@@ -859,7 +860,7 @@ describe('Canvas Component', () => {
                 updateLayer: updateLayerMock,
             };
             const { getByTestId } = renderCanvas(
-                { boardId: 'test-board-id'  },
+                { boardId: 'test-board-id' },
                 storeOverrides,
             );
 
@@ -880,7 +881,7 @@ describe('Canvas Component', () => {
                 updateLayer: updateLayerMock,
             };
             const { getByTestId } = renderCanvas(
-                { boardId: 'test-board-id'  },
+                { boardId: 'test-board-id' },
                 storeOverrides,
             );
 
@@ -901,7 +902,7 @@ describe('Canvas Component', () => {
                 updateLayer: updateLayerMock,
             };
             const { getByTestId } = renderCanvas(
-                { boardId: 'test-board-id'  },
+                { boardId: 'test-board-id' },
                 storeOverrides,
             );
 
@@ -927,7 +928,7 @@ describe('Canvas Component', () => {
                 updateLayer: updateLayerMock,
             };
             const { getByTestId } = renderCanvas(
-                { boardId: 'test-board-id'  },
+                { boardId: 'test-board-id' },
                 storeOverrides,
             );
 
