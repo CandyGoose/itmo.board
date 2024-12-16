@@ -28,7 +28,9 @@ describe('Info Component', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useRenameModal as unknown as jest.Mock).mockReturnValue({ onOpen: mockOnOpen });
+        (useRenameModal as unknown as jest.Mock).mockReturnValue({
+            onOpen: mockOnOpen,
+        });
 
         (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
