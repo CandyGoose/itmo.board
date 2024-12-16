@@ -10,7 +10,7 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuShortcut,
 } from './DropdownMenu';
-import userEvent from "@testing-library/user-event";
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@radix-ui/react-portal', () => ({
     __esModule: true,
@@ -87,7 +87,10 @@ describe('DropdownMenu Component', () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {/* Использование текста напрямую как единственный элемент */}
-                    <DropdownMenuCheckboxItem checked data-testid="checkbox-item">
+                    <DropdownMenuCheckboxItem
+                        checked
+                        data-testid="checkbox-item"
+                    >
                         Checkbox
                     </DropdownMenuCheckboxItem>
                 </DropdownMenuContent>
@@ -115,7 +118,7 @@ describe('DropdownMenu Component', () => {
                         </DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu>,
         );
 
         await userEvent.click(screen.getByTestId('menu-trigger'));

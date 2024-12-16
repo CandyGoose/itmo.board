@@ -1,20 +1,20 @@
 'use client';
 
-import { toast } from "sonner";
-import { Link2, Pencil, Trash2 } from "lucide-react";
+import { toast } from 'sonner';
+import { Link2, Pencil, Trash2 } from 'lucide-react';
 import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { ConfirmModal } from '@/components/modals/ConfirmModal';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
-} from "@/components/ui/DropdownMenu";
-import { Button } from "@/components/ui/Button";
+} from '@/components/ui/DropdownMenu';
+import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {deleteBoard} from "@/actions/Board";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { deleteBoard } from '@/actions/Board';
 
 interface ActionsProps {
     children: React.ReactNode;
@@ -40,21 +40,20 @@ export const Actions = ({
     const router = useRouter();
 
     const onCopyLink = () => {
-        navigator.clipboard.writeText(
-            `${window.location.origin}/boards/${id}`,
-        )
-            .then(() => toast.success("Link copied"))
-            .catch(() => toast.error("Failed to copy link"))
+        navigator.clipboard
+            .writeText(`${window.location.origin}/boards/${id}`)
+            .then(() => toast.success('Link copied'))
+            .catch(() => toast.error('Failed to copy link'));
     };
 
     const onDelete = async () => {
         try {
             setLoading(true);
             await deleteBoard(id);
-            toast.success("Delete successfully.");
+            toast.success('Delete successfully.');
             router.push('/');
         } catch {
-            toast.error("Failed to delete.")
+            toast.error('Failed to delete.');
         } finally {
             setLoading(false);
         }
