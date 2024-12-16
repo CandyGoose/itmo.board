@@ -35,6 +35,7 @@ import { StylesButton } from './StylesButton';
 import { Grid } from './Grid';
 import { SelectionBox } from './SelectionBox';
 import { useOrganization } from '@clerk/nextjs';
+import { Participants } from './Participants';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -701,6 +702,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         >
             {/* Container for aligning buttons in the top-right corner */}
             <div className="absolute top-2 right-2 flex items-center gap-2">
+                <Participants className="h-12 w-12" />
                 <StylesButton
                     id="styles-button"
                     activeColor={lastUsedColor}

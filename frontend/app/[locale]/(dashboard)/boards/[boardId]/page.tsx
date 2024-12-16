@@ -1,17 +1,18 @@
 'use client';
 
-import { Room } from "@/components/Room";
+import { Room } from '@/components/Room';
 import Canvas from './_components/Canvas';
-import { CanvasLoading } from "./_components/Loading";
+import { CanvasLoading } from './_components/Loading';
+import { use } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         boardId: string;
-    };
+    }>;
 }
 
 export default function BoardPage({ params }: PageProps) {
-    const { boardId } = params;
+    const { boardId } = use(params);
 
     return (
         <Room roomId={boardId} fallback={<CanvasLoading />}>

@@ -9,6 +9,13 @@ export default async function combinedMiddleware(
     req: NextRequest,
     event: NextFetchEvent,
 ) {
+
+    // Skip intlMiddleware for API routes
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        // Directly return Clerk's middleware handler for API routes
+        return clerkMiddleware()(req, event);
+    }
+
     const clerkHandler = clerkMiddleware();
 
     await clerkHandler(req, event);
@@ -17,5 +24,11 @@ export default async function combinedMiddleware(
 }
 
 export const config = {
-    matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    matcher: [
+        '/((?!.+\\.[\\w]+$|_next).*)',
+        '/',
+        '/(api|trpc)(.*)',
+        '/api/(.*)', // Explicitly match API routes
+        // '/(.*)/board/(.*)',
+    ],
 };

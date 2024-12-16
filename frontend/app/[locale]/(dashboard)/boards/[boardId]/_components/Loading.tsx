@@ -1,18 +1,18 @@
-"use client"
+'use client';
 
-import { Loader } from "lucide-react"
+import { Loader } from 'lucide-react';
 
-import { InfoSkeleton } from './Info'
-import { ParticipantsSkeleton } from "./Participants"
-import { ToolBarSkeleton } from "./Toolbar"
+import { InfoSkeleton } from './Info';
+import { ParticipantsSkeleton } from './Participants';
+import { ToolBarSkeleton } from './Toolbar';
 
 export const CanvasLoading = () => {
-    return(
+    return (
         <main className="w-full h-full relative bg-neutral-100 touch-none flex items-center justify-center">
-            <Loader className="h-6 w-6 text-muted-foreground animate-spin"/>
-            <InfoSkeleton/>
+            <Loader className="h-6 w-6 text-muted-foreground animate-spin" />
+            <InfoSkeleton />
             <ParticipantsSkeleton />
             <ToolBarSkeleton />
         </main>
-    )
-}
+    );
+};
