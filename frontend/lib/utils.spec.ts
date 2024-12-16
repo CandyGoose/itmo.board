@@ -1032,6 +1032,7 @@ describe('Utility Functions', () => {
             width = 100,
             height = 100,
             fill = { r: 0, g: 0, b: 0 },
+            lineWidth = 1,
         ): PathLayer => ({
             id,
             type: LayerType.Path,
@@ -1041,6 +1042,7 @@ describe('Utility Functions', () => {
             height,
             fill,
             points,
+            lineWidth,
         });
 
         const createRectangleLayer = (

@@ -1,10 +1,4 @@
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCanvasStore } from '@/store/useCanvasStore';
 import { LayerPreview } from './LayerPreview';
 import {
@@ -34,12 +28,12 @@ import {
     resizeBounds,
 } from '@/lib/utils';
 import { Info } from './Info';
-import { ToolBar } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Toolbar';
+import { ToolBar } from './Toolbar';
 import { nanoid } from 'nanoid';
 import { SelectionTools } from './SelectionTools';
 import { StylesButton } from './StylesButton';
-import { Grid } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Grid';
-import { SelectionBox } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/SelectionBox';
+import { Grid } from './Grid';
+import { SelectionBox } from './SelectionBox';
 import { useOrganization } from '@clerk/nextjs';
 
 export const MIN_ZOOM = 0.1;
@@ -49,7 +43,7 @@ interface CanvasProps {
     boardId: string;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ boardId }) => {
+const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgRect, setSvgRect] = useState<DOMRect | null>(null);
 
