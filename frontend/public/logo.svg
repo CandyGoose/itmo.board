@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="51" height="51" fill="none" viewBox="0 0 51 51">
+  <g class="Symbol" clip-path="url(#a)">
+    <g class="Vector">
+      <path fill="url(#b)" d="M24.842 16.078 6.672 7.684a2.138 2.138 0 0 0-1.2-.174c-1.287.178-2.466 1.44-2.468 2.971l-.07 37.623c0 1.552 1.188 2.464 2.462 2.287.486-.067.984-.293 1.433-.701l15.338-13.955-6.644-3.07c-1.546-.712-2.269-2.185-2.34-3.57a4.95 4.95 0 0 1 1.63-3.893l10.03-9.125Z"/>
+      <path fill="url(#c)" d="M44.98.907c1.276-.177 2.467.735 2.464 2.287l-.07 37.623c-.004 1.53-1.182 2.792-2.468 2.972a2.137 2.137 0 0 1-1.201-.174l-27.381-12.65c-1.565-.721-1.684-3.057-.228-4.382L43.549 1.608c.45-.408.947-.634 1.432-.701Z"/>
+    </g>
+  </g>
+  <defs>
+    <radialGradient id="b" cx="0" cy="0" r="1" class="b" gradientTransform="rotate(173.014 33.742 10.893) scale(65.9917 25.1925)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E02E2E"/>
+      <stop offset="1" stop-color="#EE215B"/>
+    </radialGradient>
+    <radialGradient id="c" cx="0" cy="0" r="1" class="c" gradientTransform="rotate(-9.876 194.87 .276) scale(45.2207 25.6163)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0091FF"/>
+      <stop offset="1" stop-color="#1846C7"/>
+    </radialGradient>
+    <clipPath id="a" class="a">
+      <path fill="#fff" d="M-.009.637h50.575V50.66H-.009z"/>
+    </clipPath>
+  </defs>
+</svg>
