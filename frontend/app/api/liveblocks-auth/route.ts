@@ -1,10 +1,12 @@
-import { Liveblocks } from '@liveblocks/node'
-import { auth, currentUser } from '@clerk/nextjs';
+import { Liveblocks } from '@liveblocks/node';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 const liveblocksSecret = process.env.LIVEBLOCKS_SECRET;
 
 if (!liveblocksSecret) {
-    throw new Error("LIVEBLOCKS_SECRET is not defined in the environment variables.");
+    throw new Error(
+        'LIVEBLOCKS_SECRET is not defined in the environment variables.',
+    );
 }
 
 const liveblocks = new Liveblocks({
@@ -16,20 +18,17 @@ export async function POST(request: Request) {
     const user = await currentUser();
 
     if (!authorization || !user) {
-        return new Response("Unauthorized", { status: 403 })
+        return new Response('Unauthorized', { status: 403 });
     }
 
     const { room } = await request.json();
 
     const userInfo = {
-        name: user.firstName || "Teammate",
+        name: user.firstName || 'Teammate',
         picture: user.imageUrl,
     };
 
-    const session = liveblocks.prepareSession(
-        user.id,
-        { userInfo }
-    )
+    const session = liveblocks.prepareSession(user.id, { userInfo });
 
     if (room) {
         session.allow(room, session.FULL_ACCESS);
