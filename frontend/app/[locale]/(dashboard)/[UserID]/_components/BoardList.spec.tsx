@@ -143,13 +143,14 @@ describe('BoardList Component', () => {
                 <BoardList orgId="org1" query={{ search: 'One' }} />
             </NextIntlClientProvider>,
         );
-
         await waitFor(() => {
             expect(getAllBoards).toHaveBeenCalledWith('user1', 'org1');
         });
 
-        expect(screen.getByText('Board One')).toBeInTheDocument();
-        expect(screen.queryByText('Board Two')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Board One')).toBeInTheDocument();
+            expect(screen.queryByText('Board Two')).not.toBeInTheDocument();
+        });
     });
 
     it('отображает EmptySearch, если нет результатов поиска', async () => {
