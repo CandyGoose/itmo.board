@@ -35,6 +35,10 @@ jest.mock('./LayerPreview', () => ({
     )),
 }));
 
+jest.mock('./Participants', () => ({
+    Participants: () => <div>Participants</div>,
+}));
+
 jest.mock('@/lib/utils', () => ({
     cn: jest.fn((...args: string[]) => args.filter(Boolean).join(' ')),
     pointerEventToCanvasPoint: jest.fn((e, camera, scale) => ({

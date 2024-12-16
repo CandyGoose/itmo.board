@@ -23,10 +23,9 @@ import {
     XYWH,
 } from '@/types/canvas';
 import { twMerge } from 'tailwind-merge';
-import {
-    MAX_ZOOM,
-    MIN_ZOOM,
-} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Canvas';
+
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 20;
 
 jest.mock('clsx', () => ({
     __esModule: true,
