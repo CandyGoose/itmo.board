@@ -333,12 +333,10 @@ describe('Canvas Component', () => {
         const { getByTestId } = renderCanvas({ boardId: 'test-board-id' });
 
         const insertButton = getByTestId('insert-rectangle-button');
-        const pencilButton = getByTestId('pencil-tool-button');
         const svgElement = getByTestId('svg-element');
 
         // Проверка наличия слоев
         const layer1 = getByTestId('layer-preview-layer1');
-        const layer2 = getByTestId('layer-preview-layer2');
 
         // Остальной код теста
         fireEvent.click(insertButton);
