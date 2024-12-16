@@ -4,7 +4,7 @@
   },
   "search": {
     "searchBoards": "search boards",
-    "notFound": "no results found :(",
+    "notFound": "no results found",
     "tryAnother": "try searching for something else"
   },
   "utils": {
