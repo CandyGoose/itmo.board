@@ -33,26 +33,33 @@ import {
     pointerEventToCanvasPoint,
     resizeBounds,
 } from '@/lib/utils';
+import { Info } from './Info';
 import { ToolBar } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Toolbar';
 import { nanoid } from 'nanoid';
 import { SelectionTools } from './SelectionTools';
 import { StylesButton } from './StylesButton';
 import { Grid } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Grid';
 import { SelectionBox } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/SelectionBox';
+import { useOrganization } from '@clerk/nextjs';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
 
 interface CanvasProps {
-    edit?: boolean;
+    boardId: string;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ edit }) => {
+const Canvas: React.FC<CanvasProps> = ({ boardId }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgRect, setSvgRect] = useState<DOMRect | null>(null);
 
     const [showSelectionTools, setShowSelectionTools] = useState(false);
+    const { membership } = useOrganization();
     const [editable, setEditable] = useState(false);
+
+    useEffect(() => {
+        if (membership) setEditable(true);
+    }, [membership]);
 
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
@@ -115,10 +122,6 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-
-    useEffect(() => {
-        if (edit !== false) setEditable(true); // TODO: later will depend on user permissions
-    }, [edit]);
 
     // Determine if any tool is active
     const isAnyToolActive = useMemo(() => {
@@ -712,6 +715,11 @@ const Canvas: React.FC<CanvasProps> = ({ edit }) => {
                 />
             </div>
 
+            <Info
+                boardId={boardId}
+                editable={editable}
+                setEditable={setEditable}
+            />
             <ToolBar
                 canvasState={canvasState}
                 setCanvasState={setCanvasState}
