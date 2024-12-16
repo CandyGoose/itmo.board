@@ -29,6 +29,7 @@ export const LanguageSwitchButton = () => {
             onClick={onClick}
             variant="default"
             size="icon"
+            className="bg-transparent hover:bg-transparent"
         >
             <Image
                 src={`/language-${

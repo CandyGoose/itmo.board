@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Provider, ErrorBoundary } from '@rollbar/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import { ModalProvider } from '@/providers/ModalProvider';
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
@@ -27,7 +28,10 @@ export default async function LocaleLayout({
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ErrorBoundary>
                         <ClerkProvider>
-                            <body>{children}</body>
+                            <body>
+                                {children}
+                                <ModalProvider />
+                            </body>
                         </ClerkProvider>
                     </ErrorBoundary>
                 </NextIntlClientProvider>
