@@ -1,7 +1,7 @@
 'use client';
 
 import Canvas from './_components/Canvas';
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 interface PageProps {
     params: Promise<{ boardId: string }>;

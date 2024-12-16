@@ -33,14 +33,14 @@ import {
     pointerEventToCanvasPoint,
     resizeBounds,
 } from '@/lib/utils';
-import { Info } from "./Info";
+import { Info } from './Info';
 import { ToolBar } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Toolbar';
 import { nanoid } from 'nanoid';
 import { SelectionTools } from './SelectionTools';
 import { StylesButton } from './StylesButton';
 import { Grid } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Grid';
 import { SelectionBox } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/SelectionBox';
-import {useOrganization} from "@clerk/nextjs";
+import { useOrganization } from '@clerk/nextjs';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
