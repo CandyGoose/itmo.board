@@ -17,3 +17,12 @@ const calculateFontSize = (width: number, height: number) => {
         maxFontSize
     );
 }
+
+import { TextLayer } from "@/types/canvas";
+
+interface TextProps {
+    id: string;
+    layer: TextLayer;
+    onPointerDown: (e: React.PointerEvent, id: string) => void;
+    selectionColor?: string;
+};
