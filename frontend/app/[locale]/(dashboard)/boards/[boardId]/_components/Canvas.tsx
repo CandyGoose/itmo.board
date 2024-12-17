@@ -56,7 +56,6 @@ interface CanvasProps {
     boardId: string;
 }
 // TODO: Transparent fill not working
-// TODO: text content not updating for other users
 // TODO: polyline pencildraft works incorrectly
 const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const svgRef = useRef<SVGSVGElement>(null);
