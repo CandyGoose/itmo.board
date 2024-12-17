@@ -55,9 +55,9 @@ export const MAX_ZOOM = 20;
 interface CanvasProps {
     boardId: string;
 }
-// TODO: Fix panning for non members
 // TODO: Transparent fill not working
-// TODO: text content not updating
+// TODO: text content not updating for other users
+// TODO: polyline pencildraft works incorrectly
 const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgRect, setSvgRect] = useState<DOMRect | null>(null);
@@ -81,78 +81,90 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         y: 0,
     });
 
-    const selections = useOthersMapped(
-        (other) => other.presence.selection
-    );
+    const selections = useOthersMapped((other) => other.presence.selection);
     const selection = useSelf((me) => me.presence.selection);
 
     // Single-layer update mutation
-    const updateLayer = useMutation(({ storage }, id: string, updates: Partial<Layer>) => {
-        const liveLayers = storage.get("layers");
-        const layer = liveLayers.get(id);
+    const updateLayer = useMutation(
+        ({ storage }, id: string, updates: Partial<Layer>) => {
+            const liveLayers = storage.get('layers');
+            const layer = liveLayers.get(id);
 
-        if (layer) {
-            layer.update(updates);
-        }
-    }, [selection]);
+            if (layer) {
+                layer.update(updates);
+            }
+        },
+        [selection],
+    );
 
     // Multi-layer ordering mutations
-    const moveLayersToFront = useMutation(({ storage }, ids: string[]) => {
-        const liveLayerIds = storage.get("layerIds");
-        // For each selected layer, remove and re-push to end
-        for (const id of ids) {
-            const index = liveLayerIds.toImmutable().indexOf(id);
-            if (index !== -1) {
-                liveLayerIds.delete(index);
-                liveLayerIds.push(id);
+    const moveLayersToFront = useMutation(
+        ({ storage }, ids: string[]) => {
+            const liveLayerIds = storage.get('layerIds');
+            // For each selected layer, remove and re-push to end
+            for (const id of ids) {
+                const index = liveLayerIds.toImmutable().indexOf(id);
+                if (index !== -1) {
+                    liveLayerIds.delete(index);
+                    liveLayerIds.push(id);
+                }
             }
-        }
-    }, [selection]);
+        },
+        [selection],
+    );
 
-    const moveLayersToBack = useMutation(({ storage }, ids: string[]) => {
-        const liveLayerIds = storage.get("layerIds");
-        // For each selected layer, remove and insert at the start in order
-        for (let i = ids.length - 1; i >= 0; i--) {
-            const id = ids[i];
-            const index = liveLayerIds.toImmutable().indexOf(id);
-            if (index !== -1) {
-                liveLayerIds.delete(index);
-                liveLayerIds.insert(id, 0);
+    const moveLayersToBack = useMutation(
+        ({ storage }, ids: string[]) => {
+            const liveLayerIds = storage.get('layerIds');
+            // For each selected layer, remove and insert at the start in order
+            for (let i = ids.length - 1; i >= 0; i--) {
+                const id = ids[i];
+                const index = liveLayerIds.toImmutable().indexOf(id);
+                if (index !== -1) {
+                    liveLayerIds.delete(index);
+                    liveLayerIds.insert(id, 0);
+                }
             }
-        }
-    }, [selection]);
+        },
+        [selection],
+    );
 
-    const moveLayersForward = useMutation(({ storage }, ids: string[]) => {
-        const liveLayerIds = storage.get("layerIds");
-        const arr = liveLayerIds.toImmutable();
-        const idsSet = new Set(ids);
+    const moveLayersForward = useMutation(
+        ({ storage }, ids: string[]) => {
+            const liveLayerIds = storage.get('layerIds');
+            const arr = liveLayerIds.toImmutable();
+            const idsSet = new Set(ids);
 
-        // Move each selected layer forward one position if possible
-        for (let i = arr.length - 2; i >= 0; i--) {
-            if (idsSet.has(arr[i]) && !idsSet.has(arr[i + 1])) {
-                liveLayerIds.move(i, i + 1);
+            // Move each selected layer forward one position if possible
+            for (let i = arr.length - 2; i >= 0; i--) {
+                if (idsSet.has(arr[i]) && !idsSet.has(arr[i + 1])) {
+                    liveLayerIds.move(i, i + 1);
+                }
             }
-        }
-    }, [selection]);
+        },
+        [selection],
+    );
 
-    const moveLayersBackward = useMutation(({ storage }, ids: string[]) => {
-        const liveLayerIds = storage.get("layerIds");
-        const arr = liveLayerIds.toImmutable();
-        const idsSet = new Set(ids);
+    const moveLayersBackward = useMutation(
+        ({ storage }, ids: string[]) => {
+            const liveLayerIds = storage.get('layerIds');
+            const arr = liveLayerIds.toImmutable();
+            const idsSet = new Set(ids);
 
-        // Move each selected layer backward one position if possible
-        for (let i = 1; i < arr.length; i++) {
-            if (idsSet.has(arr[i]) && !idsSet.has(arr[i - 1])) {
-                liveLayerIds.move(i, i - 1);
+            // Move each selected layer backward one position if possible
+            for (let i = 1; i < arr.length; i++) {
+                if (idsSet.has(arr[i]) && !idsSet.has(arr[i - 1])) {
+                    liveLayerIds.move(i, i - 1);
+                }
             }
-        }
-    }, [selection]);
+        },
+        [selection],
+    );
 
     const [canvasState, setCanvasState] = useState<CanvasState>({
         mode: CanvasMode.None,
     });
 
-    // const [pencilDraft, setPencilDraft] = useState<number[][] | null>(null);
     const pencilDraft = useSelf((me) => me.presence.pencilDraft);
 
     const history = useHistory();
@@ -220,9 +232,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             const [connectionId, selection] = user;
 
             for (const layerId of selection) {
-                layerIdsToColorSelection[layerId] = connectionIdToColor(
-                    connectionId
-                );
+                layerIdsToColorSelection[layerId] =
+                    connectionIdToColor(connectionId);
             }
         }
         return layerIdsToColorSelection;
@@ -230,8 +241,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const insertLayer = useMutation(
         ({ storage, setMyPresence }, layerType: LayerType, position: Point) => {
-            const liveLayers = storage.get("layers");
-            const liveLayerIds = storage.get("layerIds");
+            const liveLayers = storage.get('layers');
+            const liveLayerIds = storage.get('layerIds');
             const id = nanoid();
             let layerData: Layer;
 
@@ -300,14 +311,14 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 y: point.y - (canvasState.current?.y ?? 0),
             };
 
-            const liveLayers = storage.get("layers");
+            const liveLayers = storage.get('layers');
 
             selection.forEach((id) => {
                 const layer = liveLayers.get(id);
                 if (layer) {
                     layer.update({
-                        x: layer.get("x") + offset.x,
-                        y: layer.get("y") + offset.y,
+                        x: layer.get('x') + offset.x,
+                        y: layer.get('y') + offset.y,
                     });
                 }
             });
@@ -316,7 +327,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 current: point,
             });
         },
-        [canvasState, editable]
+        [canvasState, editable],
     );
 
     const unselectLayers = useMutation(({ self, setMyPresence }) => {
@@ -328,7 +339,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const updateSelectionNet = useMutation(
         ({ storage, setMyPresence }, current: Point, origin: Point) => {
             if (!editable) return;
-            const layers = storage.get("layers").toImmutable();
+            const layers = storage.get('layers').toImmutable();
 
             setCanvasState({
                 mode: CanvasMode.SelectionNet,
@@ -387,6 +398,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     setMyPresence({
                         pencilDraft: [...pencilDraft, roundedPoint],
                     });
+                } else {
+                    setMyPresence({
+                        pencilDraft: [...pencilDraft]
+                    });
                 }
             } else {
                 setMyPresence({
@@ -394,12 +409,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 });
             }
         },
-        []
+        [],
     );
 
     const insertPath = useMutation(
         ({ storage, self, setMyPresence }) => {
-            const liveLayers = storage.get("layers");
+            const liveLayers = storage.get('layers');
             const { pencilDraft } = self.presence;
             if (pencilDraft && pencilDraft.length > 1) {
                 const id = nanoid();
@@ -411,11 +426,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     lineWidth: lineWidth,
                 } as PathLayer;
                 liveLayers.set(id, new LiveObject(newLayer));
-                const liveLayerIds = storage.get("layerIds");
+                const liveLayerIds = storage.get('layerIds');
                 liveLayerIds.push(id);
             }
             setMyPresence({ pencilDraft: null });
-    }, [pencilDraft, lastUsedColor, lineWidth]);
+        },
+        [pencilDraft, lastUsedColor, lineWidth],
+    );
 
     const startDrawing = useMutation(
         ({ setMyPresence }, point: Point, pressure: number) => {
@@ -424,7 +441,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 penColor: lastUsedColor,
             });
         },
-        [lastUsedColor]
+        [lastUsedColor],
     );
 
     const resizeSelectedLayers = useMutation(
@@ -437,13 +454,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 currentPoint,
             );
 
-            const liveLayers = storage.get("layers");
+            const liveLayers = storage.get('layers');
             const layer = liveLayers.get(selection[0]);
             if (layer) {
                 layer.update(newBounds);
             }
         },
-        [canvasState]
+        [canvasState],
     );
 
     const onResizeHandlePointerDown = useCallback(
@@ -501,10 +518,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
             if (!selection.includes(layerId)) {
-                setMyPresence(
-                    { selection: [layerId] },
-                    { addToHistory: true }
-                );
+                setMyPresence({ selection: [layerId] }, { addToHistory: true });
             }
 
             setCanvasState({ mode: CanvasMode.Translating, current: point });
@@ -559,9 +573,11 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         ],
     );
 
-    const onPointerMove = useCallback(
-        (e: React.PointerEvent) => {
-            if (!editable) return;
+    const onPointerMove = useMutation(
+        ({ setMyPresence }, e: React.PointerEvent) => {
+            if (!editable) {
+                setCanvasState({ mode: CanvasMode.None });
+            }
             e.stopPropagation();
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
@@ -593,6 +609,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         setMoved(true);
                     }
             }
+            setMyPresence({ cursor: point });
         },
         [
             editable,
@@ -611,8 +628,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         ],
     );
 
-    const onPointerUp = useCallback(
-        (e: React.PointerEvent) => {
+    const onPointerUp = useMutation(
+        ({}, e) => {
             setIsPanning(false);
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
             if (
@@ -629,6 +646,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 setCanvasState({ mode: CanvasMode.None });
             }
             setMoved(false);
+            history.resume();
         },
         [
             camera,
@@ -644,7 +662,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         ],
     );
 
-    const onPointerLeave = useCallback(() => {
+    const onPointerLeave = useMutation(({ setMyPresence }) => {
+        setMyPresence({ cursor: null });
         setIsPanning(false);
     }, []);
 
@@ -653,34 +672,34 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const [copiedLayers, setCopiedLayers] = useState<Layer[]>([]);
     const [pasteCount, setPasteCount] = useState(0);
 
-    const copyLayers = useMutation(
-        ({ storage, setMyPresence }) => {
-            const liveLayers = storage.get("layers");
-            const layersToCopy = selection
-                .map((layerId) => {
-                    const layer = liveLayers.get(layerId);
-                    if (layer) {
-                        return {
-                            id: nanoid(),
-                            data: layer.toObject(),
-                        };
-                    }
-                    return null;
-                })
-                .filter((layer): layer is { id: string; data: Layer } => layer !== null);
+    const copyLayers = useMutation(({ storage, setMyPresence }) => {
+        const liveLayers = storage.get('layers');
+        const layersToCopy = selection
+            .map((layerId) => {
+                const layer = liveLayers.get(layerId);
+                if (layer) {
+                    return {
+                        id: nanoid(),
+                        data: layer.toObject(),
+                    };
+                }
+                return null;
+            })
+            .filter(
+                (layer): layer is { id: string; data: Layer } => layer !== null,
+            );
 
-            setMyPresence({ copiedLayers: layersToCopy });
-            const copiedLayers = layersToCopy.map((layer) => layer.data);
-            setCopiedLayers(copiedLayers);
-            setPasteCount(0);
-        },
-    []);
+        setMyPresence({ copiedLayers: layersToCopy });
+        const copiedLayers = layersToCopy.map((layer) => layer.data);
+        setCopiedLayers(copiedLayers);
+        setPasteCount(0);
+    }, []);
 
     const pasteLayers = useMutation(
         ({ storage, setMyPresence }) => {
             if (copiedLayers.length === 0) return;
-            const liveLayers = storage.get("layers");
-            const liveLayerIds = storage.get("layerIds");
+            const liveLayers = storage.get('layers');
+            const liveLayerIds = storage.get('layerIds');
 
             const offset = 10 * (pasteCount + 1);
             const newLayerIds = copiedLayers.map((copiedLayer) => {
@@ -699,15 +718,14 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             newLayerIds.map((id) => liveLayerIds.push(id));
             setMyPresence({ selection: newLayerIds });
             setPasteCount((prev) => prev + 1);
-    }, [copiedLayers, pasteCount]);
-
-    const selectAllLayers = useMutation(
-        ({ storage, setMyPresence }) => {
-            const allLayerIds = [...storage.get("layerIds").toImmutable()];
-            setMyPresence({ selection: allLayerIds });
         },
-        []
+        [copiedLayers, pasteCount],
     );
+
+    const selectAllLayers = useMutation(({ storage, setMyPresence }) => {
+        const allLayerIds = [...storage.get('layerIds').toImmutable()];
+        setMyPresence({ selection: allLayerIds });
+    }, []);
 
     // Functions for SelectionTools
     const setLayerColor = useCallback(
@@ -776,7 +794,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             }
 
             switch (e.key) {
-                case "z": {
+                case 'z': {
                     if (e.ctrlKey || e.metaKey) {
                         if (e.shiftKey) {
                             history.redo();
@@ -788,7 +806,11 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     break;
                 }
                 case 'Delete':
-                    if (selection.some((id) => layers.get(id)?.type !== LayerType.Note)) {
+                    if (
+                        selection.some(
+                            (id) => layers.get(id)?.type !== LayerType.Note,
+                        )
+                    ) {
                         deleteLayers();
                     }
                     break;
@@ -817,7 +839,16 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         return () => {
             window.removeEventListener('keydown', onKeyDown);
         };
-    }, [copyLayers, pasteLayers, deleteLayers, selectAllLayers, editable, selection, history, layers]);
+    }, [
+        copyLayers,
+        pasteLayers,
+        deleteLayers,
+        selectAllLayers,
+        editable,
+        selection,
+        history,
+        layers,
+    ]);
 
     const handleMoveToFront = useCallback(() => {
         moveLayersToFront(selection);
@@ -861,6 +892,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             <ToolBar
                 canvasState={canvasState}
                 setCanvasState={setCanvasState}
+                undo={history.undo}
+                redo={history.redo}
+                canUndo={canUndo}
+                canRedo={canRedo}
                 editable={editable}
                 deleteSelected={deleteLayers}
                 moveToFront={handleMoveToFront}

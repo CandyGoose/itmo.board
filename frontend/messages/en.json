@@ -34,6 +34,8 @@
     "width": "Width",
     "height": "Height",
     "font": "Font",
-    "fontSize": "Font size"
+    "fontSize": "Font size",
+    "undo": "undo",
+    "redo": "redo"
   }
 }
