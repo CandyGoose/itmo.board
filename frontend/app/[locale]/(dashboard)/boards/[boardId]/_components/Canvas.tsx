@@ -191,6 +191,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         type: LayerType.Ellipse,
                     } as EllipseLayer;
                     break;
+                case LayerType.Text:
                 case LayerType.Note:
                     layerData = {
                         ...baseProps,

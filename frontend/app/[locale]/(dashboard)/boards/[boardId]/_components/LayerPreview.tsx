@@ -7,6 +7,7 @@ import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { Text } from "@/app/[locale]/(dashboard)/boards/[boardId]/_components/Text";
 import { useStorage } from '@/liveblocks.config';
 
 interface LayerPreviewProps {
@@ -51,6 +52,15 @@ export const LayerPreview = memo(
             case LayerType.Rectangle:
                 return (
                     <Rectangle
+                        id={id}
+                        layer={layer}
+                        onPointerDown={onLayerPointerDown}
+                        selectionColor={selectionColor}
+                    />
+                );
+            case LayerType.Text:
+                return (
+                    <Text
                         id={id}
                         layer={layer}
                         onPointerDown={onLayerPointerDown}
