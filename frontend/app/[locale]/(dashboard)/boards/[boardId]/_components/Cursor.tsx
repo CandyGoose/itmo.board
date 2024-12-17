@@ -1,32 +1,30 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import { MousePointer2 } from "lucide-react";
+import { memo } from 'react';
+import { MousePointer2 } from 'lucide-react';
 
-import { useOther } from "@/liveblocks.config";
-import { connectionIdToColor } from "@/lib/utils";
+import { useOther } from '@/liveblocks.config';
+import { connectionIdToColor } from '@/lib/utils';
 
 interface CursorProps {
     connectionId: number;
 }
 
-export const Cursor = memo(({
-                                connectionId,
-                            }: CursorProps) => {
+export const Cursor = memo(({ connectionId }: CursorProps) => {
     const info = useOther(connectionId, (user) => user?.info);
     const cursor = useOther(connectionId, (user) => user.presence.cursor);
 
-    const name = info?.name || "Teammate";
+    const name = info?.name || 'Teammate';
 
-    if(!cursor){
+    if (!cursor) {
         return null;
     }
 
-    const { x, y} = cursor;
+    const { x, y } = cursor;
     return (
         <foreignObject
             style={{
-                transform: `translateX(${x}px) translateY(${y}px)`
+                transform: `translateX(${x}px) translateY(${y}px)`,
             }}
             height={50}
             width={name.length * 10 + 24}
@@ -43,12 +41,12 @@ export const Cursor = memo(({
             {/* this div tab will indicate the data of user  */}
             <div
                 className="absolute left-5 px-1.5 py-0.5 rounded-md text-xs text-white font-semibold"
-                style={{backgroundColor: connectionIdToColor(connectionId)}}
+                style={{ backgroundColor: connectionIdToColor(connectionId) }}
             >
                 {name}
             </div>
         </foreignObject>
-    )
+    );
 });
 
-Cursor.displayName = "Cursor";
+Cursor.displayName = 'Cursor';
