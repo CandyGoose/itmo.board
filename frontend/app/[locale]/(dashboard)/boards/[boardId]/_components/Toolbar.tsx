@@ -14,7 +14,7 @@ import {
     Circle,
     StickyNote,
     Undo2,
-    Redo2,
+    Redo2, Type,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -144,6 +144,19 @@ export const ToolBar = ({
                     isActive={
                         canvasState.mode === CanvasMode.Inserting &&
                         canvasState.layerType === LayerType.Ellipse
+                    }
+                    isDisabled={!editable}
+                />
+                <ToolButton
+                    label="Text"
+                    icon={Type}
+                    onClick={() => setCanvasState({
+                        mode: CanvasMode.Inserting,
+                        layerType: LayerType.Text,
+                    })}
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting &&
+                        canvasState.layerType === LayerType.Text
                     }
                     isDisabled={!editable}
                 />
