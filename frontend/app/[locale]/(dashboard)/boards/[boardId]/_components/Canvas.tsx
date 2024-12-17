@@ -36,6 +36,7 @@ import { Grid } from './Grid';
 import { SelectionBox } from './SelectionBox';
 import { useOrganization } from '@clerk/nextjs';
 import { Participants } from './Participants';
+import { CursorsPresence } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/CursorsPresence';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -824,7 +825,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                             selectionColor={layerIdsToColorSelection[layerId]}
                         />
                     ))}
-
+                    <CursorsPresence />
                     {pencilDraft && pencilDraft.length >= 1 && (
                         <polyline
                             points={pencilDraft
