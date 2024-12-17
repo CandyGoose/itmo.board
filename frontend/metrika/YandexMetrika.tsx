@@ -1,19 +1,18 @@
-import React, {useEffect} from "react";
-import Script from 'next/script'
-import {usePathname, useSearchParams} from "next/navigation";
+import React, { useEffect } from 'react';
+import Script from 'next/script';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function YandexMetrika() {
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        const url = `${pathname}?${searchParams}`
+        const url = `${pathname}?${searchParams}`;
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         window.ym(process.env.YANDEX_METRIKA_ID, 'hit', url);
-
-    }, [pathname, searchParams])
+    }, [pathname, searchParams]);
 
     return (
         <>
@@ -47,8 +46,7 @@ export default function YandexMetrika() {
                     accurateTrackBounce:true,
                     webvisor:true
                 }
-            );`
-                }
+            );`}
             </Script>
         </>
     );
