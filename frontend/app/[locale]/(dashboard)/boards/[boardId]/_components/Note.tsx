@@ -9,6 +9,7 @@ import {
     useCallback,
     useMemo,
 } from 'react';
+import { useMutation } from '@/liveblocks.config';
 
 const font = Kalam({
     subsets: ['latin'],
@@ -122,11 +123,18 @@ export const Note = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
+    const updateValue = useMutation(({ storage }, newValue: string) => {
+        const liveLayers = storage.get('layers');
+        liveLayers.get(id)?.set('value', newValue);
+    }, [id]);
+
     const handleContentChange = useCallback(
         (e: React.FormEvent<HTMLDivElement>) => {
-            setNoteValue(e.currentTarget.textContent || '');
+            const newVal = e.currentTarget.textContent || '';
+            setNoteValue(newVal);
+            updateValue(newVal);
         },
-        [],
+        [updateValue],
     );
 
     const textColor = useMemo(
@@ -165,14 +173,19 @@ export const Note = ({
         }
     }, [noteValue, width, height, currFontSize, fontSize, fontName]);
 
+    // If the layer value changes from an external source (other user editing),
+    // update the local state, but do NOT forcibly reset the textContent if we're already showing it.
     useEffect(() => {
-        if (inputRef.current) {
-            const val =
-                layer.value && layer.value !== '' ? layer.value : 'Text';
-            inputRef.current.textContent = val;
+        const val = layer.value && layer.value !== '' ? layer.value : 'Text';
+        if (val !== noteValue) {
             setNoteValue(val);
+            // Set the textContent only if it differs from what we have,
+            // ensuring the cursor won't jump unnecessarily.
+            if (inputRef.current && inputRef.current.textContent !== val) {
+                inputRef.current.textContent = val;
+            }
         }
-    }, [layer.value]);
+    }, [layer.value, noteValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
