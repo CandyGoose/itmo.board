@@ -70,6 +70,16 @@ export type NoteLayer = {
     textFormat: TextFormat[];
 };
 
+export type TextLayer = {
+    type: LayerType.Text;
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+    fill: Color;
+    value?: string;
+};
+
 export type PathLayer = {
     id: string;
     type: LayerType.Path;
@@ -146,4 +156,4 @@ export const enum CanvasMode {
     Pencil,
 }
 
-export type Layer = RectangleLayer | EllipseLayer | NoteLayer | PathLayer;
+export type Layer = RectangleLayer | EllipseLayer | NoteLayer | TextLayer | PathLayer;
