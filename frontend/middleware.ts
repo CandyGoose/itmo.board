@@ -27,7 +27,6 @@ export const config = {
         '/((?!.+\\.[\\w]+$|_next).*)',
         '/',
         '/(api|trpc)(.*)',
-        '/api/(.*)', // Explicitly match API routes
         // '/(.*)/board/(.*)',
     ],
 };

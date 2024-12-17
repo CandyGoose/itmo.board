@@ -34,7 +34,6 @@ const Drafts = () => {
         <>
             {others.map(([key, other]) => {
                 if (other.pencilDraft) {
-                    const { width, height } = penPointsToPathLayer(other.pencilDraft)
                     return (
                         <Path
                             key={key}
@@ -46,8 +45,8 @@ const Drafts = () => {
                                     ? colorToCss(other.penColor)
                                     : '#000'
                             }
-                            width={width!}
-                            height={height!}
+                            width={0}
+                            height={0}
                         />
                     );
                 }

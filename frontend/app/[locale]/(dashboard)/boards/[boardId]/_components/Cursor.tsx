@@ -8,7 +8,7 @@ import { connectionIdToColor } from "@/lib/utils";
 
 interface CursorProps {
     connectionId: number;
-};
+}
 
 export const Cursor = memo(({
                                 connectionId,
@@ -30,7 +30,7 @@ export const Cursor = memo(({
             }}
             height={50}
             width={name.length * 10 + 24}
-            // drop-shadow-... đổ bóng dưới
+            drop-shadow="0 0 10px rgba(0, 0, 0, 0.2)"
             className="relative drop-shadow-md"
         >
             <MousePointer2
