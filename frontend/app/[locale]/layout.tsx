@@ -1,7 +1,7 @@
 import '../globals.css';
 import React, { ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Provider, ErrorBoundary } from '@rollbar/react';
+import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ModalProvider } from '@/providers/ModalProvider';
@@ -24,7 +24,7 @@ export default async function LocaleLayout({
 
     return (
         <html lang={locale}>
-            <Provider config={rollbarConfig}>
+            <RollbarProvider config={rollbarConfig}>
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ErrorBoundary>
                         <ClerkProvider>
@@ -35,7 +35,7 @@ export default async function LocaleLayout({
                         </ClerkProvider>
                     </ErrorBoundary>
                 </NextIntlClientProvider>
-            </Provider>
+            </RollbarProvider>
         </html>
     );
 }

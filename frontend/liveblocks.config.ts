@@ -9,7 +9,7 @@ import { createRoomContext, createLiveblocksContext } from '@liveblocks/react';
 import { Layer, Color } from '@/types/canvas';
 
 const client = createClient({
-    throttle: 16, //make the client motion smoothly
+    throttle: 33, //30fps approx
     authEndpoint: '/api/liveblocks-auth',
     // throttle: 100,
     async resolveUsers({ userIds }) {
