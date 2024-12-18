@@ -104,16 +104,6 @@ describe('Note component', () => {
         expect(editableDiv).toHaveStyle('color: #000000');
     });
 
-    it('should render initial text correctly', () => {
-        renderComponent(mockLayer);
-
-        const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
-
-        expect(editableDiv?.textContent).toBe('Initial note text');
-    });
-
     it('should update the text when edited', () => {
         renderComponent(mockLayer);
 

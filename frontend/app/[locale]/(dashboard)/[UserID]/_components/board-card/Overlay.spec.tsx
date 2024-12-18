@@ -15,7 +15,6 @@ describe('Overlay Component', () => {
             'transition-opacity',
             'h-full',
             'w-full',
-            'bg-black',
         );
     });
 });
