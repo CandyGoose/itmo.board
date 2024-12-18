@@ -29,9 +29,9 @@ jest.mock('next-intl', () => {
         useTranslations: jest.fn(),
         useLocale: jest.fn(),
         NextIntlClientProvider: ({
-                                     children,
-                                     messages,
-                                 }: {
+            children,
+            messages,
+        }: {
             children: React.ReactNode;
             messages: Record<string, string>;
         }) => (

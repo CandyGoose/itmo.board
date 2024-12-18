@@ -33,7 +33,10 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
         return (
             <>
                 <div className="mb-1">
-                    <label className="text-sm mb-1 block text-[var(--text-color)]" htmlFor="font-picker">
+                    <label
+                        className="text-sm mb-1 block text-[var(--text-color)]"
+                        htmlFor="font-picker"
+                    >
                         {t('font')}
                     </label>
                     <select
