@@ -28,8 +28,10 @@ describe('Room Component', () => {
     const childText = 'Child Component';
 
     beforeEach(() => {
-        (ClientSideSuspense as jest.Mock).mockImplementation(({ children }: any) => (
-            <div data-testid="client-side-suspense">{children ? children() : null}</div>
+        (ClientSideSuspense as jest.Mock).mockImplementation(({ children }) => (
+            <div data-testid="client-side-suspense">
+                {children ? children() : null}
+            </div>
         ));
     });
 
@@ -41,7 +43,7 @@ describe('Room Component', () => {
         render(
             <Room roomId={roomId} fallback={fallbackText}>
                 <div>{childText}</div>
-            </Room>
+            </Room>,
         );
 
         const roomProvider = screen.getByTestId('room-provider');
@@ -70,14 +72,14 @@ describe('Room Component', () => {
     });
 
     it('renders fallback when ClientSideSuspense is in fallback state', () => {
-        (ClientSideSuspense as jest.Mock).mockImplementation(({ fallback }: any) => (
+        (ClientSideSuspense as jest.Mock).mockImplementation(({ fallback }) => (
             <div data-testid="client-side-suspense-fallback">{fallback}</div>
         ));
 
         render(
             <Room roomId={roomId} fallback={fallbackText}>
                 <div>{childText}</div>
-            </Room>
+            </Room>,
         );
 
         const fallback = screen.getByTestId('client-side-suspense-fallback');
@@ -90,7 +92,7 @@ describe('Room Component', () => {
         render(
             <Room roomId={roomId} fallback={fallbackText}>
                 <div>{childText}</div>
-            </Room>
+            </Room>,
         );
 
         expect(LiveMap).toHaveBeenCalledWith();

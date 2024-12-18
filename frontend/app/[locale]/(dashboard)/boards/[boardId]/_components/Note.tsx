@@ -13,7 +13,7 @@ const font = Kalam({
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
-function doesTextFit(
+export function doesTextFit(
     ctx: CanvasRenderingContext2D,
     text: string,
     width: number,
@@ -62,7 +62,7 @@ export const calculateFontSize = (
     width: number,
     height: number,
     text: string,
-    initialFontSize = 72,
+    initialFontSize = MAX_FONT_SIZE,
     fontName = 'Kalam',
 ) => {
     const canvas = document.createElement('canvas');

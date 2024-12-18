@@ -26,7 +26,7 @@ export default async function LocaleLayout({
     return (
         <html lang={locale}>
             <RollbarProvider config={rollbarConfig}>
-            <YandexMetrika />
+                <YandexMetrika />
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ErrorBoundary>
                         <ClerkProvider>
