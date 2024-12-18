@@ -26,6 +26,7 @@ import {
     penPointsToPathLayer,
     pointerEventToCanvasPoint,
     resizeBounds,
+    roundToTwoDecimals,
 } from '@/lib/utils';
 import { Info } from './Info';
 import { ToolBar } from './Toolbar';
@@ -240,8 +241,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 const layer = liveLayers.get(id);
                 if (layer) {
                     layer.update({
-                        x: layer.get('x') + offset.x,
-                        y: layer.get('y') + offset.y,
+                        x: roundToTwoDecimals(layer.get('x') + offset.x),
+                        y: roundToTwoDecimals(layer.get('y') + offset.y),
                     });
                 }
             }
