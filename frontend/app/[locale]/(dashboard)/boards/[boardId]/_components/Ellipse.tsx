@@ -17,10 +17,6 @@ export const Ellipse = ({
 }: EllipseProps) => {
     const fillColor = layer.fill ? colorToCss(layer.fill) : 'transparent';
     const strokeColor = selectionColor || 'transparent';
-    const cx = layer.width / 2;
-    const cy = layer.height / 2;
-    const rx = layer.width / 2;
-    const ry = layer.height / 2;
 
     return (
         <ellipse
@@ -32,10 +28,10 @@ export const Ellipse = ({
                     ${layer.y}px
                 )`,
             }}
-            cx={cx}
-            cy={cy}
-            rx={rx}
-            ry={ry}
+            cx={layer.width / 2}
+            cy={layer.height / 2}
+            rx={layer.width / 2}
+            ry={layer.height / 2}
             fill={fillColor}
             stroke={strokeColor}
             strokeWidth="1"

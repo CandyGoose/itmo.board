@@ -1,12 +1,13 @@
 import '../globals.css';
 import React, { ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Provider, ErrorBoundary } from '@rollbar/react';
+import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { Toaster } from '@/components/ui/Sonner';
 import { getMessages } from 'next-intl/server';
 import { ModalProvider } from '@/providers/ModalProvider';
 import YandexMetrika from '@/metrika/YandexMetrika';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
@@ -26,20 +27,21 @@ export default async function LocaleLayout({
 
     return (
         <html lang={locale}>
-            <YandexMetrika />
-            <Provider config={rollbarConfig}>
+            <RollbarProvider config={rollbarConfig}>
+                <YandexMetrika />
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ErrorBoundary>
                         <ClerkProvider>
                             <body>
-                                {children}
-                                <ModalProvider />
-                                <Toaster />
+                                <ThemeProvider>
+                                    {children}
+                                    <ModalProvider />
+                                </ThemeProvider>
                             </body>
                         </ClerkProvider>
                     </ErrorBoundary>
                 </NextIntlClientProvider>
-            </Provider>
+            </RollbarProvider>
         </html>
     );
 }

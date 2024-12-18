@@ -219,8 +219,8 @@ describe('SelectionTools', () => {
             <SelectionTools
                 {...defaultProps}
                 selectedLayers={[selectedLayer]}
-                onPositionChange={mockOnPositionChange} // Use the new mock
-                onSizeChange={mockOnSizeChange} // Use the new mock
+                onPositionChange={mockOnPositionChange}
+                onSizeChange={mockOnSizeChange}
             />,
         );
 
@@ -234,10 +234,10 @@ describe('SelectionTools', () => {
         fireEvent.change(widthInput, { target: { value: '350' } });
         fireEvent.change(heightInput, { target: { value: '450' } });
 
-        expect(mockOnPositionChange).toHaveBeenCalledWith(150, 200); // x changed to 150
-        expect(mockOnPositionChange).toHaveBeenCalledWith(100, 250); // y changed to 250
-        expect(mockOnSizeChange).toHaveBeenCalledWith(350, 400); // width changed to 350
-        expect(mockOnSizeChange).toHaveBeenCalledWith(300, 450); // height changed to 450
+        expect(mockOnPositionChange).toHaveBeenCalledWith(150, 200);
+        expect(mockOnPositionChange).toHaveBeenCalledWith(100, 250);
+        expect(mockOnSizeChange).toHaveBeenCalledWith(350, 400);
+        expect(mockOnSizeChange).toHaveBeenCalledWith(300, 450);
     });
 
     it('renders FontPicker and handles font changes when single Note is selected', () => {

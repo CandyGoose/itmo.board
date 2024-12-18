@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useCanvasStore } from './useCanvasStore';
-import { Layer, LayerType } from '@/types/canvas';
+import { Layer, LayerType, TextAlign } from '@/types/canvas';
 
 describe('useCanvasStore', () => {
     const sampleLayer: Layer = {
@@ -25,6 +25,7 @@ describe('useCanvasStore', () => {
             [0, 0],
             [10, 10],
         ],
+        lineWidth: 5,
     };
 
     const thirdLayer: Layer = {
@@ -46,6 +47,11 @@ describe('useCanvasStore', () => {
         height: 60,
         fill: { r: 255, g: 255, b: 0 },
         value: 'Note',
+        lineWidth: 1,
+        fontName: 'Arial',
+        fontSize: 12,
+        textAlign: TextAlign.Left,
+        textFormat: [],
     };
 
     const initializeStore = () => {

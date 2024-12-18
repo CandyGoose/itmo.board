@@ -60,7 +60,7 @@ export const Info = ({
 
     return (
         <div className="flex flex-row gap-x-2 absolute top-2 left-2 items-center">
-            <div className=" bg-white rounded-md px-1.5 h-12 flex items-center shadow-md">
+            <div className="rounded-md px-1.5 h-12 flex items-center shadow-md bg-[var(--background-color)]">
                 <Hint label="Go to boards" side="bottom" sideOffset={10}>
                     <Button asChild className="px-2" variant="board">
                         <Link href="/">
@@ -72,7 +72,7 @@ export const Info = ({
                             />
                             <span
                                 className={cn(
-                                    'font-semibold text-xl ml-2 text-black',
+                                    'font-semibold text-xl ml-2 text-[var(--text-color)]',
                                     font.className,
                                 )}
                             >
@@ -151,7 +151,7 @@ export const InfoSkeleton = () => {
     return (
         <div
             role="status"
-            className="absolute top-2 left-2 bg-white rounded-md px-1.5 h-12 flex items-center shadow-md w-[300px]"
+            className="absolute top-2 left-2 bg-[var(--background-color)] rounded-md px-1.5 h-12 flex items-center shadow-md w-[300px]"
         />
     );
 };
