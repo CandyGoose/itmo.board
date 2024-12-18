@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useRef } from 'react';
 
-export const MIN_GRID_SPACING = 10;
-export const GRID_LEVELS = [1000, 500, 100, 50, 10, 5, 1];
-export const STROKE_STYLES = [
+const MIN_GRID_SPACING = 10;
+const GRID_LEVELS = [1000, 500, 100, 50, 10, 5, 1];
+const STROKE_STYLES = [
     { minSpacing: 100, stroke: '#999', strokeWidth: 1 },
     { minSpacing: 10, stroke: '#bbb', strokeWidth: 0.5 },
     { minSpacing: 0, stroke: '#ddd', strokeWidth: 0.25 },
