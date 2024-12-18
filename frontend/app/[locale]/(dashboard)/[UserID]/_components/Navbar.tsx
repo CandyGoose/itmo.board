@@ -13,6 +13,7 @@ import { Poppins } from 'next/font/google';
 import { LanguageSwitchButton } from '@/app/[locale]/(dashboard)/[UserID]/_components/LanguageSwitchButton';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
+import {ThemeToggleButton} from "@/app/[locale]/(dashboard)/[UserID]/_components/ThemeToggleButton";
 
 const font = Poppins({
     subsets: ['latin'],
@@ -71,6 +72,8 @@ export const Navbar = () => {
             {organization && <InviteButton/>}
 
             <LanguageSwitchButton/>
+
+            <ThemeToggleButton/>
 
             <UserButton/>
         </div>
