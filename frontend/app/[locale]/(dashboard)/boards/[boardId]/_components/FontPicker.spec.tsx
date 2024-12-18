@@ -1,7 +1,6 @@
-// FontPicker.test.tsx
 import React, { useState } from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'; // Import userEvent
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { FontPicker } from './FontPicker';
 import {
@@ -25,7 +24,10 @@ jest.mock('next/font/google', () => ({
     }),
 }));
 
-// Stateful wrapper to simulate parent component behavior
+jest.mock('@/liveblocks.config', () => ({
+    useMutation: jest.fn(),
+}));
+
 const FontPickerWrapper: React.FC<{
     initialFontName?: string;
     initialFontSize?: number;

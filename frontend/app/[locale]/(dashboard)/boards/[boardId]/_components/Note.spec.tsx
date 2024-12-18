@@ -23,8 +23,6 @@ jest.mock('@/liveblocks.config', () => ({
     useMutation: jest.fn(),
 }));
 
-
-
 beforeAll(() => {
     HTMLCanvasElement.prototype.getContext = jest.fn();
 });
@@ -334,8 +332,9 @@ describe('Note component', () => {
         renderComponent(mockLayer);
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div[contenteditable=true]');
+        const editableDiv = foreignObjectElement.querySelector(
+            'div[contenteditable=true]',
+        );
 
         // Simulate rapid input changes
         fireEvent.input(editableDiv!, {

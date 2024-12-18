@@ -10,15 +10,17 @@ import { LayerType } from '@/types/canvas';
 import { useCanvasStore } from '@/store/useCanvasStore';
 import '@testing-library/jest-dom';
 
-jest.mock('@/store/useCanvasStore', () => ({
-    useCanvasStore: jest.fn(),
-}));
-
 jest.mock('./Path', () => ({
     Path: jest.fn(({ onPointerDown }) => (
         <svg data-testid="path-element" onPointerDown={onPointerDown} />
     )),
 }));
+
+jest.mock('@/liveblocks.config', () => ({
+    useStorage: jest.fn(),
+}));
+
+import { useStorage } from '@/liveblocks.config';
 
 describe('LayerPreview Component', () => {
     const mockGetLayer = jest.fn();
@@ -50,13 +52,21 @@ describe('LayerPreview Component', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useCanvasStore as unknown as jest.Mock).mockImplementation(
-            (callback) => {
-                return callback({
-                    getLayer: mockGetLayer,
-                });
-            },
-        );
+        (useStorage as jest.Mock).mockImplementation((selector) => {
+            const root = {
+                layers: {
+                    get: (id: string) => {
+                        switch (id) {
+                            case 'layer1':
+                                return mockLayer;
+                            default:
+                                return { ...mockLayer, type: 'UnknownType' };
+                        }
+                    },
+                },
+            };
+            return selector(root);
+        });
     });
 
     test('renders Path component when layer type is Path', () => {
