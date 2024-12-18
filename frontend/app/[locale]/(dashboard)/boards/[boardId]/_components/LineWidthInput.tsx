@@ -30,12 +30,15 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                         type="number"
                         value={lineWidth}
                         onChange={handleChange}
-                        className="border rounded p-1 text-sm mr-1 w-2/3"
+                        className="border rounded p-1 text-sm mr-1 w-2/3
+                            bg-[var(--background-color)]
+                            text-[var(--text-color)]
+                            border-[var(--border)]"
                         min={1}
                     />
                     <div
                         role="presentation"
-                        className="bg-black w-1/3"
+                        className="w-1/3 border border-[var(--border)]"
                         style={{ height: `${lineWidth}px` }}
                     />
                 </div>
