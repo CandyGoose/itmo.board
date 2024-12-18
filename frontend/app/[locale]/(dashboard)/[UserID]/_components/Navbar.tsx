@@ -13,6 +13,7 @@ import { Poppins } from 'next/font/google';
 import { LanguageSwitchButton } from '@/app/[locale]/(dashboard)/[UserID]/_components/LanguageSwitchButton';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
+import { ThemeToggleButton } from '@/app/[locale]/(dashboard)/[UserID]/_components/ThemeToggleButton';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -35,7 +36,7 @@ export const Navbar = () => {
                 </div>
             </Link>
 
-            <div className=" flex-2">
+            <div className="flex-2">
                 <OrganizationSwitcher
                     hidePersonal
                     appearance={{
@@ -46,14 +47,19 @@ export const Navbar = () => {
                                 alignItems: 'center',
                                 width: '100%',
                             },
-                            organizationSwitcherTrigger: {
-                                padding: '6px',
-                                width: '100%',
-                                borderRadius: '8px',
-                                border: '1px solid #E5E7EB',
-                                justifyContent: 'space-between',
-                                backgroundColor: 'white',
-                            },
+                            organizationSwitcherTrigger: `
+                                bg-[var(--background-color)] 
+                                text-[var(--text-color)] 
+                                hover:bg-[var(--foreground)] 
+                                hover:text-[var(--background)]
+                                dark:bg-[var(--primary)] 
+                                dark:text-[var(--primary-foreground)] 
+                                dark:hover:bg-[var(--secondary)] 
+                                dark:hover:text-[var(--primary-foreground)]
+                                [&_span]:text-[var(--primary-foreground)] 
+                                dark:[&_span]:text-[var(--primary-foreground)]
+                                transition-colors duration-300
+                            `,
                         },
                     }}
                 />
@@ -66,6 +72,8 @@ export const Navbar = () => {
             {organization && <InviteButton />}
 
             <LanguageSwitchButton />
+
+            <ThemeToggleButton />
 
             <UserButton />
         </div>

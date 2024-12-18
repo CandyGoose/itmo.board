@@ -76,7 +76,7 @@ export const SelectionTools = memo(
             <Toolbar.Root
                 data-testid="selection-tools-container"
                 className={cn(
-                    'absolute p-3 rounded-xl bg-white shadow-md border flex select-none flex-col',
+                    'absolute p-3 rounded-xl bg-[var(--background-color)] shadow-md border flex select-none flex-col',
                     className,
                 )}
                 style={{ right: '8px', width: '200px' }}

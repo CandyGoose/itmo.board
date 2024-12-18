@@ -23,7 +23,7 @@ export const StylesButton: FC<StylesButtonProps> = ({
             ref={buttonRef}
             id={id}
             onClick={onClick}
-            className={`flex items-center gap-2 h-12 p-3 bg-white rounded-md shadow-md border ${className}`}
+            className={`flex items-center gap-2 h-12 p-3 bg-[var(--background-color)] text-[var(--text-color)] rounded-md shadow-md border ${className}`}
         >
             <span
                 className="w-4 h-4 rounded-full border"
