@@ -1,13 +1,7 @@
 import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import {
-    useState,
-    useRef,
-    useEffect,
-    CSSProperties,
-    useMemo,
-} from 'react';
+import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
 import { useMutation } from '@/liveblocks.config';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
@@ -141,7 +135,7 @@ export const Note = ({
     // );
     const handleContentChange = (e: ContentEditableEvent) => {
         updateValue(e.target.value);
-    }
+    };
 
     const textColor = useMemo(
         () => (fill ? getContrastingTextColor(fill) : '#000'),
