@@ -42,7 +42,7 @@ describe('StylesButton Component', () => {
             .getByRole('button', { name: /styles/i })
             .querySelector('span');
         expect(colorIndicator).toHaveStyle({
-            backgroundColor: '#ff0000', // Hex for { r: 255, g: 0, b: 0 }
+            backgroundColor: '#ff0000',
             borderColor: '#ff0000',
         });
     });

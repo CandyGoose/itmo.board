@@ -1,26 +1,22 @@
 'use client';
 
+import { Room } from '@/components/Room';
 import Canvas from './_components/Canvas';
-import { useEffect, useState } from 'react';
+import { CanvasLoading } from './_components/Loading';
+import { use } from 'react';
 
 interface PageProps {
-    params: Promise<{ boardId: string }>;
+    params: Promise<{
+        boardId: string;
+    }>;
 }
 
 export default function BoardPage({ params }: PageProps) {
-    const [boardId, setBoardId] = useState<string | null>(null);
-
-    useEffect(() => {
-        params.then((data) => setBoardId(data.boardId));
-    }, [params]);
-
-    if (!boardId) {
-        return <div>Loading...</div>;
-    }
+    const { boardId } = use(params);
 
     return (
-        <div>
+        <Room roomId={boardId} fallback={<CanvasLoading />}>
             <Canvas boardId={boardId} />
-        </div>
+        </Room>
     );
 }

@@ -37,7 +37,7 @@ export type RectangleLayer = {
     y: number;
     height: number;
     width: number;
-    fill?: Color;
+    fill: Color | null;
     value?: string;
     lineWidth?: number;
 };
@@ -49,7 +49,7 @@ export type EllipseLayer = {
     y: number;
     height: number;
     width: number;
-    fill?: Color;
+    fill: Color | null;
     value?: string;
     lineWidth?: number;
 };
@@ -61,7 +61,7 @@ export type NoteLayer = {
     y: number;
     height: number;
     width: number;
-    fill?: Color;
+    fill: Color | null;
     value?: string;
     lineWidth?: number;
     fontName: string;

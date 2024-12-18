@@ -13,12 +13,18 @@ import {
     Square,
     Circle,
     StickyNote,
+    Undo2,
+    Redo2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export interface ToolbarProps {
     canvasState: CanvasState;
     setCanvasState: (newState: CanvasState) => void;
+    undo: () => void;
+    redo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
     editable: boolean;
     deleteSelected: () => void;
     moveToFront: () => void;
@@ -30,6 +36,10 @@ export interface ToolbarProps {
 export const ToolBar = ({
     canvasState,
     setCanvasState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     editable,
     deleteSelected,
     moveToFront,
@@ -54,7 +64,7 @@ export const ToolBar = ({
         <div className="absolute bottom-5 left-[50%] -translate-x-[50%] flex items-center">
             {/* Toggle button for extra tools */}
             <div className="relative flex flex-col items-center">
-                <div className="p-2 bg-white rounded-md shadow-md">
+                <div className="p-2 bg-[var(--background-color)] rounded-md shadow-md">
                     <ToolButton
                         label={t('more')}
                         icon={MoreVertical}
@@ -64,7 +74,7 @@ export const ToolBar = ({
 
                 {/* Extra tools dropdown */}
                 {showExtraTools && (
-                    <div className="flex gap-4 p-2 bg-white rounded-md shadow-md absolute bottom-full mb-2">
+                    <div className="flex gap-4 p-2 bg-[var(--background-color)] rounded-md shadow-md absolute bottom-full mb-2">
                         {extraTools.map((tool, index) => (
                             <ToolButton
                                 key={index}
@@ -82,7 +92,7 @@ export const ToolBar = ({
             <div style={{ width: '4px' }} />
 
             {/* Main toolbar */}
-            <div className="flex gap-x-2 p-2 bg-white rounded-md shadow-md">
+            <div className="flex gap-x-2 p-2 bg-[var(--background-color)] rounded-md shadow-md">
                 <ToolButton
                     label={t('select')}
                     icon={MousePointer2}
@@ -152,13 +162,25 @@ export const ToolBar = ({
                     }
                     isDisabled={!editable}
                 />
+                <ToolButton
+                    label={t('undo')}
+                    icon={Undo2}
+                    onClick={undo}
+                    isDisabled={!canUndo || !editable}
+                />
+                <ToolButton
+                    label={t('redo')}
+                    icon={Redo2}
+                    onClick={redo}
+                    isDisabled={!canRedo || !editable}
+                />
             </div>
 
             {/* Spacer with 4-pixel gap */}
             <div style={{ width: '4px' }} />
 
             {/* Separate Trash button */}
-            <div className="p-2 bg-white rounded-md shadow-md">
+            <div className="p-2 bg-[var(--background-color)] rounded-md shadow-md">
                 <ToolButton
                     label={t('delete')}
                     icon={Trash2}
@@ -167,5 +189,11 @@ export const ToolBar = ({
                 />
             </div>
         </div>
+    );
+};
+
+export const ToolBarSkeleton = () => {
+    return (
+        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-white" />
     );
 };

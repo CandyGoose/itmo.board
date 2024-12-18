@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Note } from './Note';
 import { LayerType, NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import '@testing-library/jest-dom';
+import { useMutation } from '@/liveblocks.config';
+import * as NoteModule from './Note';
 
 jest.mock('@/lib/utils', () => ({
     calculateFontSize: jest.fn(() => 48),
@@ -16,6 +17,10 @@ jest.mock('next/font/google', () => ({
     Kalam: () => ({
         className: 'kalam-font',
     }),
+}));
+
+jest.mock('@/liveblocks.config', () => ({
+    useMutation: jest.fn(),
 }));
 
 beforeAll(() => {
@@ -39,6 +44,7 @@ const mockLayer: NoteLayer = {
 
 describe('Note component', () => {
     let onPointerDown: jest.Mock;
+    const updateValueMock = jest.fn();
 
     beforeEach(() => {
         onPointerDown = jest.fn();
@@ -52,13 +58,15 @@ describe('Note component', () => {
             'get',
         ).mockReturnValue(100);
 
+        (useMutation as jest.Mock).mockReturnValue(updateValueMock);
+
         jest.clearAllMocks();
     });
 
     const renderComponent = (layer: NoteLayer, selectionColor?: string) => {
         return render(
             <svg>
-                <Note
+                <NoteModule.Note
                     id={layer.id}
                     layer={layer}
                     onPointerDown={onPointerDown}
@@ -83,7 +91,7 @@ describe('Note component', () => {
     it('should handle absence of fill by applying transparent background', () => {
         const layerWithoutFill: NoteLayer = {
             ...mockLayer,
-            fill: undefined,
+            fill: null,
         };
 
         renderComponent(layerWithoutFill);
@@ -111,7 +119,7 @@ describe('Note component', () => {
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        expect(editableDiv?.textContent).toBe('Initial note text');
+        expect(editableDiv?.textContent).toBe(mockLayer.value);
     });
 
     it('should update the text when edited', () => {
@@ -280,10 +288,8 @@ describe('Note component', () => {
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        // Assuming 'shadow-md drop-shadow-xl p-5' are applied to foreignObject
         expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
-        // 'kalam-font' is applied based on fontName
         expect(editableDiv).toHaveClass('kalam-font');
     });
 
@@ -324,8 +330,9 @@ describe('Note component', () => {
         renderComponent(mockLayer);
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = foreignObjectElement.querySelector(
+            'div[contenteditable=true]',
+        );
 
         // Simulate rapid input changes
         fireEvent.input(editableDiv!, {
@@ -370,5 +377,165 @@ describe('Note component', () => {
         expect(editableDiv).toHaveStyle('color: #000000');
         expect(editableDiv).toHaveStyle('font-weight: bold');
         expect(editableDiv).toHaveStyle('text-align: end');
+    });
+});
+
+describe('doesTextFit', () => {
+    let mockContext: CanvasRenderingContext2D;
+
+    beforeEach(() => {
+        mockContext = {
+            font: '',
+            measureText: jest.fn(),
+        } as unknown as CanvasRenderingContext2D;
+    });
+
+    it('should return true when text fits within width and height', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 50 });
+
+        const result = NoteModule.doesTextFit(
+            mockContext,
+            'Hello World',
+            200,
+            100,
+            20,
+            'Arial',
+        );
+
+        expect(result).toBe(true);
+        expect(mockContext.measureText).toHaveBeenCalled();
+    });
+
+    it('should return false when text exceeds the width', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 250 });
+
+        const result = NoteModule.doesTextFit(
+            mockContext,
+            'This is a very long text that exceeds the width',
+            200,
+            100,
+            20,
+            'Arial',
+        );
+
+        expect(result).toBe(false);
+        expect(mockContext.measureText).toHaveBeenCalled();
+    });
+
+    it('should return true for empty text', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 1 });
+        const result = NoteModule.doesTextFit(
+            mockContext,
+            '',
+            200,
+            100,
+            20,
+            'Arial',
+        );
+
+        expect(result).toBe(true);
+    });
+
+    it('should handle single long word correctly', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 250 });
+
+        const result = NoteModule.doesTextFit(
+            mockContext,
+            'Supercalifragilisticexpialidocious',
+            200,
+            100,
+            20,
+            'Arial',
+        );
+
+        expect(result).toBe(false);
+        expect(mockContext.measureText).toHaveBeenCalled();
+    });
+
+    it('should handle multiple lines fitting within height', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 150 });
+
+        const text = 'Line one\nLine two\nLine three';
+        const fontSize = 20;
+        const height = 100; // Allows up to floor(100 / 30) = 3 lines
+
+        const result = NoteModule.doesTextFit(
+            mockContext,
+            text.replace(/\n/g, ' '),
+            200,
+            height,
+            fontSize,
+            'Arial',
+        );
+
+        expect(result).toBe(true);
+    });
+});
+
+describe('calculateFontSize', () => {
+    let originalCreateElement: typeof document.createElement;
+    let mockContext: CanvasRenderingContext2D;
+
+    beforeAll(() => {
+        originalCreateElement = document.createElement;
+    });
+
+    afterAll(() => {
+        document.createElement = originalCreateElement;
+    });
+
+    beforeEach(() => {
+        mockContext = {
+            font: '',
+            measureText: jest.fn(),
+        } as unknown as CanvasRenderingContext2D;
+
+        document.createElement = jest.fn().mockImplementation(() => ({
+            getContext: () => mockContext,
+        }));
+    });
+
+    it('should return MIN_FONT_SIZE when text does not fit even at minimum size', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 300 });
+
+        const result = NoteModule.calculateFontSize(
+            200,
+            100,
+            'This text does not fit',
+            72,
+            'Arial',
+        );
+
+        expect(result).toBe(NoteModule.MIN_FONT_SIZE);
+    });
+
+    it('should return initialFontSize when text fits at initial size', () => {
+        mockContext.measureText = jest.fn().mockReturnValue({ width: 150 });
+
+        const result = NoteModule.calculateFontSize(
+            200,
+            200,
+            'This text fits',
+            72,
+            'Arial',
+        );
+
+        expect(result).toBe(72);
+    });
+
+    it('should handle calculateFontSize when context is null', () => {
+        (document.createElement as jest.Mock).mockImplementation(() => ({
+            getContext: () => null,
+        }));
+
+        const result = NoteModule.calculateFontSize(
+            200,
+            100,
+            'Some text',
+            72,
+            'Arial',
+        );
+
+        expect(result).toBe(NoteModule.MIN_FONT_SIZE);
     });
 });
