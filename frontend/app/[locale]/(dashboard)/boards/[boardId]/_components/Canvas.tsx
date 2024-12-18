@@ -48,6 +48,7 @@ import {
 } from '@/liveblocks.config';
 import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
+import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -56,8 +57,7 @@ const ZOOM_INTENSITY = 0.001;
 interface CanvasProps {
     boardId: string;
 }
-// TODO: Transparent fill not working
-// TODO: polyline pencildraft works incorrectly
+
 const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgRect, setSvgRect] = useState<DOMRect | null>(null);
@@ -325,7 +325,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 });
             }
         },
-        [],
+        [canvasState.mode],
     );
 
     const insertPath = useMutation(
@@ -335,7 +335,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 const id = nanoid();
                 const newLayer = {
                     id,
-                    type: LayerType.Path,
                     ...penPointsToPathLayer(pencilDraft),
                     fill: lastUsedColor,
                     lineWidth: lineWidth,
@@ -420,7 +419,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     );
 
     const onLayerPointerDown = useMutation(
-        ({ setMyPresence }, e: React.PointerEvent, layerId: string) => {
+        ({ self, setMyPresence }, e: React.PointerEvent, layerId: string) => {
             if (
                 canvasState.mode === CanvasMode.Pencil ||
                 canvasState.mode === CanvasMode.Inserting ||
@@ -432,13 +431,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             e.stopPropagation();
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
-            if (!selection.includes(layerId)) {
+            if (!self.presence.selection.includes(layerId)) {
                 setMyPresence({ selection: [layerId] }, { addToHistory: true });
             }
 
             setCanvasState({ mode: CanvasMode.Translating, current: point });
         },
-        [canvasState, editable, camera, scale, svgRect],
+        [canvasState.mode, history, editable, camera, scale, svgRect],
     );
 
     const onPointerDown = useCallback(
@@ -537,7 +536,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             updateSelectionNet,
             translateSelectedLayers,
             resizeSelectedLayers,
-            pencilDraft,
             continueDrawing,
             lastPointerPosition,
         ],
@@ -554,7 +552,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 if (!moved) unselectLayers();
                 setCanvasState({ mode: CanvasMode.None });
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
-                if (pencilDraft) insertPath();
+                insertPath();
             } else if (canvasState.mode === CanvasMode.Inserting && editable) {
                 insertLayer(canvasState.layerType!, point);
             } else {
@@ -570,7 +568,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             insertLayer,
             insertPath,
             moved,
-            pencilDraft,
             scale,
             svgRect,
             unselectLayers,
@@ -654,7 +651,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             selection.forEach((id) => {
                 const layer = liveLayers.get(id);
                 if (layer) {
-                    layer.update({ fill: checked ? undefined : lastUsedColor });
+                    layer.update({ fill: checked ? null : lastUsedColor });
                 }
             });
         },
@@ -1014,16 +1011,22 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         />
                     ))}
                     <CursorsPresence />
-                    {pencilDraft && pencilDraft.length >= 1 && (
-                        <polyline
-                            points={pencilDraft
-                                .map((point) => point.join(','))
-                                .join(' ')}
-                            stroke={colorToCss(lastUsedColor)}
-                            fill="none"
-                            strokeWidth={lineWidth}
-                            strokeDasharray="4 2"
-                        />
+                    {pencilDraft && pencilDraft.length > 1 && (
+                        (() => {
+                            const partialProps = penPointsToPathLayer(pencilDraft);
+                            return (
+                                <Path
+                                    x={partialProps.x!}
+                                    y={partialProps.y!}
+                                    width={partialProps.width!}
+                                    height={partialProps.height!}
+                                    points={partialProps.points!}
+                                    stroke={colorToCss(lastUsedColor)}
+                                    fill="none"
+                                    lineWidth={lineWidth}
+                                />
+                            );
+                        })()
                     )}
 
                     <SelectionBox

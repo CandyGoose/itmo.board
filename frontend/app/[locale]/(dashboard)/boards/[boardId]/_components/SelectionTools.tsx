@@ -91,7 +91,7 @@ export const SelectionTools = memo(
                         <TransparentFillChecker
                             transparentFill={
                                 selectedLayer
-                                    ? selectedLayer.fill === undefined
+                                    ? selectedLayer.fill === null
                                     : transparentFill
                             }
                             onTransparentFillChange={onTransparentFillChange}
