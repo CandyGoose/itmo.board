@@ -58,7 +58,7 @@ describe('Ellipse', () => {
         const { container } = render(
             <Ellipse
                 id="1"
-                layer={{ ...mockLayer, fill: undefined }}
+                layer={{ ...mockLayer, fill: null }}
                 onPointerDown={mockOnPointerDown}
             />,
         );

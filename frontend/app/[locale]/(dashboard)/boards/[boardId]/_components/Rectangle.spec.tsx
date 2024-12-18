@@ -58,7 +58,7 @@ describe('Rectangle', () => {
         const { container } = render(
             <Rectangle
                 id="1"
-                layer={{ ...mockLayer, fill: undefined }}
+                layer={{ ...mockLayer, fill: null }}
                 onPointerDown={mockOnPointerDown}
             />,
         );

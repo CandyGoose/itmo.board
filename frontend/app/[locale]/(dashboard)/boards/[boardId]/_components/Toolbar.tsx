@@ -13,12 +13,18 @@ import {
     Square,
     Circle,
     StickyNote,
+    Undo2,
+    Redo2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export interface ToolbarProps {
     canvasState: CanvasState;
     setCanvasState: (newState: CanvasState) => void;
+    undo: () => void;
+    redo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
     editable: boolean;
     deleteSelected: () => void;
     moveToFront: () => void;
@@ -30,6 +36,10 @@ export interface ToolbarProps {
 export const ToolBar = ({
     canvasState,
     setCanvasState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     editable,
     deleteSelected,
     moveToFront,
@@ -152,6 +162,18 @@ export const ToolBar = ({
                     }
                     isDisabled={!editable}
                 />
+                <ToolButton
+                    label={t('undo')}
+                    icon={Undo2}
+                    onClick={undo}
+                    isDisabled={!canUndo || !editable}
+                />
+                <ToolButton
+                    label={t('redo')}
+                    icon={Redo2}
+                    onClick={redo}
+                    isDisabled={!canRedo || !editable}
+                />
             </div>
 
             {/* Spacer with 4-pixel gap */}
@@ -167,5 +189,11 @@ export const ToolBar = ({
                 />
             </div>
         </div>
+    );
+};
+
+export const ToolBarSkeleton = () => {
+    return (
+        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-white" />
     );
 };

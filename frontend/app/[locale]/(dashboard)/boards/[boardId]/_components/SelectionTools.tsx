@@ -53,14 +53,6 @@ export const SelectionTools = memo(
         className = '',
     }: SelectionToolsProps) => {
         const t = useTranslations('tools');
-        const singleSelected = selectedLayers.length === 1;
-        const multiSelected = selectedLayers.length > 1;
-
-        const selectedLayer = singleSelected ? selectedLayers[0] : null;
-
-        const isNote = singleSelected && selectedLayer?.type === LayerType.Note;
-        const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
-
         const handleFormatChange = useCallback(
             (format: { textFormat?: TextFormat[]; textAlign?: TextAlign }) => {
                 onTextFormatChange(format.textFormat ?? fontFormat);
@@ -70,9 +62,15 @@ export const SelectionTools = memo(
         );
 
         // If multiple selected, show nothing
-        if (multiSelected) {
+        if (selectedLayers.length > 1) {
             return null;
         }
+        const singleSelected = selectedLayers.length === 1;
+
+        const selectedLayer = singleSelected ? selectedLayers[0] : null;
+
+        const isNote = singleSelected && selectedLayer?.type === LayerType.Note;
+        const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
 
         return (
             <Toolbar.Root
@@ -91,7 +89,7 @@ export const SelectionTools = memo(
                         <TransparentFillChecker
                             transparentFill={
                                 selectedLayer
-                                    ? selectedLayer.fill === undefined
+                                    ? selectedLayer.fill === null
                                     : transparentFill
                             }
                             onTransparentFillChange={onTransparentFillChange}

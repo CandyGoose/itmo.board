@@ -11,9 +11,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/AlertDialog';
+import { ReactNode } from 'react';
 
 interface ConfirmModalProps {
-    children: React.ReactNode;
+    children: ReactNode;
     onConfirm: () => void;
     disabled?: boolean;
     header: string;
