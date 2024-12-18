@@ -11,6 +11,7 @@ import {
     penPointsToPathLayer,
     pointerEventToCanvasPoint,
     resizeBounds,
+    roundToTwoDecimals,
 } from './utils';
 import {
     Camera,
@@ -1479,6 +1480,18 @@ describe('Utility Functions', () => {
                 data.threshold,
             );
             expect(result).toBe('path1');
+        });
+    });
+
+    describe('roundToTwoDecimals', () => {
+        it('should round correctly', () => {
+            const input = [0.04004, -5066546.0006, 343.8995, 1.119, -0.0574];
+
+            const output = [0.04, -5066546, 343.9, 1.12, -0.06];
+
+            for (let i = 0; i < input.length; i++) {
+                expect(roundToTwoDecimals(input[i])).toEqual(output[i]);
+            }
         });
     });
 });
