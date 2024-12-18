@@ -26,7 +26,9 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         id="input1"
                         type="number"
                         value={value1}
-                        onChange={(e) => onChange1(parseAndRound(e.target.value))}
+                        onChange={(e) =>
+                            onChange1(parseAndRound(e.target.value))
+                        }
                         className="border rounded p-1 text-sm w-full
                             bg-[var(--background-color)]
                             text-[var(--text-color)]
@@ -41,7 +43,9 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         id="input2"
                         type="number"
                         value={value2}
-                        onChange={(e) => onChange2(parseAndRound(e.target.value))}
+                        onChange={(e) =>
+                            onChange2(parseAndRound(e.target.value))
+                        }
                         className="border rounded p-1 text-sm w-full
                             bg-[var(--background-color)]
                             text-[var(--text-color)]
