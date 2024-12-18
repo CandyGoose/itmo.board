@@ -123,10 +123,13 @@ export const Note = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLDivElement>(null);
 
-    const updateValue = useMutation(({ storage }, newValue: string) => {
-        const liveLayers = storage.get('layers');
-        liveLayers.get(id)?.set('value', newValue);
-    }, [id]);
+    const updateValue = useMutation(
+        ({ storage }, newValue: string) => {
+            const liveLayers = storage.get('layers');
+            liveLayers.get(id)?.set('value', newValue);
+        },
+        [id],
+    );
 
     const handleContentChange = useCallback(
         (e: React.FormEvent<HTMLDivElement>) => {
@@ -186,6 +189,12 @@ export const Note = ({
             }
         }
     }, [layer.value, noteValue]);
+
+    useEffect(() => {
+        if (inputRef.current && inputRef.current.textContent !== noteValue) {
+            inputRef.current.textContent = noteValue;
+        }
+    }, [noteValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
