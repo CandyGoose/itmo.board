@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Navbar } from '@/app/[locale]/(dashboard)/[UserID]/_components/Navbar';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { useOrganization } from '@clerk/nextjs';
 import '@testing-library/jest-dom';
 import { useLocale, useTranslations } from 'next-intl';
@@ -60,11 +61,13 @@ describe('Navbar Component', () => {
         jest.clearAllMocks();
     });
 
-    const renderWithIntl = (component: React.ReactNode) => {
+    const renderWithProviders = (component: React.ReactNode) => {
         return render(
-            <NextIntlClientProvider messages={{ itmoBoard: 'itmo.board' }}>
-                {component}
-            </NextIntlClientProvider>,
+            <ThemeProvider>
+                <NextIntlClientProvider messages={{ itmoBoard: 'itmo.board' }}>
+                    {component}
+                </NextIntlClientProvider>
+            </ThemeProvider>,
         );
     };
 
@@ -73,7 +76,7 @@ describe('Navbar Component', () => {
             organization: { id: 'org1' },
         });
 
-        renderWithIntl(<Navbar />);
+        renderWithProviders(<Navbar />);
 
         expect(screen.getByText('itmo.board')).toBeInTheDocument();
         expect(screen.getByTestId('org-switcher')).toBeInTheDocument();
@@ -85,7 +88,7 @@ describe('Navbar Component', () => {
     test('does not render InviteButton if no organization is active', () => {
         (useOrganization as jest.Mock).mockReturnValue({ organization: null });
 
-        renderWithIntl(<Navbar />);
+        renderWithProviders(<Navbar />);
 
         expect(screen.queryByTestId('invite-button')).not.toBeInTheDocument();
 
@@ -94,13 +97,13 @@ describe('Navbar Component', () => {
     });
 
     test('renders SearchInput only on large screens', () => {
-        renderWithIntl(<Navbar />);
+        renderWithProviders(<Navbar />);
 
         expect(screen.getByTestId('search-input')).toBeInTheDocument();
     });
 
     test('renders UserButton', () => {
-        renderWithIntl(<Navbar />);
+        renderWithProviders(<Navbar />);
 
         expect(screen.getByTestId('user-button')).toBeInTheDocument();
     });

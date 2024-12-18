@@ -23,7 +23,10 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         type="number"
                         value={value1}
                         onChange={(e) => onChange1(parseFloat(e.target.value))}
-                        className="border rounded p-1 text-sm w-full"
+                        className="border rounded p-1 text-sm w-full
+                            bg-[var(--background-color)]
+                            text-[var(--text-color)]
+                            border-[var(--border)]"
                     />
                 </div>
                 <div className="flex flex-col w-1/2">
@@ -35,7 +38,10 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         type="number"
                         value={value2}
                         onChange={(e) => onChange2(parseFloat(e.target.value))}
-                        className="border rounded p-1 text-sm w-full"
+                        className="border rounded p-1 text-sm w-full
+                            bg-[var(--background-color)]
+                            text-[var(--text-color)]
+                            border-[var(--border)]"
                     />
                 </div>
             </div>

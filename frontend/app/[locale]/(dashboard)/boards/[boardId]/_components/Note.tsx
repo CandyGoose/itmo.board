@@ -110,7 +110,7 @@ export const Note = ({
         width,
         height,
         fill,
-        value = 'Text',
+        value = '',
         fontName,
         fontSize,
         textAlign,
@@ -154,7 +154,7 @@ export const Note = ({
             const newFontSize = calculateFontSize(
                 contentWidth,
                 contentHeight,
-                noteValue,
+                noteValue || 'Text',
                 fontSize,
                 fontName,
             );
@@ -164,15 +164,6 @@ export const Note = ({
             }
         }
     }, [noteValue, width, height, currFontSize, fontSize, fontName]);
-
-    useEffect(() => {
-        if (inputRef.current) {
-            const val =
-                layer.value && layer.value !== '' ? layer.value : 'Text';
-            inputRef.current.textContent = val;
-            setNoteValue(val);
-        }
-    }, [layer.value]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -205,6 +196,18 @@ export const Note = ({
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
 
+    const PLACEHOLDER_COLOR = '#aaa';
+
+    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
+        ...textStyle,
+        color: PLACEHOLDER_COLOR,
+    });
+
+    const placeholderStyle = useMemo<CSSProperties>(
+        () => getPlaceholderStyle(textStyle),
+        [textStyle],
+    );
+
     return (
         <foreignObject
             x={x}
@@ -235,7 +238,13 @@ export const Note = ({
                     )}
                     style={textStyle}
                     onInput={handleContentChange}
-                />
+                    data-placeholder="Text"
+                    suppressContentEditableWarning
+                >
+                    {noteValue === '' && (
+                        <span style={placeholderStyle}>Text</span>
+                    )}
+                </div>
             </div>
         </foreignObject>
     );
