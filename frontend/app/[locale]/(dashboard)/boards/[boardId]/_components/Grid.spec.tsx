@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, cleanup } from '@testing-library/react';
-import { Grid } from './Grid';
+import { Grid, GRID_LEVELS, MIN_GRID_SPACING } from './Grid';
 import '@testing-library/jest-dom';
 import 'jest-canvas-mock';
 import { CanvasRenderingContext2DEvent } from 'jest-canvas-mock';
@@ -20,13 +20,11 @@ describe('Canvas Grid Component', () => {
     const countLinesDrawn = (
         events: CanvasRenderingContext2DEvent[] | null,
     ) => {
-        // Each line is typically drawn as: beginPath -> moveTo -> lineTo -> stroke
-        // We'll count how many times `stroke` is called as a proxy for how many lines are drawn.
+        // Count how many times stroke is called, which equals to amount of lines drawn.
         return events ? events.filter((e) => e.type === 'stroke').length : null;
     };
 
     it('draws some grid lines at default scale', () => {
-        // At default scale = 1, some of the larger grid levels should be drawn.
         const props = {
             camera: { x: 0, y: 0 },
             scale: 1,
@@ -45,7 +43,7 @@ describe('Canvas Grid Component', () => {
     it('does not draw lines for grid levels that are too dense at small scale', () => {
         const props = {
             camera: { x: 0, y: 0 },
-            scale: 0.009, // Very small scale so that all gridSpacingInPixels < MIN_GRID_SPACING
+            scale: MIN_GRID_SPACING / GRID_LEVELS[0] - 0.001, // No levels shown
             width: 100,
             height: 100,
         };
@@ -54,14 +52,13 @@ describe('Canvas Grid Component', () => {
         const events = getCanvasEvents(container);
         const linesCount = countLinesDrawn(events);
 
-        // Expect no lines because gridSpacingInPixels = gridSize * scale will be < 10 for all gridSizes
         expect(linesCount).toBe(0);
     });
 
     it('draws lines for all grid levels when scale is large enough', () => {
         const props = {
             camera: { x: 0, y: 0 },
-            scale: 20, // Very large scale so all gridSpacingInPixels >= MIN_GRID_SPACING
+            scale: (MIN_GRID_SPACING / GRID_LEVELS[GRID_LEVELS.length - 1]) * 2, // All levels shown
             width: 20000,
             height: 20000,
         };
