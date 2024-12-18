@@ -124,15 +124,6 @@ export const Note = ({
         },
         [id],
     );
-
-    // const handleContentChange = useCallback(
-    //     (e: React.FormEvent<HTMLDivElement>) => {
-    //         const newVal = e.currentTarget.textContent || '';
-    //         setNoteValue(newVal);
-    //         updateValue(newVal);
-    //     },
-    //     [updateValue],
-    // );
     const handleContentChange = (e: ContentEditableEvent) => {
         updateValue(e.target.value);
     };
@@ -173,26 +164,6 @@ export const Note = ({
             }
         }
     }, [width, height, currFontSize, fontSize, fontName, value]);
-
-    // // If the layer value changes from an external source (other user editing),
-    // // update the local state, but do NOT forcibly reset the textContent if we're already showing it.
-    // useEffect(() => {
-    //     const val = layer.value && layer.value !== '' ? layer.value : 'Text';
-    //     if (val !== noteValue) {
-    //         setNoteValue(val);
-    //         // Set the textContent only if it differs from what we have,
-    //         // ensuring the cursor won't jump unnecessarily.
-    //         if (inputRef.current && inputRef.current.textContent !== val) {
-    //             inputRef.current.textContent = val;
-    //         }
-    //     }
-    // }, [layer.value, noteValue]);
-    //
-    // useEffect(() => {
-    //     if (inputRef.current && inputRef.current.textContent !== noteValue) {
-    //         inputRef.current.textContent = noteValue;
-    //     }
-    // }, [noteValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};

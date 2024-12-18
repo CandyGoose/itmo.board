@@ -288,10 +288,8 @@ describe('Note component', () => {
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        // Assuming 'shadow-md drop-shadow-xl p-5' are applied to foreignObject
         expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
-        // 'kalam-font' is applied based on fontName
         expect(editableDiv).toHaveClass('kalam-font');
     });
 

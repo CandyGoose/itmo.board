@@ -23,10 +23,5 @@ export default async function combinedMiddleware(
 }
 
 export const config = {
-    matcher: [
-        '/((?!.+\\.[\\w]+$|_next).*)',
-        '/',
-        '/(api|trpc)(.*)',
-        // '/(.*)/board/(.*)',
-    ],
+    matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };
