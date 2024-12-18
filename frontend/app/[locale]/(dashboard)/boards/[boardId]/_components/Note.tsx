@@ -6,10 +6,10 @@ import {
     useRef,
     useEffect,
     CSSProperties,
-    useCallback,
     useMemo,
 } from 'react';
 import { useMutation } from '@/liveblocks.config';
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 const font = Kalam({
     subsets: ['latin'],
@@ -118,10 +118,10 @@ export const Note = ({
         textFormat,
     } = layer;
 
-    const [noteValue, setNoteValue] = useState(value);
+    // const [noteValue, setNoteValue] = useState(value);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLDivElement>(null);
+    // const inputRef = useRef<HTMLDivElement>(null);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -131,14 +131,17 @@ export const Note = ({
         [id],
     );
 
-    const handleContentChange = useCallback(
-        (e: React.FormEvent<HTMLDivElement>) => {
-            const newVal = e.currentTarget.textContent || '';
-            setNoteValue(newVal);
-            updateValue(newVal);
-        },
-        [updateValue],
-    );
+    // const handleContentChange = useCallback(
+    //     (e: React.FormEvent<HTMLDivElement>) => {
+    //         const newVal = e.currentTarget.textContent || '';
+    //         setNoteValue(newVal);
+    //         updateValue(newVal);
+    //     },
+    //     [updateValue],
+    // );
+    const handleContentChange = (e: ContentEditableEvent) => {
+        updateValue(e.target.value);
+    }
 
     const textColor = useMemo(
         () => (fill ? getContrastingTextColor(fill) : '#000'),
@@ -165,7 +168,8 @@ export const Note = ({
             const newFontSize = calculateFontSize(
                 contentWidth,
                 contentHeight,
-                noteValue,
+                // noteValue,
+                value,
                 fontSize,
                 fontName,
             );
@@ -174,27 +178,27 @@ export const Note = ({
                 setCurrFontSize(newFontSize);
             }
         }
-    }, [noteValue, width, height, currFontSize, fontSize, fontName]);
+    }, [width, height, currFontSize, fontSize, fontName, value]);
 
-    // If the layer value changes from an external source (other user editing),
-    // update the local state, but do NOT forcibly reset the textContent if we're already showing it.
-    useEffect(() => {
-        const val = layer.value && layer.value !== '' ? layer.value : 'Text';
-        if (val !== noteValue) {
-            setNoteValue(val);
-            // Set the textContent only if it differs from what we have,
-            // ensuring the cursor won't jump unnecessarily.
-            if (inputRef.current && inputRef.current.textContent !== val) {
-                inputRef.current.textContent = val;
-            }
-        }
-    }, [layer.value, noteValue]);
-
-    useEffect(() => {
-        if (inputRef.current && inputRef.current.textContent !== noteValue) {
-            inputRef.current.textContent = noteValue;
-        }
-    }, [noteValue]);
+    // // If the layer value changes from an external source (other user editing),
+    // // update the local state, but do NOT forcibly reset the textContent if we're already showing it.
+    // useEffect(() => {
+    //     const val = layer.value && layer.value !== '' ? layer.value : 'Text';
+    //     if (val !== noteValue) {
+    //         setNoteValue(val);
+    //         // Set the textContent only if it differs from what we have,
+    //         // ensuring the cursor won't jump unnecessarily.
+    //         if (inputRef.current && inputRef.current.textContent !== val) {
+    //             inputRef.current.textContent = val;
+    //         }
+    //     }
+    // }, [layer.value, noteValue]);
+    //
+    // useEffect(() => {
+    //     if (inputRef.current && inputRef.current.textContent !== noteValue) {
+    //         inputRef.current.textContent = noteValue;
+    //     }
+    // }, [noteValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -248,15 +252,14 @@ export const Note = ({
                     backgroundColor: backgroundColor,
                 }}
             >
-                <div
-                    contentEditable
-                    ref={inputRef}
+                <ContentEditable
+                    html={value || 'Text' || ''}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
                         fontName === 'Kalam' ? font.className : '',
                     )}
                     style={textStyle}
-                    onInput={handleContentChange}
+                    onChange={handleContentChange}
                 />
             </div>
         </foreignObject>
