@@ -14,49 +14,34 @@ interface ThemeProviderProps {
 export const ThemeContext = createContext<IThemeContext | null>(null);
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-    const [theme, setTheme] = useState<string>("system");
+    const [theme, setThemeState] = useState<string>("system");
 
-    // Effect to safely access localStorage and set theme after component mounts
     useEffect(() => {
-        let savedTheme = localStorage.getItem("theme") || "system";
-
-        if (
-            savedTheme !== "system" &&
-            savedTheme !== "dark" &&
-            savedTheme !== "light"
-        ) {
-            savedTheme = "system";
-        }
-
-        setTheme(savedTheme);
-        handleThemeChange(savedTheme); // Apply the saved theme on mount
+        const savedTheme = localStorage.getItem("theme") || "system";
+        applyTheme(savedTheme);
     }, []);
 
-    const handleThemeChange = (theme: string) => {
-        if (!theme) {
-            throw new Error("Valid theme value is required");
-        }
-
-        console.log("theme change", theme);
-
+    const applyTheme = (newTheme: string) => {
         const root = document.documentElement;
 
-        // for normal css styling
-        root.setAttribute("data-theme", theme);
-
-        // for tailwind styling
-        if (theme === "dark") {
+        // Для Tailwind CSS и обычных стилей
+        if (newTheme === "dark") {
             root.classList.add("dark");
         } else {
             root.classList.remove("dark");
         }
 
-        // store in localstorage
-        localStorage.setItem("theme", theme);
+        root.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        setThemeState(newTheme); // Обновляем состояние после всех действий
+    };
+
+    const setTheme = (newTheme: "system" | "light" | "dark") => {
+        applyTheme(newTheme);
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme: handleThemeChange }}>
+        <ThemeContext.Provider value={{ theme, setTheme }}>
             {children}
         </ThemeContext.Provider>
     );
