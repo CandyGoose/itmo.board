@@ -4,7 +4,13 @@ import { UserAvatar } from './UserAvatar';
 import React from 'react';
 
 jest.mock('@/components/Hint', () => ({
-    Hint: ({ children, label }: { children: React.ReactNode; label: string }) => (
+    Hint: ({
+        children,
+        label,
+    }: {
+        children: React.ReactNode;
+        label: string;
+    }) => (
         <div data-testid="hint" aria-label={label}>
             {children}
         </div>
@@ -12,12 +18,24 @@ jest.mock('@/components/Hint', () => ({
 }));
 
 jest.mock('@/components/ui/Avatar', () => ({
-    Avatar: ({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) => (
+    Avatar: ({
+        children,
+        className,
+        style,
+    }: {
+        children: React.ReactNode;
+        className?: string;
+        style?: React.CSSProperties;
+    }) => (
         <div className={className} style={style} data-testid="avatar">
             {children}
         </div>
     ),
-    AvatarImage: ({ src }: { src?: string }) => <img src={src} alt="avatar" data-testid="avatar-image" />,
+    AvatarImage: ({ src }: { src?: string }) => (
+        // It just does not matter here
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="avatar" data-testid="avatar-image" />
+    ),
     AvatarFallback: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="avatar-fallback">{children}</div>
     ),
@@ -31,11 +49,14 @@ describe('UserAvatar Component', () => {
                 name="John Doe"
                 fallback="JD"
                 borderColor="red"
-            />
+            />,
         );
 
         const avatarImage = screen.getByTestId('avatar-image');
-        expect(avatarImage).toHaveAttribute('src', 'https://example.com/avatar.png');
+        expect(avatarImage).toHaveAttribute(
+            'src',
+            'https://example.com/avatar.png',
+        );
     });
 
     it('displays the fallback text when no image source is provided', () => {
@@ -46,7 +67,9 @@ describe('UserAvatar Component', () => {
     });
 
     it('applies the correct border color', () => {
-        render(<UserAvatar fallback="JD" name="John Doe" borderColor="green" />);
+        render(
+            <UserAvatar fallback="JD" name="John Doe" borderColor="green" />,
+        );
 
         const avatar = screen.getByTestId('avatar');
         expect(avatar).toHaveStyle({ borderColor: 'green' });
@@ -66,4 +89,3 @@ describe('UserAvatar Component', () => {
         expect(hint).toHaveAttribute('aria-label', 'Teammate');
     });
 });
-

@@ -3,8 +3,18 @@ import '@testing-library/jest-dom';
 import { Cursor } from './Cursor';
 
 jest.mock('lucide-react', () => ({
-    MousePointer2: ({ className, style }: { className: string; style: React.CSSProperties }) => (
-        <div data-testid="mouse-pointer" className={className} style={style}></div>
+    MousePointer2: ({
+        className,
+        style,
+    }: {
+        className: string;
+        style: React.CSSProperties;
+    }) => (
+        <div
+            data-testid="mouse-pointer"
+            className={className}
+            style={style}
+        ></div>
     ),
 }));
 
@@ -26,7 +36,9 @@ describe('Cursor Component', () => {
             .mockImplementationOnce(() => null) // info
             .mockImplementationOnce(() => null); // cursor
 
-        const { container } = render(<Cursor connectionId={mockConnectionId} />);
+        const { container } = render(
+            <Cursor connectionId={mockConnectionId} />,
+        );
         expect(container.firstChild).toBeNull();
     });
 
@@ -40,7 +52,7 @@ describe('Cursor Component', () => {
         const nameTag = screen.getByText('Alice');
         expect(nameTag).toBeInTheDocument();
         expect(nameTag).toHaveClass(
-            'absolute left-5 px-1.5 py-0.5 rounded-md text-xs text-white font-semibold'
+            'absolute left-5 px-1.5 py-0.5 rounded-md text-xs text-white font-semibold',
         );
         expect(nameTag).toHaveStyle({ backgroundColor: 'blue' });
 

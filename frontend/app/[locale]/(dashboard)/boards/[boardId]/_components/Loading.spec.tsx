@@ -26,7 +26,9 @@ describe('CanvasLoading Component', () => {
         render(<CanvasLoading />);
 
         const loader = screen.getByTestId('loader');
-        expect(loader).toHaveClass('h-6 w-6 text-muted-foreground animate-spin');
+        expect(loader).toHaveClass(
+            'h-6 w-6 text-muted-foreground animate-spin',
+        );
     });
 
     it('renders the InfoSkeleton', () => {
@@ -39,7 +41,9 @@ describe('CanvasLoading Component', () => {
     it('renders the ParticipantsSkeleton', () => {
         render(<CanvasLoading />);
 
-        const participantsSkeleton = screen.getByTestId('participants-skeleton');
+        const participantsSkeleton = screen.getByTestId(
+            'participants-skeleton',
+        );
         expect(participantsSkeleton).toBeInTheDocument();
     });
 
@@ -55,7 +59,7 @@ describe('CanvasLoading Component', () => {
 
         const mainContainer = screen.getByRole('main');
         expect(mainContainer).toHaveClass(
-            'w-full h-full relative bg-neutral-100 touch-none flex items-center justify-center'
+            'w-full h-full relative bg-neutral-100 touch-none flex items-center justify-center',
         );
     });
 });
