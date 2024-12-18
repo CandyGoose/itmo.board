@@ -892,7 +892,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     id="styles-button"
                     activeColor={lastUsedColor}
                     onClick={toggleSelectionTools}
-                    className="h-12 w-30 bg-white rounded-md shadow-md flex items-center justify-center"
+                    className="h-12 w-30 rounded-md shadow-md flex items-center justify-center"
                 />
             </div>
 

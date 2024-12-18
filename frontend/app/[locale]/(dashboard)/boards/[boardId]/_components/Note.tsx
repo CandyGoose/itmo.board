@@ -112,10 +112,8 @@ export const Note = ({
         textFormat,
     } = layer;
 
-    // const [noteValue, setNoteValue] = useState(value);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
-    // const inputRef = useRef<HTMLDivElement>(null);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -153,7 +151,6 @@ export const Note = ({
             const newFontSize = calculateFontSize(
                 contentWidth,
                 contentHeight,
-                // noteValue,
                 value,
                 fontSize,
                 fontName,
@@ -196,6 +193,18 @@ export const Note = ({
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
 
+    const PLACEHOLDER_COLOR = '#aaa';
+
+    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
+        ...textStyle,
+        color: PLACEHOLDER_COLOR,
+    });
+
+    const placeholderStyle = useMemo<CSSProperties>(
+        () => getPlaceholderStyle(textStyle),
+        [textStyle],
+    );
+
     return (
         <foreignObject
             x={x}
@@ -223,8 +232,9 @@ export const Note = ({
                         'h-full w-full flex flex-col justify-center outline-none',
                         fontName === 'Kalam' ? font.className : '',
                     )}
-                    style={textStyle}
+                    style={value ? textStyle : placeholderStyle}
                     onChange={handleContentChange}
+                    data-placeholder="Text"
                 />
             </div>
         </foreignObject>
