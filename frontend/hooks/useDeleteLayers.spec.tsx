@@ -14,7 +14,10 @@ interface Storage {
 
 interface MutationContext {
     storage: Storage;
-    setMyPresence: (presence: Partial<Presence>, options?: { addToHistory: boolean }) => void;
+    setMyPresence: (
+        presence: Partial<Presence>,
+        options?: { addToHistory: boolean },
+    ) => void;
 }
 
 jest.mock('@/liveblocks.config', () => ({
@@ -45,16 +48,19 @@ describe('useDeleteLayers', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        (useSelf as jest.Mock).mockImplementation((selector: (me: { presence: Presence }) => unknown) =>
-            selector({ presence: { selection: [] } })
+        (useSelf as jest.Mock).mockImplementation(
+            (selector: (me: { presence: Presence }) => unknown) =>
+                selector({ presence: { selection: [] } }),
         );
 
         (useMutation as jest.Mock).mockImplementation(
-            (
-                mutationFn: (context: MutationContext) => void,
-            ) => {
-                return () => mutationFn({ storage: mockStorage, setMyPresence: mockSetMyPresence });
-            }
+            (mutationFn: (context: MutationContext) => void) => {
+                return () =>
+                    mutationFn({
+                        storage: mockStorage,
+                        setMyPresence: mockSetMyPresence,
+                    });
+            },
         );
 
         // Default storage mock
@@ -70,9 +76,13 @@ describe('useDeleteLayers', () => {
         return <button onClick={() => deleteLayers()}>Delete Layers</button>;
     };
 
-    const setupSelection = (selection: string[], indexOfMap: Record<string, number>) => {
+    const setupSelection = (
+        selection: string[],
+        indexOfMap: Record<string, number>,
+    ) => {
         (useSelf as jest.Mock).mockImplementation(
-            (selector: (me: { presence: Presence }) => unknown) => selector({ presence: { selection } })
+            (selector: (me: { presence: Presence }) => unknown) =>
+                selector({ presence: { selection } }),
         );
 
         mockIndexOf.mockImplementation((id: string) => {
@@ -106,14 +116,17 @@ describe('useDeleteLayers', () => {
         expect(mockDeleteLayerId).toHaveBeenCalledWith(1);
 
         expect(mockSetMyPresence).toHaveBeenCalledTimes(1);
-        expect(mockSetMyPresence).toHaveBeenCalledWith({ selection: [] }, { addToHistory: true });
+        expect(mockSetMyPresence).toHaveBeenCalledWith(
+            { selection: [] },
+            { addToHistory: true },
+        );
     });
 
     it('handles layerIds.indexOf returning -1', () => {
         const selection = ['layer1', 'layer2'];
         const indexOfMap = {
             layer1: -1, // layer1 does not exist in layerIds
-            layer2: 1,  // layer2 exists at index 1
+            layer2: 1, // layer2 exists at index 1
         };
 
         setupSelection(selection, indexOfMap);
@@ -134,7 +147,10 @@ describe('useDeleteLayers', () => {
         expect(mockDeleteLayerId).toHaveBeenCalledWith(1);
 
         expect(mockSetMyPresence).toHaveBeenCalledTimes(1);
-        expect(mockSetMyPresence).toHaveBeenCalledWith({ selection: [] }, { addToHistory: true });
+        expect(mockSetMyPresence).toHaveBeenCalledWith(
+            { selection: [] },
+            { addToHistory: true },
+        );
     });
 
     it('does nothing if selection is empty', () => {
@@ -154,6 +170,9 @@ describe('useDeleteLayers', () => {
         expect(mockDeleteLayerId).not.toHaveBeenCalled();
 
         expect(mockSetMyPresence).toHaveBeenCalledTimes(1);
-        expect(mockSetMyPresence).toHaveBeenCalledWith({ selection: [] }, { addToHistory: true });
+        expect(mockSetMyPresence).toHaveBeenCalledWith(
+            { selection: [] },
+            { addToHistory: true },
+        );
     });
 });
