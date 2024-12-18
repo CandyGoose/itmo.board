@@ -20,9 +20,9 @@ export function ThemeToggleButton() {
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon">
                     {theme === "dark" ? (
-                        <Moon className="h-[1.2rem] w-[1.2rem] transition-all" />
+                        <Moon data-testid="moon-icon" className="h-[1.2rem] w-[1.2rem] transition-all" />
                     ) : (
-                        <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />
+                        <Sun data-testid="sun-icon" className="h-[1.2rem] w-[1.2rem] transition-all" />
                     )}
                     <span className="sr-only">Toggle theme</span>
                 </Button>
