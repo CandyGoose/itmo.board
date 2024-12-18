@@ -23,10 +23,9 @@ import {
     XYWH,
 } from '@/types/canvas';
 import { twMerge } from 'tailwind-merge';
-import {
-    MAX_ZOOM,
-    MIN_ZOOM,
-} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Canvas';
+
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 20;
 
 jest.mock('clsx', () => ({
     __esModule: true,
@@ -1032,6 +1031,7 @@ describe('Utility Functions', () => {
             width = 100,
             height = 100,
             fill = { r: 0, g: 0, b: 0 },
+            lineWidth = 1,
         ): PathLayer => ({
             id,
             type: LayerType.Path,
@@ -1041,6 +1041,7 @@ describe('Utility Functions', () => {
             height,
             fill,
             points,
+            lineWidth,
         });
 
         const createRectangleLayer = (

@@ -8,10 +8,9 @@ import {
     STROKE_STYLES,
 } from './Grid';
 import '@testing-library/jest-dom';
-import {
-    MAX_ZOOM,
-    MIN_ZOOM,
-} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Canvas';
+
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 20;
 
 jest.mock('nanoid', () => ({
     nanoid: () => 'nanoid',

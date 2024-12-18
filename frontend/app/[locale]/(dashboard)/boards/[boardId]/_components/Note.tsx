@@ -1,14 +1,9 @@
 import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
-import {
-    useState,
-    useRef,
-    useEffect,
-    CSSProperties,
-    useCallback,
-    useMemo,
-} from 'react';
+import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
+import { useMutation } from '@/liveblocks.config';
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 const font = Kalam({
     subsets: ['latin'],
@@ -18,7 +13,7 @@ const font = Kalam({
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
-function doesTextFit(
+export function doesTextFit(
     ctx: CanvasRenderingContext2D,
     text: string,
     width: number,
@@ -67,7 +62,7 @@ export const calculateFontSize = (
     width: number,
     height: number,
     text: string,
-    initialFontSize = 72,
+    initialFontSize = MAX_FONT_SIZE,
     fontName = 'Kalam',
 ) => {
     const canvas = document.createElement('canvas');
@@ -110,24 +105,26 @@ export const Note = ({
         width,
         height,
         fill,
-        value = '',
+        value = 'Text',
         fontName,
         fontSize,
         textAlign,
         textFormat,
     } = layer;
 
-    const [noteValue, setNoteValue] = useState(value);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLDivElement>(null);
 
-    const handleContentChange = useCallback(
-        (e: React.FormEvent<HTMLDivElement>) => {
-            setNoteValue(e.currentTarget.textContent || '');
+    const updateValue = useMutation(
+        ({ storage }, newValue: string) => {
+            const liveLayers = storage.get('layers');
+            liveLayers.get(id)?.set('value', newValue);
         },
-        [],
+        [id],
     );
+    const handleContentChange = (e: ContentEditableEvent) => {
+        updateValue(e.target.value);
+    };
 
     const textColor = useMemo(
         () => (fill ? getContrastingTextColor(fill) : '#000'),
@@ -154,7 +151,7 @@ export const Note = ({
             const newFontSize = calculateFontSize(
                 contentWidth,
                 contentHeight,
-                noteValue || 'Text',
+                value,
                 fontSize,
                 fontName,
             );
@@ -163,7 +160,7 @@ export const Note = ({
                 setCurrFontSize(newFontSize);
             }
         }
-    }, [noteValue, width, height, currFontSize, fontSize, fontName]);
+    }, [width, height, currFontSize, fontSize, fontName, value]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -229,22 +226,16 @@ export const Note = ({
                     backgroundColor: backgroundColor,
                 }}
             >
-                <div
-                    contentEditable
-                    ref={inputRef}
+                <ContentEditable
+                    html={value || 'Text' || ''}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
                         fontName === 'Kalam' ? font.className : '',
                     )}
-                    style={textStyle}
-                    onInput={handleContentChange}
+                    style={value ? textStyle : placeholderStyle}
+                    onChange={handleContentChange}
                     data-placeholder="Text"
-                    suppressContentEditableWarning
-                >
-                    {noteValue === '' && (
-                        <span style={placeholderStyle}>Text</span>
-                    )}
-                </div>
+                />
             </div>
         </foreignObject>
     );

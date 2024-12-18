@@ -4,10 +4,10 @@ import { memo } from 'react';
 import { LayerType } from '@/types/canvas';
 import { colorToCss } from '@/lib/utils';
 import { Path } from './Path';
-import { useCanvasStore } from '@/store/useCanvasStore';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { useStorage } from '@/liveblocks.config';
 
 interface LayerPreviewProps {
     id: string;
@@ -17,7 +17,7 @@ interface LayerPreviewProps {
 
 export const LayerPreview = memo(
     ({ id, onLayerPointerDown, selectionColor }: LayerPreviewProps) => {
-        const layer = useCanvasStore((state) => state.getLayer(id));
+        const layer = useStorage((root) => root.layers.get(id));
 
         if (!layer) {
             return null;

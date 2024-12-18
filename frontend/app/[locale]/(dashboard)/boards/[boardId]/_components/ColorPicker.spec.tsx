@@ -3,23 +3,26 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import { ColorPicker } from './ColorPicker';
 import '@testing-library/jest-dom';
 
-// Mock Input component properly with forwardRef
 jest.mock('@/components/ui/Input', () => {
     const Input = forwardRef<
         HTMLInputElement,
         React.InputHTMLAttributes<HTMLInputElement>
     >((props, ref) => <input ref={ref} data-testid="color-input" {...props} />);
-    Input.displayName = 'Input'; // Add displayName for ESLint compliance
+    Input.displayName = 'Input';
     return { Input };
 });
 
-// Mock utility functions
 jest.mock('@/lib/utils', () => ({
     colorToCss: jest.fn(({ r, g, b }) => `rgb(${r}, ${g}, ${b})`),
-    parseColor: jest.fn((color: string) => {
-        if (color === '#000000') return { r: 0, g: 0, b: 0 };
-        if (color === '#ffffff') return { r: 255, g: 255, b: 255 };
-        return null;
+    parseColor: jest.fn((color) => {
+        switch (color) {
+            case '#000000':
+                return { r: 0, g: 0, b: 0 };
+            case '#ffffff':
+                return { r: 255, g: 255, b: 255 };
+            default:
+                return null;
+        }
     }),
 }));
 
