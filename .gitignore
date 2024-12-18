@@ -137,3 +137,4 @@ dist
 
 # Tests
 test-results
+__snapshots__
