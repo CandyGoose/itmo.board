@@ -1,13 +1,5 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 
-export interface GridProps {
-    camera: { x: number; y: number };
-    scale: number;
-    width: number;
-    height: number;
-}
-
-// Minimum grid spacing in pixels
 export const MIN_GRID_SPACING = 10;
 export const GRID_LEVELS = [1000, 500, 100, 50, 10, 5, 1];
 export const STROKE_STYLES = [
@@ -16,25 +8,48 @@ export const STROKE_STYLES = [
     { minSpacing: 0, stroke: '#ddd', strokeWidth: 0.25 },
 ];
 
+const getStrokeStyle = (spacing: number) => {
+    for (const style of STROKE_STYLES) {
+        if (spacing >= style.minSpacing) {
+            return {
+                stroke: style.stroke,
+                strokeWidth: style.strokeWidth,
+            };
+        }
+    }
+    // Fallback if none matched (shouldn't happen)
+    return { stroke: '#ddd', strokeWidth: 0.25 };
+};
+
+export interface GridProps {
+    camera: { x: number; y: number };
+    scale: number;
+    width: number;
+    height: number;
+}
+
 export const Grid: React.FC<GridProps> = memo(
     ({ camera, scale, width, height }) => {
-        const getStrokeStyle = (spacing: number) => {
-            for (const style of STROKE_STYLES) {
-                if (spacing >= style.minSpacing) {
-                    return {
-                        stroke: style.stroke,
-                        strokeWidth: style.strokeWidth,
-                    };
-                }
-            }
-        };
+        const canvasRef = useRef<HTMLCanvasElement>(null);
 
-        const roundFactor = 10 ** 4;
+        useEffect(() => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
 
-        const gridPaths = useMemo(() => {
-            const paths: React.JSX.Element[] = [];
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
 
-            // Calculate visible area in world coordinates
+            // Device Pixel Ratio for crisp rendering
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.scale(dpr, dpr);
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Convert screen space to world space
             const x0 = (0 - camera.x) / scale;
             const x1 = (width - camera.x) / scale;
             const y0 = (0 - camera.y) / scale;
@@ -42,7 +57,10 @@ export const Grid: React.FC<GridProps> = memo(
 
             const usedX = new Set<number>();
             const usedY = new Set<number>();
-            GRID_LEVELS.forEach((gridSize) => {
+
+            const roundFactor = 10 ** 4;
+
+            for (const gridSize of GRID_LEVELS) {
                 const gridSpacingInPixels = gridSize * scale;
                 if (gridSpacingInPixels < MIN_GRID_SPACING) {
                     return; // Skip grid levels that are too dense
@@ -55,48 +73,60 @@ export const Grid: React.FC<GridProps> = memo(
                 const xStart = Math.floor(x0 / gridSize) * gridSize;
                 const yStart = Math.floor(y0 / gridSize) * gridSize;
 
-                let pathData = '';
+                // Set stroke style
+                ctx.strokeStyle = stroke;
+                ctx.lineWidth = strokeWidth;
 
-                // Build path data for vertical lines
+                // Draw vertical lines
                 for (let x = xStart; x <= x1; x += gridSize) {
                     if (usedX.has(x)) {
                         continue;
                     }
                     usedX.add(x);
+
                     const xScreen = x * scale + camera.x;
-                    const xScreenRounded =
-                        Math.round(xScreen * roundFactor) / roundFactor;
-                    pathData += `M ${xScreenRounded} 0 L ${xScreenRounded} ${height} `;
+                    const xScreenRounded = Math.round(xScreen * roundFactor) / roundFactor;
+
+                    ctx.beginPath();
+                    ctx.moveTo(xScreenRounded, 0);
+                    ctx.lineTo(xScreenRounded, height);
+                    ctx.stroke();
                 }
 
-                // Build path data for horizontal lines
+                // Draw horizontal lines
                 for (let y = yStart; y <= y1; y += gridSize) {
                     if (usedY.has(y)) {
                         continue;
                     }
                     usedY.add(y);
+
                     const yScreen = y * scale + camera.y;
-                    const yScreenRounded =
-                        Math.round(yScreen * roundFactor) / roundFactor;
-                    pathData += `M 0 ${yScreenRounded} L ${width} ${yScreenRounded} `;
+                    const yScreenRounded = Math.round(yScreen * roundFactor) / roundFactor;
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, yScreenRounded);
+                    ctx.lineTo(width, yScreenRounded);
+                    ctx.stroke();
                 }
+            }
 
-                // Add the path element to the array
-                paths.push(
-                    <path
-                        key={`grid-${gridSize}`}
-                        d={pathData}
-                        stroke={stroke}
-                        strokeWidth={strokeWidth}
-                    />,
-                );
-            });
+        }, [camera, scale, width, height]);
 
-            return paths;
-        }, [camera, scale, width, height, roundFactor]);
-
-        return <g data-testid="grid">{gridPaths}</g>;
-    },
+        return (
+            <canvas
+                id="gridCanvas"
+                ref={canvasRef}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    pointerEvents: 'none',
+                    zIndex: -1,
+                }}
+                data-testid={'grid'}
+            />
+        );
+    }
 );
 
 Grid.displayName = 'Grid';

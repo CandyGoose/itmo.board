@@ -882,9 +882,17 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     return (
         <main
-            className={cn('h-full w-full relative bg-neutral-100 touch-none')}
+            className={cn('h-full w-full relative touch-none')}
             data-testid="canvas-main"
         >
+            {svgRect && (
+                <Grid
+                    camera={camera}
+                    scale={scale}
+                    width={svgRect.width}
+                    height={svgRect.height}
+                />
+            )}
             {/* Container for aligning buttons in the top-right corner */}
             <div className="absolute top-2 right-2 flex items-center gap-2">
                 <Participants className="h-12 w-12" />
@@ -978,7 +986,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         data-testid="selection-tools"
                     />
                 )}
-
             <svg
                 ref={svgRef}
                 data-testid="svg-element"
@@ -990,14 +997,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 onPointerUp={onPointerUp}
                 tabIndex={0}
             >
-                {svgRect && (
-                    <Grid
-                        camera={camera}
-                        scale={scale}
-                        width={svgRect.width}
-                        height={svgRect.height}
-                    />
-                )}
                 <g
                     data-testid="svg-group"
                     transform={`translate(${camera.x}, ${camera.y}) scale(${scale})`}

@@ -8,6 +8,7 @@ import {
     STROKE_STYLES,
 } from './Grid';
 import '@testing-library/jest-dom';
+import 'jest-canvas-mock';
 
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 20;
@@ -19,9 +20,7 @@ jest.mock('nanoid', () => ({
 describe('Grid Component', () => {
     const renderGrid = (props: GridProps) => {
         return render(
-            <svg>
-                <Grid {...props} />
-            </svg>,
+            <Grid {...props} />
         );
     };
 
@@ -170,9 +169,7 @@ describe('Grid Component', () => {
         };
 
         rerender(
-            <svg>
-                <Grid {...updatedProps} />
-            </svg>,
+            <Grid {...updatedProps} />
         );
 
         const pathsAfter = container.querySelectorAll('path');
