@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CanvasLoading } from './Loading';
 
-// Mock external components
 jest.mock('lucide-react', () => ({
     Loader: ({ className }: { className: string }) => (
         <div data-testid="loader" className={className}></div>

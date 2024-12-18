@@ -1,9 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-
 import { useOthersConnectionIds, useOthersMapped } from '@/liveblocks.config';
-
 import { Cursor } from './Cursor';
 import { shallow } from '@liveblocks/client';
 import { Path } from './Path';

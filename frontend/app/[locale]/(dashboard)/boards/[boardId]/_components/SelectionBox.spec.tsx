@@ -11,7 +11,6 @@ const mockedUseSelectionBounds = useSelectionBounds as jest.MockedFunction<
     typeof useSelectionBounds
 >;
 
-// Define mock layers
 const mockLayers: Layer[] = [
     {
         id: '1',
@@ -46,7 +45,6 @@ const mockMap = new Map<string, Layer>(
     mockLayers.map((layer) => [layer.id, layer]),
 );
 
-// Define default props for the SelectionBox
 const defaultProps = {
     onResizeHandlePointerDown: jest.fn(),
     isShowingHandles: false,
@@ -253,7 +251,6 @@ describe('SelectionBox Component', () => {
                 expectedCorners[index],
                 mockBounds,
             );
-            // Reset the mock for the next iteration
             onResizeHandlePointerDown.mockReset();
         });
     });

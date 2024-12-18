@@ -22,7 +22,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
     ({ fontName, onFontChange, fontSize, onFontSizeChange }) => {
         const t = useTranslations('tools');
 
-        const handleFontSizeBlur = (value: string) => {
+        const onBlur = (value: string) => {
             const numericValue = Math.max(
                 MIN_FONT_SIZE,
                 Math.min(MAX_FONT_SIZE, parseInt(value, 10) || MIN_FONT_SIZE),
@@ -79,7 +79,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                         onChange={(e) =>
                             onFontSizeChange(parseInt(e.target.value, 10))
                         }
-                        onBlur={(e) => handleFontSizeBlur(e.target.value)}
+                        onBlur={(e) => onBlur(e.target.value)}
                         className="border rounded p-1 text-sm w-full"
                         min={MIN_FONT_SIZE}
                         max={MAX_FONT_SIZE}
