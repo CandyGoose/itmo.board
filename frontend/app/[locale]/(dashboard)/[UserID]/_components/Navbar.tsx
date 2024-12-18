@@ -26,7 +26,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-x-4 p-5">
             <Link href="/">
                 <div className="flex items-center gap-x-2">
-                    <Image src="/logo.svg" alt="Logo" height={30} width={30} />
+                    <Image src="/logo.svg" alt="Logo" height={30} width={30}/>
                     <span
                         className={cn('font-semibold text-2xl', font.className)}
                     >
@@ -35,7 +35,7 @@ export const Navbar = () => {
                 </div>
             </Link>
 
-            <div className=" flex-2">
+            <div className="flex-2">
                 <OrganizationSwitcher
                     hidePersonal
                     appearance={{
@@ -46,28 +46,33 @@ export const Navbar = () => {
                                 alignItems: 'center',
                                 width: '100%',
                             },
-                            organizationSwitcherTrigger: {
-                                padding: '6px',
-                                width: '100%',
-                                borderRadius: '8px',
-                                border: '1px solid #E5E7EB',
-                                justifyContent: 'space-between',
-                                backgroundColor: 'white',
-                            },
+                            organizationSwitcherTrigger: `
+                                bg-[var(--background-color)] 
+                                text-[var(--text-color)] 
+                                hover:bg-[var(--foreground)] 
+                                hover:text-[var(--background)]
+                                dark:bg-[var(--primary)] 
+                                dark:text-[var(--primary-foreground)] 
+                                dark:hover:bg-[var(--secondary)] 
+                                dark:hover:text-[var(--primary-foreground)]
+                                [&_span]:text-[var(--primary-foreground)] 
+                                dark:[&_span]:text-[var(--primary-foreground)]
+                                transition-colors duration-300
+                            `,
                         },
                     }}
                 />
             </div>
 
             <div className="hidden lg:flex lg:flex-1 ">
-                <SearchInput />
+                <SearchInput/>
             </div>
 
-            {organization && <InviteButton />}
+            {organization && <InviteButton/>}
 
-            <LanguageSwitchButton />
+            <LanguageSwitchButton/>
 
-            <UserButton />
+            <UserButton/>
         </div>
     );
 };

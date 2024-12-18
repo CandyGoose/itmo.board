@@ -75,7 +75,7 @@ export const BoardCard = ({
             data-testid={`board-card-${id}`} // Уникальный data-testid
             onClick={onClick}
         >
-            <div className="relative flex-1 bg-white">
+            <div className="relative flex-1">
                 <Image src={imageUrl} alt="" fill className="object-fit" />
                 <Overlay />
                 <Actions id={id} title={title} side="right">
