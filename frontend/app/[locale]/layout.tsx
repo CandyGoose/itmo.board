@@ -36,6 +36,7 @@ export default async function LocaleLayout({
                                 <ThemeProvider>
                                     {children}
                                     <ModalProvider />
+                                    <Toaster />
                                 </ThemeProvider>
                             </body>
                         </ClerkProvider>
