@@ -8,7 +8,7 @@ import { getMessages } from 'next-intl/server';
 import { ModalProvider } from '@/providers/ModalProvider';
 import YandexMetrika from '@/metrika/YandexMetrika';
 import { ThemeProvider } from '@/providers/ThemeProvider';
-import Loading from "./loading";
+import Loading from './loading';
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
