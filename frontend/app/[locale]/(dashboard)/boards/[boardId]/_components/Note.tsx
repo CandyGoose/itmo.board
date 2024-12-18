@@ -196,11 +196,15 @@ export const Note = ({
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
 
+    const PLACEHOLDER_COLOR = '#aaa';
+
+    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
+        ...textStyle,
+        color: PLACEHOLDER_COLOR,
+    });
+
     const placeholderStyle = useMemo<CSSProperties>(
-        () => ({
-            ...textStyle,
-            color: '#aaa', // Placeholder color
-        }),
+        () => getPlaceholderStyle(textStyle),
         [textStyle],
     );
 
