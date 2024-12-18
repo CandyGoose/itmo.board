@@ -399,7 +399,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     });
                 } else {
                     setMyPresence({
-                        pencilDraft: [...pencilDraft]
+                        pencilDraft: [...pencilDraft],
                     });
                 }
             } else {

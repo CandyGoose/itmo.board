@@ -47,7 +47,9 @@ const Drafts = () => {
                                     ? colorToCss(other.penColor)
                                     : '#000'
                             }
-                            stroke={colorToCss(other.penColor ?? {r: 0, g: 0, b: 0})}
+                            stroke={colorToCss(
+                                other.penColor ?? { r: 0, g: 0, b: 0 },
+                            )}
                             lineWidth={4}
                         />
                     );

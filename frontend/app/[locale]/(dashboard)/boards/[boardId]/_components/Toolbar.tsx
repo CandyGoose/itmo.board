@@ -12,7 +12,9 @@ import {
     MousePointer2,
     Square,
     Circle,
-    StickyNote, Undo2, Redo2,
+    StickyNote,
+    Undo2,
+    Redo2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 

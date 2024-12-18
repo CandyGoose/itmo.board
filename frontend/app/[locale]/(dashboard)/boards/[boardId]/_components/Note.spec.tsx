@@ -1,7 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Note } from './Note';
 import { LayerType, NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import '@testing-library/jest-dom';
+import { useMutation } from '@/liveblocks.config';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@/lib/utils', () => ({
     calculateFontSize: jest.fn(() => 48),
@@ -17,6 +19,12 @@ jest.mock('next/font/google', () => ({
         className: 'kalam-font',
     }),
 }));
+
+jest.mock('@/liveblocks.config', () => ({
+    useMutation: jest.fn(),
+}));
+
+
 
 beforeAll(() => {
     HTMLCanvasElement.prototype.getContext = jest.fn();
@@ -39,6 +47,7 @@ const mockLayer: NoteLayer = {
 
 describe('Note component', () => {
     let onPointerDown: jest.Mock;
+    const updateValueMock = jest.fn();
 
     beforeEach(() => {
         onPointerDown = jest.fn();
@@ -51,6 +60,8 @@ describe('Note component', () => {
             'offsetHeight',
             'get',
         ).mockReturnValue(100);
+
+        (useMutation as jest.Mock).mockReturnValue(updateValueMock);
 
         jest.clearAllMocks();
     });
@@ -111,22 +122,27 @@ describe('Note component', () => {
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        expect(editableDiv?.textContent).toBe('Initial note text');
+        expect(editableDiv?.textContent).toBe(mockLayer.value);
     });
 
-    it('should update the text when edited', () => {
+    it('should update the text when edited', async () => {
         renderComponent(mockLayer);
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
 
-        // Simulate text input
-        fireEvent.input(editableDiv!, {
-            target: { textContent: 'Updated note text' },
+        // Simulate user clearing and typing new text
+        await userEvent.clear(editableDiv!);
+        await userEvent.type(editableDiv!, 'Updated note text');
+        expect(updateValueMock).toHaveBeenCalledWith('Updated note text');
+
+        // Wait for state updates and DOM changes
+        await waitFor(() => {
+            expect(editableDiv).toHaveTextContent('Updated note text');
         });
 
-        expect(editableDiv?.textContent).toBe('Updated note text');
+
     });
 
     it('should call onPointerDown with correct arguments when clicked', () => {
@@ -325,7 +341,7 @@ describe('Note component', () => {
 
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
         const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+            foreignObjectElement.querySelector('div[contenteditable=true]');
 
         // Simulate rapid input changes
         fireEvent.input(editableDiv!, {
