@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ModalProvider } from '@/providers/ModalProvider';
 import YandexMetrika from '@/metrika/YandexMetrika';
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
@@ -31,8 +32,10 @@ export default async function LocaleLayout({
                     <ErrorBoundary>
                         <ClerkProvider>
                             <body>
-                                {children}
-                                <ModalProvider />
+                                <ThemeProvider>
+                                    {children}
+                                    <ModalProvider />
+                                </ThemeProvider>
                             </body>
                         </ClerkProvider>
                     </ErrorBoundary>
