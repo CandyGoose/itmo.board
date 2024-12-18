@@ -85,7 +85,8 @@ export const Grid: React.FC<GridProps> = memo(
                     usedX.add(x);
 
                     const xScreen = x * scale + camera.x;
-                    const xScreenRounded = Math.round(xScreen * roundFactor) / roundFactor;
+                    const xScreenRounded =
+                        Math.round(xScreen * roundFactor) / roundFactor;
 
                     ctx.beginPath();
                     ctx.moveTo(xScreenRounded, 0);
@@ -101,7 +102,8 @@ export const Grid: React.FC<GridProps> = memo(
                     usedY.add(y);
 
                     const yScreen = y * scale + camera.y;
-                    const yScreenRounded = Math.round(yScreen * roundFactor) / roundFactor;
+                    const yScreenRounded =
+                        Math.round(yScreen * roundFactor) / roundFactor;
 
                     ctx.beginPath();
                     ctx.moveTo(0, yScreenRounded);
@@ -109,13 +111,13 @@ export const Grid: React.FC<GridProps> = memo(
                     ctx.stroke();
                 }
             }
-
         }, [camera, scale, width, height]);
 
         return (
             <canvas
                 id="gridCanvas"
                 ref={canvasRef}
+                className={'bg-[var(--background-color)]'}
                 style={{
                     position: 'absolute',
                     top: 0,
@@ -126,7 +128,7 @@ export const Grid: React.FC<GridProps> = memo(
                 data-testid={'grid'}
             />
         );
-    }
+    },
 );
 
 Grid.displayName = 'Grid';

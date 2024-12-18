@@ -19,9 +19,7 @@ jest.mock('nanoid', () => ({
 
 describe('Grid Component', () => {
     const renderGrid = (props: GridProps) => {
-        return render(
-            <Grid {...props} />
-        );
+        return render(<Grid {...props} />);
     };
 
     it('renders without crashing', () => {
@@ -168,9 +166,7 @@ describe('Grid Component', () => {
             camera: { x: 50, y: 50 },
         };
 
-        rerender(
-            <Grid {...updatedProps} />
-        );
+        rerender(<Grid {...updatedProps} />);
 
         const pathsAfter = container.querySelectorAll('path');
 
