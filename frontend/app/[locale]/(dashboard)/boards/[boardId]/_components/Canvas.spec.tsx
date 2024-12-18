@@ -6,7 +6,6 @@ import {
     waitFor,
 } from '@testing-library/react';
 import Canvas from './Canvas';
-import { useCanvasStore } from '@/store/useCanvasStore';
 import '@testing-library/jest-dom';
 import {
     CanvasMode,
@@ -15,7 +14,6 @@ import {
     TextAlign,
     TextFormat,
 } from '@/types/canvas';
-import { useTranslations } from 'next-intl';
 import { SelectionToolsProps } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/SelectionTools';
 import { StylesButtonProps } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/StylesButton';
 
@@ -119,7 +117,7 @@ jest.mock(
 );
 
 jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(),
+    useTranslations: jest.fn().mockImplementation(() => () => 'a'),
 }));
 
 jest.mock(
@@ -252,6 +250,10 @@ jest.mock('./StylesButton', () => ({
     },
 }));
 
+jest.mock('./CursorsPresence', () => ({
+    CursorsPresence: () => <div>CursorsPresence</div>,
+}));
+
 jest.mock('@clerk/nextjs', () => ({
     useOrganization: jest.fn(() => ({ membership: true })),
     ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -276,9 +278,6 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('Canvas Component', () => {
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(() => () => 'a');
-
     const mockUseCanvasStoreHook = (overrides = {}) => {
         const store = {
             layerIds: ['layer1', 'layer2'], // Добавляем слои

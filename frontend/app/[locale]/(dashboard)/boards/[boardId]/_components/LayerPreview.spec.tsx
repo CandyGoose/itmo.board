@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import { LayerPreview } from './LayerPreview';
 import { LayerType } from '@/types/canvas';
-import { useCanvasStore } from '@/store/useCanvasStore';
 import '@testing-library/jest-dom';
 
 jest.mock('./Path', () => ({

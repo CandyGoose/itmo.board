@@ -1011,9 +1011,11 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         />
                     ))}
                     <CursorsPresence />
-                    {pencilDraft && pencilDraft.length > 1 && (
+                    {pencilDraft &&
+                        pencilDraft.length > 1 &&
                         (() => {
-                            const partialProps = penPointsToPathLayer(pencilDraft);
+                            const partialProps =
+                                penPointsToPathLayer(pencilDraft);
                             return (
                                 <Path
                                     x={partialProps.x!}
@@ -1026,8 +1028,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                                     lineWidth={lineWidth}
                                 />
                             );
-                        })()
-                    )}
+                        })()}
 
                     <SelectionBox
                         onResizeHandlePointerDown={onResizeHandlePointerDown}
