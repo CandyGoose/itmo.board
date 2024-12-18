@@ -128,7 +128,9 @@ describe('BoardList Component', () => {
 
         mockBoards.forEach((board) => {
             const boardCard = screen.getByText(board.title).closest('div');
-            expect(within(boardCard!).getByText(board.title)).toBeInTheDocument();
+            expect(
+                within(boardCard!).getByText(board.title),
+            ).toBeInTheDocument();
         });
     });
 

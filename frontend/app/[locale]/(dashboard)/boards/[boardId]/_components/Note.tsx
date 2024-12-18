@@ -99,11 +99,11 @@ interface NoteProps {
 }
 
 export const Note = ({
-                  layer,
-                  onPointerDown,
-                  id,
-                  selectionColor,
-              }: NoteProps) => {
+    layer,
+    onPointerDown,
+    id,
+    selectionColor,
+}: NoteProps) => {
     const {
         x,
         y,

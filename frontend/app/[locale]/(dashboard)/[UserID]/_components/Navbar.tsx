@@ -13,7 +13,7 @@ import { Poppins } from 'next/font/google';
 import { LanguageSwitchButton } from '@/app/[locale]/(dashboard)/[UserID]/_components/LanguageSwitchButton';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
-import {ThemeToggleButton} from "@/app/[locale]/(dashboard)/[UserID]/_components/ThemeToggleButton";
+import { ThemeToggleButton } from '@/app/[locale]/(dashboard)/[UserID]/_components/ThemeToggleButton';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -27,7 +27,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-x-4 p-5">
             <Link href="/">
                 <div className="flex items-center gap-x-2">
-                    <Image src="/logo.svg" alt="Logo" height={30} width={30}/>
+                    <Image src="/logo.svg" alt="Logo" height={30} width={30} />
                     <span
                         className={cn('font-semibold text-2xl', font.className)}
                     >
@@ -66,16 +66,16 @@ export const Navbar = () => {
             </div>
 
             <div className="hidden lg:flex lg:flex-1 ">
-                <SearchInput/>
+                <SearchInput />
             </div>
 
-            {organization && <InviteButton/>}
+            {organization && <InviteButton />}
 
-            <LanguageSwitchButton/>
+            <LanguageSwitchButton />
 
-            <ThemeToggleButton/>
+            <ThemeToggleButton />
 
-            <UserButton/>
+            <UserButton />
         </div>
     );
 };
