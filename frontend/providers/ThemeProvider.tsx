@@ -23,8 +23,6 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
     const applyTheme = (newTheme: string) => {
         const root = document.documentElement;
-
-        // Для Tailwind CSS и обычных стилей
         if (newTheme === "dark") {
             root.classList.add("dark");
         } else {
@@ -33,7 +31,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
         root.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
-        setThemeState(newTheme); // Обновляем состояние после всех действий
+        setThemeState(newTheme);
     };
 
     const setTheme = (newTheme: "system" | "light" | "dark") => {
