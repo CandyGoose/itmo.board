@@ -58,7 +58,7 @@ describe('Canvas Grid Component', () => {
     it('draws lines for all grid levels when scale is large enough', () => {
         const props = {
             camera: { x: 0, y: 0 },
-            scale: (MIN_GRID_SPACING / GRID_LEVELS[-1]) * 2, // All levels shown
+            scale: (MIN_GRID_SPACING / GRID_LEVELS[GRID_LEVELS.length - 1]) * 2, // All levels shown
             width: 20000,
             height: 20000,
         };
