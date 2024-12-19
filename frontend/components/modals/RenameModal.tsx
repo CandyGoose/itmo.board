@@ -33,10 +33,10 @@ export const RenameModal = () => {
             e.preventDefault();
             await renameBoard(initialValues.id, title);
             toast.success('Board renamed.');
-            router.refresh();
+            router.push('/');
             onClose();
         } catch {
-            toast.error('Failed to renamed board.');
+            toast.error('Failed to rename board.');
         } finally {
             setLoading(false);
         }
