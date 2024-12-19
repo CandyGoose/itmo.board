@@ -6,6 +6,7 @@ interface UserAvatarProps {
     name?: string;
     fallback?: string;
     borderColor?: string;
+    style?: React.CSSProperties;
 }
 
 export const UserAvatar = ({
@@ -13,12 +14,13 @@ export const UserAvatar = ({
     name,
     fallback,
     borderColor,
+    style,
 }: UserAvatarProps) => {
     return (
         <Hint label={name || 'Teammate'} side="bottom" sideOffset={18}>
             <Avatar
                 className="h-8 w-8 border-2"
-                style={{ borderColor: borderColor }}
+                style={{ borderColor: borderColor, ...style }} // Передаем стили
             >
                 <AvatarImage src={src} />
                 <AvatarFallback className="text-xs font-semibold">
