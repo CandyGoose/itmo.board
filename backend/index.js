@@ -48,7 +48,7 @@ mongoose
     });
 app.use(bodyParser.json());
 
-require('./views/board.view')(app);
+require('./views/Board.view')(app);
 
 app.listen(port, () => {
     console.log(`Server is running at site: http://localhost:${port}`);
