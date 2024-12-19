@@ -4,6 +4,7 @@ import { RenameModal } from './RenameModal';
 import { useRenameModal } from '@/store/useRenameModal';
 import { renameBoard } from '@/actions/Board';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 jest.mock('@/store/useRenameModal', () => ({
     useRenameModal: jest.fn(),
@@ -17,15 +18,22 @@ jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
 }));
 
+jest.mock('sonner', () => ({
+    toast: {
+        success: jest.fn(),
+        error: jest.fn(),
+    },
+}));
+
 describe('RenameModal', () => {
     const mockOnClose = jest.fn();
-    const mockRefresh = jest.fn();
+    const mockPush = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
 
         (useRouter as jest.Mock).mockReturnValue({
-            refresh: mockRefresh,
+            push: mockPush,
         });
 
         (useRenameModal as unknown as jest.Mock).mockReturnValue({
@@ -73,8 +81,9 @@ describe('RenameModal', () => {
 
         await waitFor(() => {
             expect(renameBoard).toHaveBeenCalledWith('1', 'New Board Title');
-            expect(mockRefresh).toHaveBeenCalled();
+            expect(mockPush).toHaveBeenCalledWith('/');
             expect(mockOnClose).toHaveBeenCalled();
+            expect(toast.success).toHaveBeenCalledWith('Board renamed.');
         });
 
         expect(screen.queryByText(/board renamed\./i)).not.toBeInTheDocument();
@@ -94,10 +103,9 @@ describe('RenameModal', () => {
 
         await waitFor(() => {
             expect(renameBoard).toHaveBeenCalledWith('1', 'New Board Title');
+            expect(toast.error).toHaveBeenCalledWith('Failed to rename board.');
         });
 
-        expect(
-            screen.queryByText(/failed to renamed board\./i),
-        ).not.toBeInTheDocument();
+        expect(mockOnClose).not.toHaveBeenCalled();
     });
 });
