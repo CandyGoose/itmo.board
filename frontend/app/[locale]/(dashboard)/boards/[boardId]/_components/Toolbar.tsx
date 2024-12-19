@@ -194,6 +194,6 @@ export const ToolBar = ({
 
 export const ToolBarSkeleton = () => {
     return (
-        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-white" />
+        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-[var(--background-color)]" />
     );
 };
