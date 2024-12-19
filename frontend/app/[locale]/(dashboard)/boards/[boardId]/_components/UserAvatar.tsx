@@ -10,12 +10,12 @@ interface UserAvatarProps {
 }
 
 export const UserAvatar = ({
-                               src,
-                               name,
-                               fallback,
-                               borderColor,
-                               style,
-                           }: UserAvatarProps) => {
+    src,
+    name,
+    fallback,
+    borderColor,
+    style,
+}: UserAvatarProps) => {
     return (
         <Hint label={name || 'Teammate'} side="bottom" sideOffset={18}>
             <Avatar
