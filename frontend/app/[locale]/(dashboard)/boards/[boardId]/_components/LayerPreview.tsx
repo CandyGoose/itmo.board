@@ -7,6 +7,7 @@ import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { ImageLayerComponent } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageLayer';
 import { useStorage } from '@/liveblocks.config';
 
 interface LayerPreviewProps {
@@ -60,6 +61,15 @@ export const LayerPreview = memo(
             case LayerType.Note:
                 return (
                     <Note
+                        id={id}
+                        layer={layer}
+                        onPointerDown={onLayerPointerDown}
+                        selectionColor={selectionColor}
+                    />
+                );
+            case LayerType.Image:
+                return (
+                    <ImageLayerComponent
                         id={id}
                         layer={layer}
                         onPointerDown={onLayerPointerDown}
