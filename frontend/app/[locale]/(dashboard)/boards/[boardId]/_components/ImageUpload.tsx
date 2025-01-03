@@ -77,8 +77,22 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     };
 
     const handleSubmitUrl = async () => {
-        // No upload on URL
-        onUploadComplete(imageUrl);
+        if (!imageUrl) return;
+        try {
+            const response = await fetch(imageUrl, { mode: 'cors' });
+            if (!response.ok) {
+                console.error('Failed to fetch image from URL. Possible CORS error.');
+            }
+            const blob = await response.blob();
+
+            const file = new File([blob], 'downloaded-image', { type: blob.type });
+
+            // Upload the file to the server
+            const finalUrl = await uploadToServer(file);
+            onUploadComplete(finalUrl);
+        } catch (err) {
+            console.error('Error handling URL submission:', err);
+        }
     };
 
     return (
