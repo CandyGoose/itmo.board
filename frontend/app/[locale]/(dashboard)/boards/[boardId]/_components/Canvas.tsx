@@ -175,7 +175,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             { storage, setMyPresence },
             layerType: LayerType,
             position: Point,
-            imageSrc?: string,
+            imageData?: {url: string, width?: number, height?: number},
         ) => {
             const liveLayers = storage.get('layers');
             const liveLayerIds = storage.get('layerIds');
@@ -219,7 +219,9 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layerData = {
                         ...baseProps,
                         type: LayerType.Image,
-                        src: imageSrc ?? '',
+                        width: imageData?.width ?? 100,
+                        height: imageData?.height ?? 100,
+                        src: imageData?.url ?? '',
                     } as ImageLayer;
                     break;
                 default:
@@ -605,11 +607,11 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     }, []);
 
     // Handler that the <ImageUpload/> calls after finishing upload
-    const handleImageUploadComplete = (imageUrl: string) => {
+    const handleImageUploadComplete = (url: string, width?: number, height?: number) => {
         setShowImageUpload(false);
         if (!pendingImagePosition) return;
-
-        insertLayer(LayerType.Image, pendingImagePosition, imageUrl);
+        const imageData = {url, width, height};
+        insertLayer(LayerType.Image, pendingImagePosition, imageData);
         setPendingImagePosition(null);
     };
 

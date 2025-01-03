@@ -27,6 +27,7 @@ export const ImageLayerComponent: React.FC<ImageLayerComponentProps> = ({
             width={width}
             height={height}
             stroke={strokeColor}
+            preserveAspectRatio="none"
         />
     );
 };
