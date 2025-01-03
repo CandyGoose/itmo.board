@@ -51,6 +51,7 @@ import {
 import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
 import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
+import { ImageUpload } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageUpload';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -110,6 +111,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         TextFormat.None,
     ]);
 
+    const [showImageUpload, setShowImageUpload] = useState(false);
+    const [pendingImagePosition, setPendingImagePosition] =
+        useState<Point | null>(null);
+
     useEffect(() => {
         if (svgRef.current) {
             setSvgRect(svgRef.current.getBoundingClientRect());
@@ -166,7 +171,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     }, [selections]);
 
     const insertLayer = useMutation(
-        ({ storage, setMyPresence }, layerType: LayerType, position: Point) => {
+        (
+            { storage, setMyPresence },
+            layerType: LayerType,
+            position: Point,
+            imageSrc?: string,
+        ) => {
             const liveLayers = storage.get('layers');
             const liveLayerIds = storage.get('layerIds');
             const id = nanoid();
@@ -209,8 +219,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layerData = {
                         ...baseProps,
                         type: LayerType.Image,
+                        src: imageSrc ?? '',
                     } as ImageLayer;
-                    // TODO
                     break;
                 default:
                     throw new Error(`Invalid layer type: ${layerType}`);
@@ -564,7 +574,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
                 insertPath();
             } else if (canvasState.mode === CanvasMode.Inserting && editable) {
-                insertLayer(canvasState.layerType!, point);
+                if (canvasState.layerType === LayerType.Image) {
+                    setPendingImagePosition(point);
+                    setShowImageUpload(true);
+                } else {
+                    insertLayer(canvasState.layerType!, point);
+                }
             } else {
                 setCanvasState({ mode: CanvasMode.None });
             }
@@ -588,6 +603,15 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         setMyPresence({ cursor: null });
         setIsPanning(false);
     }, []);
+
+    // Handler that the <ImageUpload/> calls after finishing upload
+    const handleImageUploadComplete = (imageUrl: string) => {
+        setShowImageUpload(false);
+        if (!pendingImagePosition) return;
+
+        insertLayer(LayerType.Image, pendingImagePosition, imageUrl);
+        setPendingImagePosition(null);
+    };
 
     const deleteLayers = useDeleteLayers();
 
@@ -933,6 +957,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 moveForward={moveForward}
                 moveBackward={moveBackward}
             />
+
+            {showImageUpload && (
+                <ImageUpload
+                    onClose={() => setShowImageUpload(false)}
+                    onUploadComplete={handleImageUploadComplete}
+                />
+            )}
 
             {editable &&
                 showSelectionTools &&
