@@ -6,6 +6,7 @@ import {
     CanvasState,
     Color,
     EllipseLayer,
+    ImageLayer,
     Layer,
     LayerType,
     NoteLayer,
@@ -138,7 +139,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 (canvasState.layerType === LayerType.Text ||
                     canvasState.layerType === LayerType.Note ||
                     canvasState.layerType === LayerType.Rectangle ||
-                    canvasState.layerType === LayerType.Ellipse)) ||
+                    canvasState.layerType === LayerType.Ellipse ||
+                    canvasState.layerType === LayerType.Image)) ||
             canvasState.mode === CanvasMode.Pencil
         );
     }, [canvasState]);
@@ -202,6 +204,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         textAlign,
                         textFormat,
                     } as NoteLayer;
+                    break;
+                case LayerType.Image:
+                    layerData = {
+                        ...baseProps,
+                        type: LayerType.Image,
+                    } as ImageLayer;
+                    // TODO
                     break;
                 default:
                     throw new Error(`Invalid layer type: ${layerType}`);
