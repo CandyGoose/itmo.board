@@ -37,6 +37,12 @@
     "font": "Шрифт",
     "fontSize": "Размер шрифта",
     "undo": "отменить",
-    "redo": "повторить"
+    "redo": "повторить",
+    "uploadOrPasteAnImage": "Загрузите или вставьте изображение",
+    "dragDropLabel": "Перетащите изображение сюда",
+    "orLabel": "или",
+    "selectFromComputer": "Выберите с компьютера",
+    "imageUrl": "URL изображения",
+    "loadButton": "Загрузить"
   }
 }
