@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 
 interface ImageUploadProps {
     onClose: () => void;
-    onUploadComplete: (url: string, width?: number, height?: number ) => void;
+    onUploadComplete: (url: string, width?: number, height?: number) => void;
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -15,7 +15,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     const [imageUrl, setImageUrl] = useState('');
     const [dragActive, setDragActive] = useState(false);
 
-    const getImageDimensions = (fileOrBlob: File | Blob): Promise<{ width: number; height: number }> => {
+    const getImageDimensions = (
+        fileOrBlob: File | Blob,
+    ): Promise<{ width: number; height: number }> => {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => {
@@ -28,7 +30,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         });
     };
 
-    const uploadToServer = async (file: File): Promise<{ url: string; width?: number; height?: number }> => {
+    const uploadToServer = async (
+        file: File,
+    ): Promise<{ url: string; width?: number; height?: number }> => {
         const { width, height } = await getImageDimensions(file);
         const formData = new FormData();
         formData.append('file', file);
@@ -43,7 +47,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         }
         const data = await res.json();
         // data should be like: { url: "http://localhost:4000/uploads/167233_myImage.png" }
-        return {url: data.url, width, height};
+        return { url: data.url, width, height };
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +69,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             try {
-                const { url: finalUrl, width, height } = await uploadToServer(file);
+                const {
+                    url: finalUrl,
+                    width,
+                    height,
+                } = await uploadToServer(file);
                 onUploadComplete(finalUrl, width, height);
             } catch (err) {
                 console.error('File upload error:', err);
@@ -95,11 +103,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         try {
             const response = await fetch(imageUrl, { mode: 'cors' });
             if (!response.ok) {
-                console.error('Failed to fetch image from URL. Possible CORS error.');
+                console.error(
+                    'Failed to fetch image from URL. Possible CORS error.',
+                );
             }
             const blob = await response.blob();
 
-            const file = new File([blob], 'downloaded-image', { type: blob.type });
+            const file = new File([blob], 'downloaded-image', {
+                type: blob.type,
+            });
 
             const { width, height } = await getImageDimensions(blob);
 
@@ -114,6 +126,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         <div
             className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
             onClick={onClose}
+            data-testid="backdrop"
         >
             <div
                 className="relative bg-white rounded-lg p-6 w-96"
@@ -174,6 +187,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 {/* CANCEL BUTTON */}
                 <button
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                    data-testid="close-button"
                     onClick={onClose}
                 >
                     ✕

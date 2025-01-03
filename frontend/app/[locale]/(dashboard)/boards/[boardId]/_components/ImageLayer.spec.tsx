@@ -12,7 +12,7 @@ const mockLayer: ImageLayer = {
     width: 200,
     height: 150,
     src: 'https://example.com/image.png',
-    fill: null
+    fill: null,
 };
 
 const mockOnPointerDown = jest.fn();
@@ -37,8 +37,14 @@ describe('ImageLayerComponent', () => {
         expect(imageElement).toHaveAttribute('href', mockLayer.src);
         expect(imageElement).toHaveAttribute('x', mockLayer.x.toString());
         expect(imageElement).toHaveAttribute('y', mockLayer.y.toString());
-        expect(imageElement).toHaveAttribute('width', mockLayer.width.toString());
-        expect(imageElement).toHaveAttribute('height', mockLayer.height.toString());
+        expect(imageElement).toHaveAttribute(
+            'width',
+            mockLayer.width.toString(),
+        );
+        expect(imageElement).toHaveAttribute(
+            'height',
+            mockLayer.height.toString(),
+        );
         expect(imageElement).toHaveAttribute('stroke', 'red');
         expect(imageElement).toHaveAttribute('preserveAspectRatio', 'none');
         expect(imageElement).toHaveClass('drop-shadow-md');
@@ -60,7 +66,10 @@ describe('ImageLayerComponent', () => {
         fireEvent.pointerDown(imageElement!);
 
         expect(mockOnPointerDown).toHaveBeenCalledTimes(1);
-        expect(mockOnPointerDown).toHaveBeenCalledWith(expect.any(Object), mockLayer.id);
+        expect(mockOnPointerDown).toHaveBeenCalledWith(
+            expect.any(Object),
+            mockLayer.id,
+        );
     });
 
     it('renders with default selectionColor when selectionColor prop is undefined', () => {
