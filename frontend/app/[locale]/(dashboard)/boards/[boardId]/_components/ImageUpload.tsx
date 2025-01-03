@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 
 interface ImageUploadProps {
     onClose: () => void;
-    onUploadComplete: (imageUrl: string) => void;
+    onUploadComplete: (url: string, width?: number, height?: number ) => void;
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -15,7 +15,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     const [imageUrl, setImageUrl] = useState('');
     const [dragActive, setDragActive] = useState(false);
 
-    const uploadToServer = async (file: File): Promise<string> => {
+    const getImageDimensions = (fileOrBlob: File | Blob): Promise<{ width: number; height: number }> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                resolve({ width: img.width, height: img.height });
+            };
+            img.onerror = () => {
+                reject(new Error('Failed to load image for dimensions.'));
+            };
+            img.src = URL.createObjectURL(fileOrBlob);
+        });
+    };
+
+    const uploadToServer = async (file: File): Promise<{ url: string; width?: number; height?: number }> => {
+        const { width, height } = await getImageDimensions(file);
         const formData = new FormData();
         formData.append('file', file);
 
@@ -29,15 +43,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         }
         const data = await res.json();
         // data should be like: { url: "http://localhost:4000/uploads/167233_myImage.png" }
-        return data.url;
+        return {url: data.url, width, height};
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
-            const finalUrl = await uploadToServer(file);
-            onUploadComplete(finalUrl);
+            const { url: finalUrl, width, height } = await uploadToServer(file);
+            onUploadComplete(finalUrl, width, height);
         } catch (err) {
             console.error('File upload error:', err);
         }
@@ -51,8 +65,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             try {
-                const finalUrl = await uploadToServer(file);
-                onUploadComplete(finalUrl);
+                const { url: finalUrl, width, height } = await uploadToServer(file);
+                onUploadComplete(finalUrl, width, height);
             } catch (err) {
                 console.error('File upload error:', err);
             }
@@ -87,9 +101,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
             const file = new File([blob], 'downloaded-image', { type: blob.type });
 
-            // Upload the file to the server
-            const finalUrl = await uploadToServer(file);
-            onUploadComplete(finalUrl);
+            const { width, height } = await getImageDimensions(blob);
+
+            const { url: finalUrl } = await uploadToServer(file);
+            onUploadComplete(finalUrl, width, height);
         } catch (err) {
             console.error('Error handling URL submission:', err);
         }
