@@ -37,6 +37,12 @@
     "font": "Font",
     "fontSize": "Font size",
     "undo": "undo",
-    "redo": "redo"
+    "redo": "redo",
+    "uploadOrPasteAnImage": "Upload or Paste an Image",
+    "dragDropLabel": "Drag & Drop Image Here",
+    "orLabel": "or",
+    "selectFromComputer": "Select from computer",
+    "imageUrl": "Image URL",
+    "loadButton": "Load"
   }
 }

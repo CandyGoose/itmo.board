@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ImageUploadProps {
     onClose: () => void;
@@ -9,31 +10,52 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     onClose,
     onUploadComplete,
 }) => {
+    const t = useTranslations('tools');
+
     const [imageUrl, setImageUrl] = useState('');
     const [dragActive, setDragActive] = useState(false);
 
-    // Mock function
     const uploadToServer = async (file: File): Promise<string> => {
         const formData = new FormData();
         formData.append('file', file);
-        return Promise.resolve(URL.createObjectURL(file));
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploads`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!res.ok) {
+            throw new Error('Upload failed');
+        }
+        const data = await res.json();
+        // data should be like: { url: "http://localhost:4000/uploads/167233_myImage.png" }
+        return data.url;
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const finalUrl = await uploadToServer(file);
-        onUploadComplete(finalUrl);
+        try {
+            const finalUrl = await uploadToServer(file);
+            onUploadComplete(finalUrl);
+        } catch (err) {
+            console.error('File upload error:', err);
+        }
     };
 
     const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
+
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
-            const finalUrl = await uploadToServer(file);
-            onUploadComplete(finalUrl);
+            try {
+                const finalUrl = await uploadToServer(file);
+                onUploadComplete(finalUrl);
+            } catch (err) {
+                console.error('File upload error:', err);
+            }
         }
     };
 
@@ -55,6 +77,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     };
 
     const handleSubmitUrl = async () => {
+        // No upload on URL
         onUploadComplete(imageUrl);
     };
 
@@ -63,13 +86,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
             onClick={onClose}
         >
-            {/* Inner wrapper stops clicks from closing if they click inside */}
             <div
                 className="relative bg-white rounded-lg p-6 w-96"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-xl font-bold mb-4">
-                    Upload or Paste an Image
+                    {t('uploadOrPasteAnImage')}
                 </h2>
 
                 {/* DRAG & DROP AREA */}
@@ -84,10 +106,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                 >
-                    <p className="mb-2">Drag & Drop Image Here</p>
-                    <p>or</p>
+                    <p className="mb-2">{t('dragDropLabel')}</p>
+                    <p>{t('orLabel')}</p>
                     <label className="mt-2 inline-block cursor-pointer text-blue-600 hover:underline">
-                        <span>Select from computer</span>
+                        <span>{t('selectFromComputer')}</span>
                         <input
                             className="hidden"
                             type="file"
@@ -100,7 +122,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 {/* PASTE A URL */}
                 <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Image URL
+                        {t('imageUrl')}
                     </label>
                     <div className="flex gap-2">
                         <input
@@ -115,7 +137,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                             className="bg-blue-600 text-white rounded px-4 py-1"
                             onClick={handleSubmitUrl}
                         >
-                            Load
+                            {t('loadButton')}
                         </button>
                     </div>
                 </div>
