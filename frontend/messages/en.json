@@ -29,6 +29,7 @@
     "rectangle": "rectangle",
     "ellipse": "ellipse",
     "stickyNote": "sticky note",
+    "image": "image",
     "lineWidth": "Line width",
     "transparentFill": "Transparent fill",
     "width": "Width",

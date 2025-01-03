@@ -15,6 +15,7 @@ export const enum LayerType {
     Path,
     Text,
     Note,
+    Image,
 }
 
 export const enum TextAlign {
@@ -83,6 +84,19 @@ export type PathLayer = {
     lineWidth: number;
 };
 
+export type ImageLayer = {
+    id: string;
+    type: LayerType.Image;
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+    fill: Color | null;
+    value?: string;
+    lineWidth?: number;
+    src: string;
+};
+
 export type Point = {
     x: number;
     y: number;
@@ -121,7 +135,8 @@ export type CanvasState =
               | LayerType.Ellipse
               | LayerType.Rectangle
               | LayerType.Text
-              | LayerType.Note;
+              | LayerType.Note
+              | LayerType.Image;
       }
     | {
           mode: CanvasMode.Pencil;
@@ -146,4 +161,9 @@ export const enum CanvasMode {
     Pencil,
 }
 
-export type Layer = RectangleLayer | EllipseLayer | NoteLayer | PathLayer;
+export type Layer =
+    | RectangleLayer
+    | EllipseLayer
+    | NoteLayer
+    | PathLayer
+    | ImageLayer;
