@@ -48,6 +48,9 @@ mongoose
     });
 app.use(bodyParser.json());
 
+app.use('/uploads', express.static('uploads'));
+
+require('./views/ImageUpload.view')(app);
 require('./views/Board.view')(app);
 
 app.listen(port, () => {

@@ -15,6 +15,7 @@ import {
     StickyNote,
     Undo2,
     Redo2,
+    Image,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -159,6 +160,21 @@ export const ToolBar = ({
                     isActive={
                         canvasState.mode === CanvasMode.Inserting &&
                         canvasState.layerType === LayerType.Note
+                    }
+                    isDisabled={!editable}
+                />
+                <ToolButton
+                    label={t('image')}
+                    icon={Image}
+                    onClick={() =>
+                        setCanvasState({
+                            mode: CanvasMode.Inserting,
+                            layerType: LayerType.Image,
+                        })
+                    }
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting &&
+                        canvasState.layerType === LayerType.Image
                     }
                     isDisabled={!editable}
                 />

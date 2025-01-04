@@ -29,6 +29,7 @@
     "rectangle": "rectangle",
     "ellipse": "ellipse",
     "stickyNote": "sticky note",
+    "image": "image",
     "lineWidth": "Line width",
     "transparentFill": "Transparent fill",
     "width": "Width",
@@ -36,6 +37,12 @@
     "font": "Font",
     "fontSize": "Font size",
     "undo": "undo",
-    "redo": "redo"
+    "redo": "redo",
+    "uploadOrPasteAnImage": "Upload or paste an image",
+    "dragDropLabel": "Drag & drop image here",
+    "orLabel": "or",
+    "selectFromComputer": "Select from computer",
+    "imageUrl": "Image URL",
+    "loadButton": "Load"
   }
 }
