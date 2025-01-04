@@ -17,13 +17,14 @@ function fileFilter(req, file, cb) {
     if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Invalid file type'), false);
+        req.fileValidationError = 'Forbidden extension';
+        cb(null, false, req.fileValidationError);
     }
 }
 
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter,
 });
 
@@ -31,14 +32,17 @@ exports.uploadMiddleware = upload.single('file');
 
 exports.uploadFile = async (req, res) => {
     try {
-        if (!req.file) {
+        if (req.fileValidationError || !req.file) {
             return res
                 .status(400)
                 .json({ error: 'No file uploaded or invalid file type.' });
         }
 
         const fileBuffer = req.file.buffer;
-        const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+        const hash = crypto
+            .createHash('sha256')
+            .update(fileBuffer)
+            .digest('hex');
         let imageDoc = await Image.findOne({ hash });
 
         if (imageDoc) {
@@ -50,7 +54,7 @@ exports.uploadFile = async (req, res) => {
 
         const ext = path.extname(req.file.originalname);
         const filename = `${uuidv4()}${ext}`;
-        const uploadDir = 'uploads'
+        const uploadDir = 'uploads';
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
