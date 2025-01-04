@@ -607,17 +607,16 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     }, []);
 
     // Handler that the <ImageUpload/> calls after finishing upload
-    const handleImageUploadComplete = (
-        url: string,
-        width?: number,
-        height?: number,
-    ) => {
-        setShowImageUpload(false);
-        if (!pendingImagePosition) return;
-        const imageData = { url, width, height };
-        insertLayer(LayerType.Image, pendingImagePosition, imageData);
-        setPendingImagePosition(null);
-    };
+    const handleImageUploadComplete = useCallback(
+        (url: string, width?: number, height?: number) => {
+            setShowImageUpload(false);
+            if (!pendingImagePosition) return;
+            const imageData = { url, width, height };
+            insertLayer(LayerType.Image, pendingImagePosition, imageData);
+            setPendingImagePosition(null);
+        },
+        [pendingImagePosition, insertLayer],
+    );
 
     const deleteLayers = useDeleteLayers();
 
@@ -664,7 +663,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 setPasteCount((prev) => prev + 1);
             }
         },
-        [pasteCount],
+        [pasteCount, editable],
     );
 
     const selectAllLayers = useMutation(({ storage, setMyPresence }) => {
