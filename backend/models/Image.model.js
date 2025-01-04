@@ -15,6 +15,11 @@ const ImageSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    hash: {
+        type: String,
+        required: true,
+        unique: true,
+    },
 });
 
 module.exports = mongoose.model('Image', ImageSchema);
