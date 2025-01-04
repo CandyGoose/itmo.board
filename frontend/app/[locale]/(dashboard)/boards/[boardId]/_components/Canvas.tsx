@@ -6,6 +6,7 @@ import {
     CanvasState,
     Color,
     EllipseLayer,
+    ImageLayer,
     Layer,
     LayerType,
     NoteLayer,
@@ -50,6 +51,7 @@ import {
 import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
 import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
+import { ImageUpload } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageUpload';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -109,6 +111,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         TextFormat.None,
     ]);
 
+    const [showImageUpload, setShowImageUpload] = useState(false);
+    const [pendingImagePosition, setPendingImagePosition] =
+        useState<Point | null>(null);
+
     useEffect(() => {
         if (svgRef.current) {
             setSvgRect(svgRef.current.getBoundingClientRect());
@@ -138,7 +144,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 (canvasState.layerType === LayerType.Text ||
                     canvasState.layerType === LayerType.Note ||
                     canvasState.layerType === LayerType.Rectangle ||
-                    canvasState.layerType === LayerType.Ellipse)) ||
+                    canvasState.layerType === LayerType.Ellipse ||
+                    canvasState.layerType === LayerType.Image)) ||
             canvasState.mode === CanvasMode.Pencil
         );
     }, [canvasState]);
@@ -164,7 +171,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     }, [selections]);
 
     const insertLayer = useMutation(
-        ({ storage, setMyPresence }, layerType: LayerType, position: Point) => {
+        (
+            { storage, setMyPresence },
+            layerType: LayerType,
+            position: Point,
+            imageData?: { url: string; width?: number; height?: number },
+        ) => {
             const liveLayers = storage.get('layers');
             const liveLayerIds = storage.get('layerIds');
             const id = nanoid();
@@ -202,6 +214,15 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         textAlign,
                         textFormat,
                     } as NoteLayer;
+                    break;
+                case LayerType.Image:
+                    layerData = {
+                        ...baseProps,
+                        type: LayerType.Image,
+                        width: imageData?.width ?? 100,
+                        height: imageData?.height ?? 100,
+                        src: imageData?.url ?? '',
+                    } as ImageLayer;
                     break;
                 default:
                     throw new Error(`Invalid layer type: ${layerType}`);
@@ -555,7 +576,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
                 insertPath();
             } else if (canvasState.mode === CanvasMode.Inserting && editable) {
-                insertLayer(canvasState.layerType!, point);
+                if (canvasState.layerType === LayerType.Image) {
+                    setPendingImagePosition(point);
+                    setShowImageUpload(true);
+                } else {
+                    insertLayer(canvasState.layerType!, point);
+                }
             } else {
                 setCanvasState({ mode: CanvasMode.None });
             }
@@ -579,6 +605,18 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         setMyPresence({ cursor: null });
         setIsPanning(false);
     }, []);
+
+    // Handler that the <ImageUpload/> calls after finishing upload
+    const handleImageUploadComplete = useCallback(
+        (url: string, width?: number, height?: number) => {
+            setShowImageUpload(false);
+            if (!pendingImagePosition) return;
+            const imageData = { url, width, height };
+            insertLayer(LayerType.Image, pendingImagePosition, imageData);
+            setPendingImagePosition(null);
+        },
+        [pendingImagePosition, insertLayer],
+    );
 
     const deleteLayers = useDeleteLayers();
 
@@ -625,7 +663,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 setPasteCount((prev) => prev + 1);
             }
         },
-        [pasteCount],
+        [pasteCount, editable],
     );
 
     const selectAllLayers = useMutation(({ storage, setMyPresence }) => {
@@ -924,6 +962,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 moveForward={moveForward}
                 moveBackward={moveBackward}
             />
+
+            {showImageUpload && (
+                <ImageUpload
+                    onClose={() => setShowImageUpload(false)}
+                    onUploadComplete={handleImageUploadComplete}
+                />
+            )}
 
             {editable &&
                 showSelectionTools &&
