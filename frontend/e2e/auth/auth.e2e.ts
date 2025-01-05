@@ -23,6 +23,6 @@ test.describe('Auth Actions', () => {
         await page.getByPlaceholder('Enter your password').fill(password);
 
         await page.getByRole('button', { name: 'Continue' }).click();
-        await page.getByRole('heading', { name: 'welcome to itmo.board' }).click();
+        page.getByRole('link', { name: 'Logo itmo.board' });
     });
 });
