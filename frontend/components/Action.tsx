@@ -15,6 +15,7 @@ import { useRenameModal } from '@/store/useRenameModal';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteBoard } from '@/actions/Board';
+import { useTranslations } from 'next-intl';
 
 interface ActionsProps {
     children: React.ReactNode;
@@ -38,6 +39,7 @@ export const Actions = ({
     const { onOpen } = useRenameModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const t = useTranslations('tools');
 
     const onCopyLink = () => {
         navigator.clipboard
@@ -73,7 +75,7 @@ export const Actions = ({
                     className="p-3 cursor-pointer"
                 >
                     <Link2 className="h-4 w-4 mr-2" />
-                    Copy link
+                    {t('copyLink')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => onOpen(id, title)}
@@ -82,7 +84,7 @@ export const Actions = ({
                     disabled={disable}
                 >
                     <Pencil className="h-4 w-4 mr-2" />
-                    Rename
+                    {t('rename')}
                 </DropdownMenuItem>
                 <ConfirmModal
                     header="Delete board?"
@@ -96,7 +98,7 @@ export const Actions = ({
                         disabled={disable}
                     >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
+                        {t('delete')}
                     </Button>
                 </ConfirmModal>
             </DropdownMenuContent>
