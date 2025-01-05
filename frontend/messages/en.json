@@ -45,6 +45,9 @@
     "imageUrl": "Image URL",
     "loadButton": "Load",
     "copyLink": "Copy link",
-    "rename": "Rename"
+    "rename": "Rename",
+    "download": "Download",
+    "downloadAsSVG": "Download as SVG",
+    "downloadAsPNG": "Download as PNG"
   }
 }
