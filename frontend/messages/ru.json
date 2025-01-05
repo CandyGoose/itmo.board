@@ -45,6 +45,9 @@
     "imageUrl": "URL изображения",
     "loadButton": "Загрузить",
     "copyLink": "Скопировать ссылку",
-    "rename": "Переименовать"
+    "rename": "Переименовать",
+    "download": "Скачать",
+    "downloadAsSVG": "Скачать как SVG",
+    "downloadAsPNG": "Скачать как PNG"
   }
 }

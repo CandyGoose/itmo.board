@@ -1,7 +1,7 @@
 'use client';
 
 import { toast } from 'sonner';
-import { Link2, Pencil, Trash2 } from 'lucide-react';
+import { Download, FileAxis3D, FileImage, Link2, Pencil, Trash2 } from 'lucide-react';
 import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
 import { ConfirmModal } from '@/components/modals/ConfirmModal';
 import {
@@ -85,6 +85,43 @@ export const Actions = ({
                 >
                     <Pencil className="h-4 w-4 mr-2" />
                     {t('rename')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid="download"
+                    className="p-3 cursor-pointer flex-1 relative"
+                >
+                    <Download className="h-4 w-4 mr-2" />
+                    {t('download')}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                                {/* Icon or indicator for nested menu */}
+                                &gt;
+                            </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            side="right"
+                            sideOffset={4}
+                            className="w-48"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <DropdownMenuItem
+                                onClick={() => console.log('Download as SVG')}
+                                className="p-3 cursor-pointer"
+                            >
+                                <FileAxis3D className="h-4 w-4 mr-2" />
+                                {t('downloadAsSVG')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => console.log('Download as PNG')}
+                                className="p-3 cursor-pointer"
+                            >
+                                <FileImage className="h-4 w-4 mr-2" />
+                                {t('downloadAsPNG')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </DropdownMenuItem>
                 <ConfirmModal
                     header="Delete board?"

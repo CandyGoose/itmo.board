@@ -77,23 +77,27 @@ export const SelectionBox = memo(
         const handleRects = useMemo(() => {
             if (!isShowingHandles || !bounds) return null;
 
-            return handlesConfig.map(({ corner, cursor, translateX, translateY }, index) => (
-                <rect
-                    key={index}
-                    data-testid={`handle-${index}`}
-                    className="fill-white stroke-1 stroke-blue-500"
-                    style={{
-                        cursor,
-                        width: `${HANDLE_WIDTH}px`,
-                        height: `${HANDLE_WIDTH}px`,
-                        transform: `translate(${translateX(bounds)}px, ${translateY(bounds)}px)`,
-                    }}
-                    onPointerDown={(e) => {
-                        e.stopPropagation();
-                        onResizeHandlePointerDown(corner, bounds);
-                    }}
-                />
-            ));
+            return handlesConfig.map(
+                ({ corner, cursor, translateX, translateY }, index) => (
+                    <rect
+                        key={index}
+                        data-testid={`handle-${index}`}
+                        className="fill-white stroke-1 stroke-blue-500"
+                        style={{
+                            cursor,
+                            width: `${HANDLE_WIDTH}px`,
+                            height: `${HANDLE_WIDTH}px`,
+                            transform: `translate(${translateX(
+                                bounds,
+                            )}px, ${translateY(bounds)}px)`,
+                        }}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                            onResizeHandlePointerDown(corner, bounds);
+                        }}
+                    />
+                ),
+            );
         }, [isShowingHandles, bounds, onResizeHandlePointerDown]);
 
         if (!bounds) {
