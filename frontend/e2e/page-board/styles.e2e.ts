@@ -1,5 +1,7 @@
 import { test } from '@playwright/test';
 
+test.use({ storageState: 'storageState.json' });
+
 test.describe('Object Styles', () => {
     test('should apply color to an object', async ({ page }) => {
 

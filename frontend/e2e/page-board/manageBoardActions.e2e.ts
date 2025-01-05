@@ -1,5 +1,7 @@
 import { test } from '@playwright/test';
 
+test.use({ storageState: 'storageState.json' });
+
 test.describe('Board Actions', () => {
     test('should copy the board link to clipboard', async ({ page }) => {
 
