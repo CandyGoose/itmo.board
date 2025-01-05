@@ -1,5 +1,7 @@
 import { test } from '@playwright/test';
 
+test.use({ storageState: 'storageState.json' });
+
 test.describe('Board Elements', () => {
     test('should display the pen tool', async ({ page }) => {
 

@@ -1,5 +1,7 @@
 import { test } from '@playwright/test';
 
+test.use({ storageState: 'storageState.json' });
+
 test.describe('Images', () => {
     test('should upload an image to the board', async ({ page }) => {
 
