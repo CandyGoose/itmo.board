@@ -29,7 +29,7 @@ const font = Poppins({
 const TabSeparator = () => {
     return <div className="text-neutral-300 px-1.5">|</div>;
 };
-
+// TODO: Add translations
 export const Info = ({
     boardId,
     editable,

@@ -18,7 +18,7 @@ export default function CanvasSaver({ boardId }: SaverProps) {
         </Room>
     );
 }
-
+// TODO: Allow renaming on download
 function Renderer() {
     const svgRef = useRef<SVGSVGElement>(null);
     const layerIds = useStorage((root) => root.layerIds);
@@ -95,9 +95,11 @@ function Renderer() {
                 console.error('Failed to load the SVG as an image.');
             };
 
-            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serializedSVG);
+            img.src =
+                'data:image/svg+xml;charset=utf-8,' +
+                encodeURIComponent(serializedSVG);
         },
-        [bounds.width, bounds.height],
+        [bounds.width, bounds.height, scale],
     );
 
     useEffect(() => {
