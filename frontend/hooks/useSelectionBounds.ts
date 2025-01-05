@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Layer, XYWH } from '@/types/canvas';
 
-const boundingBox = (layers: Layer[]): XYWH | null => {
+export const boundingBox = (layers: Layer[]): XYWH | null => {
     const first = layers[0];
 
     if (!first) {
