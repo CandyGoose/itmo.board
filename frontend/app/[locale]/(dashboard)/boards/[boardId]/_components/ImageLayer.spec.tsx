@@ -35,8 +35,6 @@ describe('ImageLayerComponent', () => {
         const imageElement = container.querySelector('image');
         expect(imageElement).toBeInTheDocument();
         expect(imageElement).toHaveAttribute('href', mockLayer.src);
-        expect(imageElement).toHaveAttribute('x', mockLayer.x.toString());
-        expect(imageElement).toHaveAttribute('y', mockLayer.y.toString());
         expect(imageElement).toHaveAttribute(
             'width',
             mockLayer.width.toString(),

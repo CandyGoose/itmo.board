@@ -68,8 +68,6 @@ export const Path = memo(
                 style={{
                     transform: `translate(${x}px, ${y}px) scale(${scale.x}, ${scale.y})`,
                 }}
-                x={x}
-                y={y}
                 fill={fill}
                 stroke={stroke}
                 strokeWidth={0.5}
