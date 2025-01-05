@@ -19,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { useOrganization } from '@clerk/nextjs';
+import CanvasSaver from '@/actions/CanvasSaver';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -108,6 +109,9 @@ export const Info = ({
                         </Hint>
                     </div>
                 </Actions>
+                <div style={{ display: 'none' }}>
+                    <CanvasSaver boardId={boardId} />
+                </div>
             </div>
 
             <DropdownMenu>

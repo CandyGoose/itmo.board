@@ -1,9 +1,7 @@
 'use client';
 
 import { formatDistanceToNow } from 'date-fns';
-
 import { Skeleton } from '@/components/ui/Skeleton';
-
 import { Overlay } from './Overlay';
 import { Footer } from './Footer';
 import { useEffect, useState } from 'react';
@@ -13,6 +11,7 @@ import { useClerk } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Actions } from '@/components/Action';
 import { MoreHorizontal } from 'lucide-react';
+import CanvasSaver from '@/actions/CanvasSaver';
 
 interface BoardCardProps {
     id: string;
@@ -83,6 +82,9 @@ export const BoardCard = ({
                         <MoreHorizontal className="text-white opacity-75 hover:opacity-100 transition-opacity" />
                     </button>
                 </Actions>
+                <div style={{ display: 'none' }}>
+                    <CanvasSaver boardId={id} />
+                </div>
             </div>
             <Footer
                 title={title}

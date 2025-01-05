@@ -2,6 +2,7 @@
 
 import { toast } from 'sonner';
 import {
+    ChevronRight,
     Download,
     FileAxis3D,
     FileImage,
@@ -19,7 +20,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteBoard } from '@/actions/Board';
 import { useTranslations } from 'next-intl';
@@ -68,6 +69,18 @@ export const Actions = ({
         }
     };
 
+    const handleDownloadSVG = useCallback(() => {
+        window.dispatchEvent(
+            new CustomEvent('canvas-download', { detail: { format: 'svg' } }),
+        );
+    }, []);
+
+    const handleDownloadPNG = useCallback(() => {
+        window.dispatchEvent(
+            new CustomEvent('canvas-download', { detail: { format: 'png' } }),
+        );
+    }, []);
+
     return (
         <DropdownMenu defaultOpen={defaultOpen}>
             <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -102,10 +115,7 @@ export const Actions = ({
                     {t('download')}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                                {/* Icon or indicator for nested menu */}
-                                &gt;
-                            </span>
+                            <ChevronRight className="h-4 w-4 mr-2 absolute right-3" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             side="right"
@@ -114,14 +124,14 @@ export const Actions = ({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <DropdownMenuItem
-                                onClick={() => console.log('Download as SVG')}
+                                onClick={handleDownloadSVG}
                                 className="p-3 cursor-pointer"
                             >
                                 <FileAxis3D className="h-4 w-4 mr-2" />
                                 {t('downloadAsSVG')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => console.log('Download as PNG')}
+                                onClick={handleDownloadPNG}
                                 className="p-3 cursor-pointer"
                             >
                                 <FileImage className="h-4 w-4 mr-2" />
