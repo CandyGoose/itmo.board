@@ -67,36 +67,39 @@ function Renderer() {
 
     const downloadPNG = useCallback(
         (serializedSVG: string) => {
-            const width = Math.max(bounds.width, 100);
-            const height = Math.max(bounds.height, 100);
+            const width = bounds.width * scale;
+            const height = bounds.height * scale;
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
 
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
             const img = new Image();
             img.onload = function () {
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return;
+                ctx.clearRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0);
+
+                const pngUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = pngUrl;
+                link.download = 'canvas.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             };
 
-            img.src = 'data:image/svg+xml;base64,' + btoa(serializedSVG);
+            img.onerror = function () {
+                console.error('Failed to load the SVG as an image.');
+            };
 
-            const pngUrl = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = pngUrl;
-            link.download = 'canvas.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serializedSVG);
         },
         [bounds.width, bounds.height],
     );
 
-    /**
-     * Listen for a custom "canvas-download" event (detail: { format: 'svg' | 'png' })
-     */
     useEffect(() => {
         function handleDownload(e: CustomEvent) {
             if (!svgRef.current) return;
@@ -141,11 +144,15 @@ function Renderer() {
             ref={svgRef}
             data-testid="svg-element"
             className="h-[100vh] w-[100vw]"
+            width={screenWidth}
+            height={screenHeight}
             xmlns="http://www.w3.org/2000/svg"
         >
             <g
                 data-testid="svg-group"
                 transform={`translate(${translateX}, ${translateY}) scale(${scale})`}
+                width={bounds.width}
+                height={bounds.height}
             >
                 {layerIds?.map((layerId) => (
                     <LayerPreview
