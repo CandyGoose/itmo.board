@@ -3,7 +3,7 @@ import { test } from '@playwright/test';
 test.use({ storageState: 'storageState.json' });
 
 test.describe('Create Board', () => {
-    test('should create a new board from the page-home page', async ({ page }) => {
+    test('should create a new board from the page-board page', async ({ page }) => {
         await page.goto('/');
 
         await page.getByLabel('Open organization switcher').click();
