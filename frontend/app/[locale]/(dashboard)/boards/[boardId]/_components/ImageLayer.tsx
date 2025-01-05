@@ -22,8 +22,9 @@ export const ImageLayerComponent: React.FC<ImageLayerComponentProps> = ({
             className="drop-shadow-md"
             onPointerDown={(e) => onPointerDown(e, id)}
             href={src}
-            x={x}
-            y={y}
+            style={{
+                transform: `translate(${x}px, ${y}px) `,
+            }}
             width={width}
             height={height}
             stroke={strokeColor}
