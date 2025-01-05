@@ -15,12 +15,11 @@ test('should log in', async ({ page }) => {
 
     await page.goto('/');
 
-    await page.getByPlaceholder('Enter your email address').click();
-    await page.fill('input[name="identifier"]', username);
+    await page.getByPlaceholder('Enter your email address').fill(username);
 
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
-    await page.getByPlaceholder('Enter your password').click();
-    await page.fill('input[name="password"]', password);
+    
+    await page.getByPlaceholder('Enter your password').fill(password);
 
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('heading', { name: 'welcome to itmo.board' }).click();
