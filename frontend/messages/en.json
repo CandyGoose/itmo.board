@@ -22,7 +22,7 @@
     "bringToBack": "bring to back",
     "moveForward": "move forward",
     "moveBackward": "move backward",
-    "delete": "delete",
+    "delete": "Delete",
     "pen": "pen",
     "select": "select",
     "more": "more",
@@ -43,6 +43,8 @@
     "orLabel": "or",
     "selectFromComputer": "Select from computer",
     "imageUrl": "Image URL",
-    "loadButton": "Load"
+    "loadButton": "Load",
+    "copyLink": "Copy link",
+    "rename": "Rename"
   }
 }
