@@ -1,7 +1,14 @@
 'use client';
 
 import { toast } from 'sonner';
-import { Download, FileAxis3D, FileImage, Link2, Pencil, Trash2 } from 'lucide-react';
+import {
+    Download,
+    FileAxis3D,
+    FileImage,
+    Link2,
+    Pencil,
+    Trash2,
+} from 'lucide-react';
 import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
 import { ConfirmModal } from '@/components/modals/ConfirmModal';
 import {
