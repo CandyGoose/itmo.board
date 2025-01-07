@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import { Actions } from './Action';
 import { useRenameModal } from '@/store/useRenameModal';
 import { useRouter } from 'next/navigation';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
@@ -14,6 +15,17 @@ jest.mock('next-intl', () => ({
 
 jest.mock('@/store/useRenameModal', () => ({
     useRenameModal: jest.fn(),
+}));
+
+jest.mock('@/actions/Board', () => ({
+    deleteBoard: jest.fn(),
+}));
+
+jest.mock('sonner', () => ({
+    toast: {
+        success: jest.fn(),
+        error: jest.fn(),
+    },
 }));
 
 jest.mock('lucide-react', () => ({
@@ -29,6 +41,23 @@ jest.mock('lucide-react', () => ({
 describe('Actions Component', () => {
     const onOpenMock = jest.fn();
     const mockPush = jest.fn();
+
+    const originalClipboard = { ...global.navigator.clipboard };
+    const originalDispatchEvent = window.dispatchEvent;
+
+    beforeAll(() => {
+        Object.assign(navigator, {
+            clipboard: {
+                writeText: jest.fn(),
+            },
+        });
+        window.dispatchEvent = jest.fn();
+    });
+
+    afterAll(() => {
+        Object.assign(global.navigator, { clipboard: originalClipboard });
+        window.dispatchEvent = originalDispatchEvent;
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -48,13 +77,13 @@ describe('Actions Component', () => {
         );
 
         const trigger = screen.getByTestId('trigger');
-        fireEvent.click(trigger);
+        await userEvent.click(trigger);
 
         const menuContent = await screen.findByRole('menu');
         expect(menuContent).toBeInTheDocument();
 
         const menuItem = within(menuContent).getByRole('menuitem', {
-            name: 'Copy link',
+            name: 'copyLink',
         });
         expect(menuItem).toBeInTheDocument();
 
@@ -74,7 +103,7 @@ describe('Actions Component', () => {
         expect(menuItem).toHaveAttribute('aria-disabled', 'true');
     });
 
-    test('клик на содержимое не вызывает событие родителя', async () => {
+    test('клик на содержимое не вызывает событие родителя', () => {
         const parentClick = jest.fn();
 
         render(
@@ -86,9 +115,79 @@ describe('Actions Component', () => {
         );
 
         const menuItem = screen.getByTestId('rename-item');
-
         fireEvent.click(menuItem);
 
         expect(parentClick).not.toHaveBeenCalled();
+    });
+
+    test('при клике на пункт rename вызывает useRenameModal.onOpen', () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const renameItem = screen.getByTestId('rename-item');
+        expect(renameItem).toBeEnabled();
+
+        fireEvent.click(renameItem);
+
+        expect(onOpenMock).toHaveBeenCalledTimes(1);
+        expect(onOpenMock).toHaveBeenCalledWith('123', 'Test Title');
+    });
+
+    test('клик по Download -> субменю содержит пункты для SVG и PNG', () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const downloadItem = screen.getByTestId('download-sub-menu');
+        expect(downloadItem).toBeInTheDocument();
+
+        fireEvent.click(downloadItem);
+
+        const fileAxis3DItem = screen.getByText('downloadAsSVG');
+        const fileImageItem = screen.getByText('downloadAsPNG');
+
+        expect(fileAxis3DItem).toBeInTheDocument();
+        expect(fileImageItem).toBeInTheDocument();
+    });
+
+    test('клик по downloadAsSVG отправляет кастомное событие', () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const downloadItem = screen.getByTestId('download-sub-menu');
+        fireEvent.click(downloadItem);
+
+        const fileAxis3DItem = screen.getByText('downloadAsSVG');
+        fireEvent.click(fileAxis3DItem);
+
+        expect(window.dispatchEvent).toHaveBeenCalledWith(
+            new CustomEvent('canvas-download', { detail: { format: 'svg' } }),
+        );
+    });
+
+    test('клик по downloadAsPNG отправляет кастомное событие', () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const downloadItem = screen.getByTestId('download-sub-menu');
+        fireEvent.click(downloadItem);
+
+        const fileImageItem = screen.getByText('downloadAsPNG');
+        fireEvent.click(fileImageItem);
+
+        expect(window.dispatchEvent).toHaveBeenCalledWith(
+            new CustomEvent('canvas-download', { detail: { format: 'png' } }),
+        );
     });
 });

@@ -2,7 +2,6 @@
 
 import { toast } from 'sonner';
 import {
-    ChevronRight,
     Download,
     FileAxis3D,
     FileImage,
@@ -10,13 +9,18 @@ import {
     Pencil,
     Trash2,
 } from 'lucide-react';
-import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
+import {
+    DropdownMenuContentProps,
+    DropdownMenuSub,
+} from '@radix-ui/react-dropdown-menu';
 import { ConfirmModal } from '@/components/modals/ConfirmModal';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from '@/components/ui/DropdownMenu';
 import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
@@ -106,40 +110,35 @@ export const Actions = ({
                     <Pencil className="h-4 w-4 mr-2" />
                     {t('rename')}
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={(e) => e.stopPropagation()}
-                    data-testid="download"
-                    className="p-3 cursor-pointer flex-1 relative"
-                >
-                    <Download className="h-4 w-4 mr-2" />
-                    {t('download')}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <ChevronRight className="h-4 w-4 mr-2 absolute right-3" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            side="right"
-                            sideOffset={4}
-                            className="w-48"
-                            onClick={(e) => e.stopPropagation()}
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger
+                        className="p-3 cursor-pointer flex items-center"
+                        data-testid="download-sub-menu"
+                    >
+                        <Download className="h-4 w-4 mr-2" />
+                        {t('download')}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent
+                        sideOffset={4}
+                        className="w-48"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <DropdownMenuItem
+                            onClick={handleDownloadSVG}
+                            className="p-3 cursor-pointer"
                         >
-                            <DropdownMenuItem
-                                onClick={handleDownloadSVG}
-                                className="p-3 cursor-pointer"
-                            >
-                                <FileAxis3D className="h-4 w-4 mr-2" />
-                                {t('downloadAsSVG')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={handleDownloadPNG}
-                                className="p-3 cursor-pointer"
-                            >
-                                <FileImage className="h-4 w-4 mr-2" />
-                                {t('downloadAsPNG')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </DropdownMenuItem>
+                            <FileAxis3D className="h-4 w-4 mr-2" />
+                            {t('downloadAsSVG')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={handleDownloadPNG}
+                            className="p-3 cursor-pointer"
+                        >
+                            <FileImage className="h-4 w-4 mr-2" />
+                            {t('downloadAsPNG')}
+                        </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
                 <ConfirmModal
                     header="Delete board?"
                     description="This will delete the board and all of its contents."
