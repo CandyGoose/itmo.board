@@ -18,7 +18,7 @@ export default function CanvasSaver({ boardId }: SaverProps) {
         </Room>
     );
 }
-// TODO: Allow renaming on download
+
 function Renderer() {
     const svgRef = useRef<SVGSVGElement>(null);
     const layerIds = useStorage((root) => root.layerIds);

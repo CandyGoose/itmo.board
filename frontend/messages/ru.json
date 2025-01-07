@@ -48,6 +48,9 @@
     "rename": "Переименовать",
     "download": "Скачать",
     "downloadAsSVG": "Скачать как SVG",
-    "downloadAsPNG": "Скачать как PNG"
+    "downloadAsPNG": "Скачать как PNG",
+    "board": "Доска",
+    "viewOnly": "Только просмотр",
+    "editMode": "Режим редактирования"
   }
 }

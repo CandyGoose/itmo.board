@@ -48,6 +48,9 @@
     "rename": "Rename",
     "download": "Download",
     "downloadAsSVG": "Download as SVG",
-    "downloadAsPNG": "Download as PNG"
+    "downloadAsPNG": "Download as PNG",
+    "board": "Board",
+    "viewOnly": "View only",
+    "editMode": "Edit mode"
   }
 }
