@@ -4,6 +4,9 @@ import { Actions } from './Action';
 import { useRenameModal } from '@/store/useRenameModal';
 import { useRouter } from 'next/navigation';
 import userEvent from '@testing-library/user-event';
+import { deleteBoard } from '@/actions/Board';
+import { toast } from 'sonner';
+import React, { ReactNode } from 'react';
 
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
@@ -38,6 +41,55 @@ jest.mock('lucide-react', () => ({
     FileImage: () => <svg data-testid="file-image-icon" />,
 }));
 
+jest.mock('@/components/modals/ConfirmModal', () => {
+    return {
+        ConfirmModal: ({
+            onConfirm,
+            children,
+            disabled,
+        }: {
+            onConfirm: () => void;
+            children: ReactNode;
+            disabled: boolean;
+        }) => {
+            const [isOpen, setIsOpen] = React.useState(false);
+
+            return (
+                <div>
+                    <button
+                        data-testid="open-delete-modal"
+                        disabled={disabled}
+                        onClick={() => setIsOpen(true)}
+                    >
+                        {children}
+                    </button>
+
+                    {isOpen && (
+                        <div data-testid="delete-modal">
+                            <p>Are you sure you want to delete?</p>
+                            <button
+                                data-testid="confirm-delete"
+                                onClick={() => {
+                                    onConfirm();
+                                    setIsOpen(false);
+                                }}
+                            >
+                                Confirm
+                            </button>
+                            <button
+                                data-testid="cancel-delete"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        },
+    };
+});
+
 describe('Actions Component', () => {
     const onOpenMock = jest.fn();
     const mockPush = jest.fn();
@@ -48,7 +100,7 @@ describe('Actions Component', () => {
     beforeAll(() => {
         Object.assign(navigator, {
             clipboard: {
-                writeText: jest.fn(),
+                writeText: jest.fn().mockResolvedValue(undefined),
             },
         });
         window.dispatchEvent = jest.fn();
@@ -93,13 +145,12 @@ describe('Actions Component', () => {
 
     test('пункт Rename отключен при disable=true', async () => {
         render(
-            <Actions id="123" title="Test Title" disable={true} defaultOpen>
+            <Actions id="123" title="Test Title" disable defaultOpen>
                 <button data-testid="trigger">Open Actions</button>
             </Actions>,
         );
 
         const menuItem = screen.getByTestId('rename-item');
-
         expect(menuItem).toHaveAttribute('aria-disabled', 'true');
     });
 
@@ -189,5 +240,116 @@ describe('Actions Component', () => {
         expect(window.dispatchEvent).toHaveBeenCalledWith(
             new CustomEvent('canvas-download', { detail: { format: 'png' } }),
         );
+    });
+
+    test('при клике на copyLink копирует ссылку и показывает toast.success', async () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        fireEvent.click(screen.getByTestId('trigger'));
+
+        const copyLinkItem = screen.getByRole('menuitem', { name: 'copyLink' });
+        await userEvent.click(copyLinkItem);
+
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+            `${window.location.origin}/boards/123`,
+        );
+
+        expect(toast.success).toHaveBeenCalledWith('Link copied');
+    });
+
+    test('при ошибке копирования показывает toast.error', async () => {
+        (navigator.clipboard.writeText as jest.Mock).mockRejectedValueOnce(
+            new Error('Clipboard error'),
+        );
+
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        fireEvent.click(screen.getByTestId('trigger'));
+
+        const copyLinkItem = screen.getByRole('menuitem', { name: 'copyLink' });
+        await userEvent.click(copyLinkItem);
+
+        expect(toast.error).toHaveBeenCalledWith('Failed to copy link');
+    });
+
+    test('успешное удаление: открываем ConfirmModal -> нажимаем Confirm -> вызывает deleteBoard и переходит на главную', async () => {
+        (deleteBoard as jest.Mock).mockResolvedValueOnce({});
+
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const deleteButton = screen.getByTestId('open-delete-modal');
+        fireEvent.click(deleteButton);
+
+        const deleteModal = screen.getByTestId('delete-modal');
+        expect(deleteModal).toBeInTheDocument();
+
+        const confirmButton = screen.getByTestId('confirm-delete');
+        await userEvent.click(confirmButton);
+
+        expect(deleteBoard).toHaveBeenCalledWith('123');
+
+        expect(toast.success).toHaveBeenCalledWith('Delete successfully.');
+
+        expect(mockPush).toHaveBeenCalledWith('/');
+    });
+
+    test('неуспешное удаление: показывает toast.error, не переходит на главную', async () => {
+        (deleteBoard as jest.Mock).mockRejectedValueOnce(
+            new Error('Delete error'),
+        );
+
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const deleteButton = screen.getByTestId('open-delete-modal');
+        fireEvent.click(deleteButton);
+
+        const deleteModal = screen.getByTestId('delete-modal');
+        expect(deleteModal).toBeInTheDocument();
+
+        const confirmButton = screen.getByTestId('confirm-delete');
+        await userEvent.click(confirmButton);
+
+        expect(deleteBoard).toHaveBeenCalledWith('123');
+        expect(toast.error).toHaveBeenCalledWith('Failed to delete.');
+        expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    test('отмена удаления: пользователь нажал "Delete", потом "Cancel"', async () => {
+        render(
+            <Actions id="123" title="Test Title" defaultOpen>
+                <button data-testid="trigger">Open Actions</button>
+            </Actions>,
+        );
+
+        const deleteButton = screen.getByTestId('open-delete-modal');
+        fireEvent.click(deleteButton);
+
+        const deleteModal = screen.getByTestId('delete-modal');
+        expect(deleteModal).toBeInTheDocument();
+
+        const cancelButton = screen.getByTestId('cancel-delete');
+        fireEvent.click(cancelButton);
+
+        expect(deleteModal).not.toBeInTheDocument();
+
+        expect(deleteBoard).not.toHaveBeenCalled();
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(toast.error).not.toHaveBeenCalled();
     });
 });
