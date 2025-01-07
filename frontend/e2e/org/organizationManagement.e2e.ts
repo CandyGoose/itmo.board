@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.use({ storageState: 'storageState.json' });
 
@@ -7,7 +7,6 @@ test.describe('Organization Management', () => {
         await page.goto('/');
 
         await page.getByLabel('Open organization switcher').click();
-
         await page.locator('button', { hasText: 'org_name' }).click();
 
         await page.getByLabel('Open organization switcher').click();
@@ -17,7 +16,8 @@ test.describe('Organization Management', () => {
         await page.getByPlaceholder('org_name').fill('org_name');
         await page.getByRole('button', { name: 'Delete organization' }).click();
 
-        page.getByText('create an organization to get')
+        const noOrganizationText = page.getByText('create an organization to get');
+        await expect(noOrganizationText).toBeVisible();
     });
 
     test('should create a new organization', async ({ page }) => {
@@ -26,6 +26,8 @@ test.describe('Organization Management', () => {
         await page.getByRole('button', { name: 'create an organization' }).click();
         await page.getByPlaceholder('Organization name').fill('org_name');
         await page.getByRole('button', { name: 'Create organization' }).click();
-        page.getByRole('button', { name: 'new board' });
+
+        const newBoardButton = page.getByRole('button', { name: 'new board' });
+        await expect(newBoardButton).toBeVisible();
     });
 });
