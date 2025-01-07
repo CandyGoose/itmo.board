@@ -18,6 +18,11 @@ jest.mock('@/actions/Board', () => ({
     createBoard: jest.fn(),
 }));
 
+jest.mock('@/actions/CanvasSaver', () => ({
+    __esModule: true,
+    default: () => <div data-testid="canvas-saver-mock" />,
+}));
+
 jest.mock(
     '@/app/[locale]/(dashboard)/[UserID]/_components/NewBoardButton',
     () => ({
