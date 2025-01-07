@@ -33,9 +33,9 @@ test.describe('Draw', () => {
         await svg.hover();
 
         const startX = 0;
-        const startY = 0;
+        const startY = 100;
         const mid1X = 1000;
-        const mid1Y = 0;
+        const mid1Y = 100;
         const mid2X = 1000;
         const mid2Y = 1000;
         const endX = 0;
@@ -70,7 +70,7 @@ test.describe('Draw', () => {
         const path = svg.locator('path');
         await expect(path).toBeVisible();
 
-        await page.mouse.click(0, 0);
+        await page.mouse.dblclick(10, 100);
 
         await page.keyboard.press('Delete');
 
