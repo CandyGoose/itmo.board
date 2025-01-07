@@ -38,6 +38,14 @@ jobs:
           npm run build
           nohup npm start &      
 
+      - name: Save storageState.json
+        uses: actions/cache@v3
+        with:
+          path: frontend/storageState.json
+          key: ${{ runner.os }}-playwright-storageState
+          restore-keys: |
+            ${{ runner.os }}-playwright-storageState
+            
       - name: Run Playwright tests
         working-directory: frontend
         env:
