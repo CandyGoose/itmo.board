@@ -22,6 +22,10 @@ jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
 }));
 
+jest.mock('next-intl', () => ({
+    useTranslations: () => (key: string) => key,
+}));
+
 describe('Info Component', () => {
     const mockOnOpen = jest.fn();
     const mockRouter = { back: jest.fn() };

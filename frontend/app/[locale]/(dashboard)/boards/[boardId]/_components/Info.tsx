@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { useOrganization } from '@clerk/nextjs';
 import CanvasSaver from '@/actions/CanvasSaver';
+import { useTranslations } from 'next-intl';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -29,7 +30,7 @@ const font = Poppins({
 const TabSeparator = () => {
     return <div className="text-neutral-300 px-1.5">|</div>;
 };
-// TODO: Add translations
+
 export const Info = ({
     boardId,
     editable,
@@ -42,6 +43,7 @@ export const Info = ({
     const { onOpen } = useRenameModal();
     const [board, setBoard] = useState<Board>();
     const router = useRouter();
+    const t = useTranslations('tools');
 
     const { membership } = useOrganization();
 
@@ -77,7 +79,7 @@ export const Info = ({
                                     font.className,
                                 )}
                             >
-                                Board
+                                {t('board')}
                             </span>
                         </Link>
                     </Button>
@@ -137,13 +139,13 @@ export const Info = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                     <DropdownMenuItem onClick={() => setEditable(false)}>
-                        View only
+                        {t('viewOnly')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => setEditable(true)}
                         disabled={!membership}
                     >
-                        Edit mode
+                        {t('editMode')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
