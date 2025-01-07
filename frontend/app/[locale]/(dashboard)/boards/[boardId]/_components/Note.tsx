@@ -189,6 +189,7 @@ export const Note = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            padding: '0.5rem',
         }),
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
