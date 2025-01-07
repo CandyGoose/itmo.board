@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,12 +17,12 @@ test.describe('Auth Actions', () => {
         await page.goto('/');
 
         await page.getByPlaceholder('Enter your email address').fill(username);
-
         await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
         await page.getByPlaceholder('Enter your password').fill(password);
-
         await page.getByRole('button', { name: 'Continue' }).click();
-        page.getByRole('link', { name: 'Logo itmo.board' });
+
+        const logoLink = page.getByRole('link', { name: 'Logo itmo.board' });
+        await expect(logoLink).toBeVisible();
     });
 });
