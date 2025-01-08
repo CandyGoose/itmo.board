@@ -1,20 +1,33 @@
 'use client';
 
 import { toast } from 'sonner';
-import { Link2, Pencil, Trash2 } from 'lucide-react';
-import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu';
+import {
+    Download,
+    FileAxis3D,
+    FileImage,
+    Link2,
+    Pencil,
+    Trash2,
+} from 'lucide-react';
+import {
+    DropdownMenuContentProps,
+    DropdownMenuSub,
+} from '@radix-ui/react-dropdown-menu';
 import { ConfirmModal } from '@/components/modals/ConfirmModal';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from '@/components/ui/DropdownMenu';
 import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteBoard } from '@/actions/Board';
+import { useTranslations } from 'next-intl';
 
 interface ActionsProps {
     children: React.ReactNode;
@@ -38,6 +51,7 @@ export const Actions = ({
     const { onOpen } = useRenameModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const t = useTranslations('tools');
 
     const onCopyLink = () => {
         navigator.clipboard
@@ -59,6 +73,18 @@ export const Actions = ({
         }
     };
 
+    const handleDownloadSVG = useCallback(() => {
+        window.dispatchEvent(
+            new CustomEvent('canvas-download', { detail: { format: 'svg' } }),
+        );
+    }, []);
+
+    const handleDownloadPNG = useCallback(() => {
+        window.dispatchEvent(
+            new CustomEvent('canvas-download', { detail: { format: 'png' } }),
+        );
+    }, []);
+
     return (
         <DropdownMenu defaultOpen={defaultOpen}>
             <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -73,7 +99,7 @@ export const Actions = ({
                     className="p-3 cursor-pointer"
                 >
                     <Link2 className="h-4 w-4 mr-2" />
-                    Copy link
+                    {t('copyLink')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => onOpen(id, title)}
@@ -82,8 +108,37 @@ export const Actions = ({
                     disabled={disable}
                 >
                     <Pencil className="h-4 w-4 mr-2" />
-                    Rename
+                    {t('rename')}
                 </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger
+                        className="p-3 cursor-pointer flex items-center"
+                        data-testid="download-sub-menu"
+                    >
+                        <Download className="h-4 w-4 mr-2" />
+                        {t('download')}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent
+                        sideOffset={4}
+                        className="w-48"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <DropdownMenuItem
+                            onClick={handleDownloadSVG}
+                            className="p-3 cursor-pointer"
+                        >
+                            <FileAxis3D className="h-4 w-4 mr-2" />
+                            {t('downloadAsSVG')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={handleDownloadPNG}
+                            className="p-3 cursor-pointer"
+                        >
+                            <FileImage className="h-4 w-4 mr-2" />
+                            {t('downloadAsPNG')}
+                        </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
                 <ConfirmModal
                     header="Delete board?"
                     description="This will delete the board and all of its contents."
@@ -96,7 +151,7 @@ export const Actions = ({
                         disabled={disable}
                     >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
+                        {t('delete')}
                     </Button>
                 </ConfirmModal>
             </DropdownMenuContent>

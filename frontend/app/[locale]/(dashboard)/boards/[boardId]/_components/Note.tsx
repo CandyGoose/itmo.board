@@ -207,14 +207,13 @@ export const Note = ({
 
     return (
         <foreignObject
-            x={x}
-            y={y}
             width={width}
             height={height}
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
+                transform: `translate(${x}px, ${y}px) `,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
