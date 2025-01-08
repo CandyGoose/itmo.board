@@ -325,8 +325,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             if (canvasState.mode !== CanvasMode.Pencil || !pencilDraft) return;
 
             const roundedPoint: [number, number, number] = [
-                Number(point.x.toFixed(4)),
-                Number(point.y.toFixed(4)),
+                Math.round(point.x * 10000) / 10000,
+                Math.round(point.y * 10000) / 10000,
                 Number(e.pressure),
             ];
 
