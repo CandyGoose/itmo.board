@@ -22,7 +22,7 @@
     "bringToBack": "переместить вниз",
     "moveForward": "поставить ближе",
     "moveBackward": "поставить дальше",
-    "delete": "удалить",
+    "delete": "Удалить",
     "pen": "карандаш",
     "select": "выбор",
     "more": "больше",
@@ -43,6 +43,14 @@
     "orLabel": "или",
     "selectFromComputer": "Выберите с компьютера",
     "imageUrl": "URL изображения",
-    "loadButton": "Загрузить"
+    "loadButton": "Загрузить",
+    "copyLink": "Скопировать ссылку",
+    "rename": "Переименовать",
+    "download": "Скачать",
+    "downloadAsSVG": "Скачать как SVG",
+    "downloadAsPNG": "Скачать как PNG",
+    "board": "Доска",
+    "viewOnly": "Только просмотр",
+    "editMode": "Режим редактирования"
   }
 }
