@@ -1,24 +1,34 @@
-import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
-import {TextAlign, TextFormat, TextLayer} from "@/types/canvas";
-import {cn, colorToCss} from "@/lib/utils";
-import { useMutation } from "@/liveblocks.config";
-import React, {CSSProperties, useEffect, useMemo, useRef, useState} from "react";
-import {font, doesTextFit, calculateFontSize } from "@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note";
+import { TextAlign, TextFormat, TextLayer } from '@/types/canvas';
+import { cn, colorToCss } from '@/lib/utils';
+import { useMutation } from '@/liveblocks.config';
+import React, {
+    CSSProperties,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import {
+    font,
+    doesTextFit,
+    calculateFontSize,
+} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 interface TextProps {
-    id:  string;
+    id: string;
     layer: TextLayer;
     onPointerDown: (e: React.PointerEvent, id: string) => void;
     selectionColor?: string;
 }
 
 export const Text = ({
-                         layer,
-                         onPointerDown,
-                         id,
-                         selectionColor,
-                     }: TextProps) => {
+    layer,
+    onPointerDown,
+    id,
+    selectionColor,
+}: TextProps) => {
     const {
         x,
         y,
@@ -71,7 +81,7 @@ export const Text = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            backgroundColor: "transparent",
+            backgroundColor: 'transparent',
         }),
         [fill, currFontSize, fontName, applyTextAlign, applyTextFormat],
     );
@@ -90,17 +100,14 @@ export const Text = ({
         setCurrFontSize(fontSize);
     }, [fontSize]);
 
-    const updateValue = useMutation((
-        { storage },
-        newValue: string,
-    )=> {
-        const liveLayers = storage.get("layers");
-        liveLayers.get(id)?.set("value", newValue);
+    const updateValue = useMutation(({ storage }, newValue: string) => {
+        const liveLayers = storage.get('layers');
+        liveLayers.get(id)?.set('value', newValue);
     }, []);
 
     const handleContentChange = (e: ContentEditableEvent) => {
         updateValue(e.target.value);
-    }
+    };
 
     useEffect(() => {
         setCurrFontSize(fontSize);
@@ -125,30 +132,37 @@ export const Text = ({
         }
     }, [width, height, currFontSize, fontSize, fontName, value]);
 
-
-    const updateWidth = useMutation((
-        { storage },
-        newWidth: number,
-    ) => {
-        const liveLayers = storage.get("layers");
-        liveLayers.get(id)?.set("width", newWidth);
+    const updateWidth = useMutation(({ storage }, newWidth: number) => {
+        const liveLayers = storage.get('layers');
+        liveLayers.get(id)?.set('width', newWidth);
     }, []);
 
     useEffect(() => {
-        const calculateContainerWidth = (given_width: number, text: string, fontSize: number, fontName = 'Kalam') => {
+        const calculateContainerWidth = (
+            given_width: number,
+            text: string,
+            fontSize: number,
+            fontName = 'Kalam',
+        ) => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             if (!ctx) return given_width;
 
-            if (doesTextFit(ctx, text, given_width, height, fontSize, fontName)) {
+            if (
+                doesTextFit(ctx, text, given_width, height, fontSize, fontName)
+            ) {
                 return given_width;
             }
 
             const textWidth = ctx.measureText(text).width;
             return Math.max(textWidth, given_width);
-        }
+        };
 
-        const newWidth = calculateContainerWidth(currentWidth, value || "", currFontSize);
+        const newWidth = calculateContainerWidth(
+            currentWidth,
+            value || '',
+            currFontSize,
+        );
 
         setCurrentWidth(newWidth);
         if (containerRef.current) {
@@ -172,7 +186,15 @@ export const Text = ({
         if (containerRef.current) {
             containerRef.current.style.width = `${newWidth}px`;
         }
-    }, [height, value, currentWidth, updateWidth, currFontSize, fontSize, fontName]);
+    }, [
+        height,
+        value,
+        currentWidth,
+        updateWidth,
+        currFontSize,
+        fontSize,
+        fontName,
+    ]);
 
     return (
         <foreignObject
@@ -183,7 +205,7 @@ export const Text = ({
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
                 outline: outlineStyle,
-                backgroundColor: "transparent",
+                backgroundColor: 'transparent',
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="text-foreign-object"
@@ -192,22 +214,21 @@ export const Text = ({
                 ref={containerRef}
                 className="h-full w-full flex flex-col items-center justify-center"
                 style={{
-                    backgroundColor: "transparent",
+                    backgroundColor: 'transparent',
                     width: `${currentWidth}px`,
                 }}
             >
                 <ContentEditable
-                    html={value || "Text"}
+                    html={value || 'Text'}
                     onChange={handleContentChange}
                     className={cn(
-                        "h-full w-full flex flex-col items-center justify-center text-center outline-none",
-                        font.className
+                        'h-full w-full flex flex-col items-center justify-center text-center outline-none',
+                        font.className,
                     )}
                     style={value ? textStyle : placeholderStyle}
                     data-placeholder="Text"
                 />
             </div>
-
         </foreignObject>
-    )
-}
+    );
+};

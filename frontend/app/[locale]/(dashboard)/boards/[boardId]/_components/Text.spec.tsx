@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import {LayerType, TextAlign, TextFormat, TextLayer} from '@/types/canvas';
+import { LayerType, TextAlign, TextFormat, TextLayer } from '@/types/canvas';
 import '@testing-library/jest-dom';
 import { useMutation } from '@/liveblocks.config';
 import * as TextModule from './Text';
@@ -74,9 +74,7 @@ describe('Text component', () => {
             'text-foreign-object',
         );
 
-        expect(foreignObjectElement).toHaveStyle(
-            'color: 255 0 0',
-        );
+        expect(foreignObjectElement).toHaveStyle('color: 255 0 0');
     });
 
     it('should have transparent background', async () => {
