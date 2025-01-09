@@ -83,7 +83,7 @@ export type TextLayer = {
     fontName: string;
     fontSize: number;
     textAlign: TextAlign;
-    textFormat: TextFormat[]
+    textFormat: TextFormat[];
 };
 
 export type PathLayer = {
@@ -162,4 +162,9 @@ export const enum CanvasMode {
     Pencil,
 }
 
-export type Layer = RectangleLayer | EllipseLayer | NoteLayer | TextLayer | PathLayer;
+export type Layer =
+    | RectangleLayer
+    | EllipseLayer
+    | NoteLayer
+    | TextLayer
+    | PathLayer;
