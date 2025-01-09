@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { LayerType } from '@/types/canvas';
+import {EllipseLayer, LayerType, NoteLayer, RectangleLayer, TextLayer} from '@/types/canvas';
 import { colorToCss } from '@/lib/utils';
 import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
@@ -44,7 +44,7 @@ export const LayerPreview = memo(
                 return (
                     <Ellipse
                         id={id}
-                        layer={layer}
+                        layer={layer as EllipseLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
@@ -53,7 +53,7 @@ export const LayerPreview = memo(
                 return (
                     <Rectangle
                         id={id}
-                        layer={layer}
+                        layer={layer as RectangleLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
@@ -62,7 +62,7 @@ export const LayerPreview = memo(
                 return (
                     <Text
                         id={id}
-                        layer={layer}
+                        layer={layer as TextLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
@@ -71,7 +71,7 @@ export const LayerPreview = memo(
                 return (
                     <Note
                         id={id}
-                        layer={layer}
+                        layer={layer as NoteLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
