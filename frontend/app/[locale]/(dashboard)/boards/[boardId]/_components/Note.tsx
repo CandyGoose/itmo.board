@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
 import { useMutation } from '@/liveblocks.config';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
-const font = Kalam({
+export const font = Kalam({
     subsets: ['latin'],
     weight: ['400'],
 });
@@ -227,7 +227,7 @@ export const Note = ({
                 }}
             >
                 <ContentEditable
-                    html={value || 'Text' || ''}
+                    html={value || 'Text'}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
                         fontName === 'Kalam' ? font.className : '',

@@ -70,6 +70,7 @@ export const SelectionTools = memo(
         const selectedLayer = singleSelected ? selectedLayers[0] : null;
 
         const isNote = singleSelected && selectedLayer?.type === LayerType.Note;
+        const isText = singleSelected && selectedLayer?.type === LayerType.Text;
         const isPath = singleSelected && selectedLayer?.type === LayerType.Path;
 
         return (
@@ -138,7 +139,7 @@ export const SelectionTools = memo(
                 )}
 
                 {/* Font and Text styling (only if single note selected) */}
-                {isNote && (
+                {(isNote || isText) && (
                     <>
                         <FontPicker
                             fontName={

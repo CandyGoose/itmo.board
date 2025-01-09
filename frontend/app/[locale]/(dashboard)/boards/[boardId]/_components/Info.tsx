@@ -18,7 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { useOrganization } from '@clerk/nextjs';
+import { useOrganization, useOrganizationList } from '@clerk/nextjs';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -43,6 +43,15 @@ export const Info = ({
     const router = useRouter();
 
     const { membership } = useOrganization();
+
+    // get all organizations of a user
+    const organizationsList = useOrganizationList();
+    const userOrganizations = organizationsList.userMemberships;
+
+    const checkMembership = () => {
+        if (!board) return false;
+        console.log('AAAAAAAA', userOrganizations);
+    }
 
     useEffect(() => {
         const request = async () => {
@@ -90,6 +99,7 @@ export const Info = ({
                         disabled={!membership}
                     >
                         {board.title}
+                        {checkMembership()}
                     </Button>
                 </Hint>
                 <TabSeparator />

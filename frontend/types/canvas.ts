@@ -71,13 +71,19 @@ export type NoteLayer = {
 };
 
 export type TextLayer = {
+    id: string;
     type: LayerType.Text;
     x: number;
     y: number;
     height: number;
     width: number;
-    fill: Color;
+    fill: Color | null;
     value?: string;
+    lineWidth?: number;
+    fontName: string;
+    fontSize: number;
+    textAlign: TextAlign;
+    textFormat: TextFormat[]
 };
 
 export type PathLayer = {
