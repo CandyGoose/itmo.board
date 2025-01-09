@@ -182,9 +182,11 @@ export const Text = ({
             height={height}
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
-                outline: outlineStyle
+                outline: outlineStyle,
+                backgroundColor: "transparent",
             }}
-            className="p-3"
+            className="shadow-md drop-shadow-xl"
+            data-testid="text-foreign-object"
         >
             <div
                 ref={containerRef}
