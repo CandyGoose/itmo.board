@@ -1,13 +1,19 @@
 'use client';
 
 import { memo } from 'react';
-import {EllipseLayer, LayerType, NoteLayer, RectangleLayer, TextLayer} from '@/types/canvas';
+import {
+    EllipseLayer,
+    LayerType,
+    NoteLayer,
+    RectangleLayer,
+    TextLayer,
+} from '@/types/canvas';
 import { colorToCss } from '@/lib/utils';
 import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
-import { Text } from "@/app/[locale]/(dashboard)/boards/[boardId]/_components/Text";
+import { Text } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Text';
 import { useStorage } from '@/liveblocks.config';
 
 interface LayerPreviewProps {

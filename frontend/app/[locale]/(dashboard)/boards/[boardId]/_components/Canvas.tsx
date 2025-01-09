@@ -14,7 +14,8 @@ import {
     RectangleLayer,
     Side,
     TextAlign,
-    TextFormat, TextLayer,
+    TextFormat,
+    TextLayer,
     XYWH,
 } from '@/types/canvas';
 import {

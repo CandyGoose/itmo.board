@@ -68,7 +68,7 @@ describe('ToolBar Component', () => {
                 throw new Error('Function not implemented.');
             },
             canUndo: false,
-            canRedo: false
+            canRedo: false,
         };
 
         return render(<ToolBar {...defaultProps} {...props} />);
