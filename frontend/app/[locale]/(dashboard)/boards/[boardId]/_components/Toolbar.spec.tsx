@@ -61,6 +61,14 @@ describe('ToolBar Component', () => {
             moveToBack: mockMoveToBack,
             moveForward: mockMoveForward,
             moveBackward: mockMoveBackward,
+            undo: function (): void {
+                throw new Error('Function not implemented.');
+            },
+            redo: function (): void {
+                throw new Error('Function not implemented.');
+            },
+            canUndo: false,
+            canRedo: false
         };
 
         return render(<ToolBar {...defaultProps} {...props} />);
