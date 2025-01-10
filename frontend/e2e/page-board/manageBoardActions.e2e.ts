@@ -105,6 +105,18 @@ test.describe('Board Actions', () => {
             expect(fileName.endsWith('.svg')).toBeTruthy();
         });
 
-        test('should delete the board in org', async ({ page }) => {});
+        test('should delete the board in org', async ({ page }) => {
+            const deleteButton = page.getByRole('button', { name: 'Delete' });
+            await deleteButton.click();
+
+            const confirmButton = page.getByRole('button', { name: 'Confirm' });
+            await confirmButton.click();
+
+            await expect(page.getByText('Untitle-1')).not.toBeVisible();
+
+            const newBoardButton = page.getByRole('button', { name: 'new board' });
+            await expect(newBoardButton).toBeVisible();
+            await newBoardButton.click();
+        });
     });
 });
