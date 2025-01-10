@@ -15,7 +15,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = memo(
         const workerRef = useRef<Worker | null>(null);
 
         useEffect(() => {
-            workerRef.current = new Worker('/workers/imageUpload.worker.js');
+            workerRef.current = new Worker('/workers/imageUploader.worker.js');
             const w = workerRef.current;
             w.onmessage = (event) => {
                 const { success, url, width, height, error } = event.data;
