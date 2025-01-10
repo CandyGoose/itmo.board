@@ -39,9 +39,19 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions in org', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
+            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').first();
+            await expect(menuButton).toBeVisible();
+            await menuButton.click();
         });
 
-        test('should copy the board link to clipboard in org', async ({ page }) => {});
+        test('should copy the board link to clipboard in org', async ({ page }) => {
+            const copyLinkButton = page.getByRole('menuitem', { name: 'Copy link' });
+            await expect(copyLinkButton).toBeVisible();
+            await copyLinkButton.click();
+
+            const notification = page.getByRole('menuitem', { name: 'Copy link' });
+            await expect(notification).toBeVisible();
+        });
 
         test('should rename the board in org', async ({ page }) => {});
 
