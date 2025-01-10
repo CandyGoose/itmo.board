@@ -62,7 +62,6 @@ const applyComputedStyles = (element: Element) => {
     const excludedTestIds = [
         'svg-element',
         'svg-group',
-        'note-container',
     ];
     if (
         !excludedTestIds.includes(
