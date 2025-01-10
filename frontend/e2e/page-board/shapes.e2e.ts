@@ -82,6 +82,8 @@ test.describe('Shapes', () => {
             const resizeHandleX = boundingBox.x + boundingBox.width;
             const resizeHandleY = boundingBox.y + boundingBox.height;
 
+            await page.mouse.click(resizeHandleX, resizeHandleY);
+
             await page.mouse.move(resizeHandleX, resizeHandleY);
             await page.mouse.down();
             await page.mouse.move(resizeHandleX + 50, resizeHandleY + 50);
@@ -90,8 +92,8 @@ test.describe('Shapes', () => {
             const newWidth = await square.getAttribute('width');
             const newHeight = await square.getAttribute('height');
 
-            expect(Number(newWidth)).toBeGreaterThanOrEqual(100);
-            expect(Number(newHeight)).toBeGreaterThanOrEqual(100);
+            expect(Number(newWidth)).toBeGreaterThan(100);
+            expect(Number(newHeight)).toBeGreaterThan(100);
         });
 
         test('should delete the square', async ({ page }) => {
@@ -138,6 +140,8 @@ test.describe('Shapes', () => {
             const resizeHandleX = boundingBox.x + boundingBox.width;
             const resizeHandleY = boundingBox.y + boundingBox.height;
 
+            await page.mouse.click(resizeHandleX - 50, resizeHandleY - 50);
+
             await page.mouse.move(resizeHandleX, resizeHandleY);
             await page.mouse.down();
             await page.mouse.move(resizeHandleX + 50, resizeHandleY + 50);
@@ -145,8 +149,8 @@ test.describe('Shapes', () => {
 
             const newXRadius = await circle.getAttribute('rx');
             const newYRadius = await circle.getAttribute('ry');
-            expect(Number(newXRadius)).toBeGreaterThanOrEqual(50);
-            expect(Number(newYRadius)).toBeGreaterThanOrEqual(50);
+            expect(Number(newXRadius)).toBeGreaterThan(50);
+            expect(Number(newYRadius)).toBeGreaterThan(50);
         });
 
         test('should delete the circle', async ({ page }) => {
