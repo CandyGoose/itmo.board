@@ -19,6 +19,71 @@ export default function CanvasSaver({ boardId }: SaverProps) {
     );
 }
 
+export async function embedImagesInSVG(svgElement: SVGSVGElement) {
+    const imageElements = svgElement.querySelectorAll('image');
+
+    const imagesArray = Array.from(imageElements);
+
+    for (const imageEl of imagesArray) {
+        const href = imageEl.getAttribute('href');
+        if (!href) continue;
+
+        // Skip if it's already a data URL
+        if (href.startsWith('data:')) continue;
+
+        try {
+            const response = await fetch(href, { cache: 'no-cache' });
+            if (!response.ok) throw new Error(`Failed to fetch ${href}`);
+
+            const blob = await response.blob();
+
+            const reader = new FileReader();
+            const base64Promise = new Promise<string>((resolve, reject) => {
+                reader.onloadend = () => {
+                    if (typeof reader.result === 'string') {
+                        resolve(reader.result);
+                    } else {
+                        reject('Could not convert blob to base64 string');
+                    }
+                };
+                reader.onerror = (err) => reject(err);
+            });
+
+            reader.readAsDataURL(blob);
+            const base64DataURL = await base64Promise;
+
+            imageEl.setAttribute('href', base64DataURL);
+        } catch (error) {
+            console.error(`Error converting ${href} to base64:`, error);
+        }
+    }
+}
+const applyComputedStyles = (element: Element) => {
+    const excludedTestIds = [
+        'svg-element',
+        'svg-group',
+        'note-container',
+    ];
+    if (
+        !excludedTestIds.includes(
+            element.getAttribute('data-testid') || '',
+        )
+    ) {
+        const computedStyles = window.getComputedStyle(element);
+        const styleString = Array.from(computedStyles)
+            .map(
+                (prop) =>
+                    `${prop}: ${computedStyles.getPropertyValue(
+                        prop,
+                    )};`,
+            )
+            .join(' ');
+
+        (element as HTMLElement).setAttribute('style', styleString);
+    }
+    Array.from(element.children).forEach(applyComputedStyles);
+};
+
 function Renderer() {
     const svgRef = useRef<SVGSVGElement>(null);
     const layerIds = useStorage((root) => root.layerIds);
@@ -105,28 +170,30 @@ function Renderer() {
     useEffect(() => {
         function handleDownload(e: CustomEvent) {
             if (!svgRef.current) return;
-
             const serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svgRef.current);
+            embedImagesInSVG(svgRef.current).then(() => {
+                applyComputedStyles(svgRef.current!);
+                let source = serializer.serializeToString(svgRef.current!);
+                if (
+                    !source.match(
+                        /^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,
+                    )
+                ) {
+                    source = source.replace(
+                        /^<svg/,
+                        '<svg xmlns="http://www.w3.org/2000/svg"',
+                    );
+                }
+                source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
 
-            if (
-                !source.match(
-                    /^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,
-                )
-            ) {
-                source = source.replace(
-                    /^<svg/,
-                    '<svg xmlns="http://www.w3.org/2000/svg"',
-                );
-            }
-            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+                const format = e.detail?.format;
+                if (format === 'svg') {
+                    downloadSVG(source);
+                } else if (format === 'png') {
+                    downloadPNG(source);
+                }
+            });
 
-            const format = e.detail?.format;
-            if (format === 'svg') {
-                downloadSVG(source);
-            } else if (format === 'png') {
-                downloadPNG(source);
-            }
         }
 
         window.addEventListener(
@@ -145,7 +212,6 @@ function Renderer() {
         <svg
             ref={svgRef}
             data-testid="svg-element"
-            className="h-[100vh] w-[100vw]"
             width={screenWidth}
             height={screenHeight}
             xmlns="http://www.w3.org/2000/svg"
