@@ -51,7 +51,7 @@ test.describe('Draw', () => {
 
         await page.mouse.up();
 
-        const path = svg.locator('path');
+        const path = svg.locator('path').first();
         await expect(path).toBeVisible();
 
         const d = await path.getAttribute('d');
@@ -67,7 +67,7 @@ test.describe('Draw', () => {
 
         const svg = page.locator('svg[data-testid="svg-element"]').nth(1);
 
-        const path = svg.locator('path');
+        const path = svg.locator('path').first();
         await expect(path).toBeVisible();
 
         await page.mouse.dblclick(10, 100);
