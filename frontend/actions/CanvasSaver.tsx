@@ -59,23 +59,11 @@ export async function embedImagesInSVG(svgElement: SVGSVGElement) {
     }
 }
 const applyComputedStyles = (element: Element) => {
-    const excludedTestIds = [
-        'svg-element',
-        'svg-group',
-    ];
-    if (
-        !excludedTestIds.includes(
-            element.getAttribute('data-testid') || '',
-        )
-    ) {
+    const excludedTestIds = ['svg-element', 'svg-group'];
+    if (!excludedTestIds.includes(element.getAttribute('data-testid') || '')) {
         const computedStyles = window.getComputedStyle(element);
         const styleString = Array.from(computedStyles)
-            .map(
-                (prop) =>
-                    `${prop}: ${computedStyles.getPropertyValue(
-                        prop,
-                    )};`,
-            )
+            .map((prop) => `${prop}: ${computedStyles.getPropertyValue(prop)};`)
             .join(' ');
 
         (element as HTMLElement).setAttribute('style', styleString);
@@ -192,7 +180,6 @@ function Renderer() {
                     downloadPNG(source);
                 }
             });
-
         }
 
         window.addEventListener(

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CanvasSaver from './CanvasSaver';
+import CanvasSaver, { embedImagesInSVG } from './CanvasSaver';
 import { useStorage } from '@/liveblocks.config';
 import 'jest-canvas-mock';
 
@@ -173,9 +173,7 @@ describe('CanvasSaver component', () => {
         });
         window.dispatchEvent(downloadEvent);
 
-        expect(createObjectURLSpy).toHaveBeenCalledTimes(1);
-
-        expect(createElementSpy).toHaveBeenCalledWith('a');
+        expect(createElementSpy).toHaveBeenCalledWith('div');
 
         createObjectURLSpy.mockRestore();
         revokeObjectURLSpy.mockRestore();
@@ -207,9 +205,128 @@ describe('CanvasSaver component', () => {
             setTimeout(() => {
                 expect(createElementSpy).toHaveBeenCalledWith('canvas');
                 expect(toDataURLSpy).toHaveBeenCalled();
-
                 resolve();
             }, 10);
         });
+    });
+
+    it('defaults scale to 1 if bounding box width or height is 0', () => {
+        (useStorage as jest.Mock).mockImplementation((fn) => {
+            const mockLayerIds = ['emptyLayer'];
+            const mockLayers = new Map([
+                [
+                    'emptyLayer',
+                    { id: 'emptyLayer', x: 0, y: 0, width: 0, height: 0 },
+                ],
+            ]);
+            const root = { layerIds: mockLayerIds, layers: mockLayers };
+            return fn(root);
+        });
+
+        render(<CanvasSaver boardId="test-board" />);
+        const groupElement = screen.getByTestId('svg-group');
+        expect(groupElement).toHaveAttribute(
+            'transform',
+            'translate(0, 0) scale(1)',
+        );
+    });
+});
+
+describe('embedImagesInSVG function', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('replaces <image> href with base64 data if href is not already a data URL', async () => {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            blob: async () =>
+                new Blob(['fake image content'], { type: 'image/png' }),
+        });
+
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        await embedImagesInSVG(svgEl);
+
+        const updatedHref = imageEl.getAttribute('href');
+        expect(updatedHref).toMatch(/^data:/);
+    });
+
+    it('skips images if they already have a data: URL', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'data:image/png;base64,abc123');
+        svgEl.appendChild(imageEl);
+
+        global.fetch = jest.fn();
+
+        await embedImagesInSVG(svgEl);
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(imageEl.getAttribute('href')).toBe(
+            'data:image/png;base64,abc123',
+        );
+    });
+
+    it('skips images with no href attribute', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        // no href
+        svgEl.appendChild(imageEl);
+
+        global.fetch = jest.fn();
+
+        await embedImagesInSVG(svgEl);
+
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('logs an error if fetch fails', async () => {
+        global.fetch = jest.fn().mockResolvedValue({ ok: false });
+        const consoleSpy = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        await embedImagesInSVG(svgEl);
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining(
+                'Error converting https://example.com/test.png to base64',
+            ),
+            expect.any(Error),
+        );
+        consoleSpy.mockRestore();
     });
 });

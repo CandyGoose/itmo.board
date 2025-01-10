@@ -120,4 +120,21 @@ describe('LayerPreview Component', () => {
         expect(consoleWarnSpy).toHaveBeenCalledWith('Unknown layer type');
         consoleWarnSpy.mockRestore();
     });
+
+    test('renders null if no layer is given', () => {
+        (useStorage as jest.Mock).mockImplementation((selector) => {
+            const root = {
+                layers: {
+                    get: () => null,
+                },
+            };
+            return selector(root);
+        });
+
+        const { container } = renderLayerPreview({
+            id: 'non-existent-layer',
+        });
+
+        expect(container.firstChild).toBeNull();
+    });
 });
