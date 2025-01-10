@@ -16,14 +16,18 @@ test.describe('Organization Management', () => {
         await page.getByPlaceholder('org_name').fill('org_name');
         await page.getByRole('button', { name: 'Delete organization' }).click();
 
-        const noOrganizationText = page.getByText('create an organization to get');
+        const noOrganizationText = page.getByText(
+            'create an organization to get',
+        );
         await expect(noOrganizationText).toBeVisible();
     });
 
     test('should create a new organization', async ({ page }) => {
         await page.goto('/');
 
-        await page.getByRole('button', { name: 'create an organization' }).click();
+        await page
+            .getByRole('button', { name: 'create an organization' })
+            .click();
         await page.getByPlaceholder('Organization name').fill('org_name');
         await page.getByRole('button', { name: 'Create organization' }).click();
 

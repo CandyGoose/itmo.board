@@ -10,7 +10,9 @@ test.describe('Boars Elements', () => {
 
     test.describe('Board Tools Elements', () => {
         test('should display the pointer tool', async ({ page }) => {
-            const pointerTool = page.locator('svg.lucide-mouse-pointer2').locator('..');
+            const pointerTool = page
+                .locator('svg.lucide-mouse-pointer2')
+                .locator('..');
             await expect(pointerTool).toBeVisible();
         });
 
@@ -27,7 +29,9 @@ test.describe('Boars Elements', () => {
         });
 
         test('should display the note tool', async ({ page }) => {
-            const noteTool = page.locator('svg.lucide-sticky-note').locator('..');
+            const noteTool = page
+                .locator('svg.lucide-sticky-note')
+                .locator('..');
             await expect(noteTool).toBeVisible();
         });
 
@@ -44,19 +48,29 @@ test.describe('Boars Elements', () => {
         });
 
         test('should display the delete button', async ({ page }) => {
-            const deleteButton = page.locator('svg.lucide-trash2').locator('..');
+            const deleteButton = page
+                .locator('svg.lucide-trash2')
+                .locator('..');
             await expect(deleteButton).toBeVisible();
         });
 
         test('should display the layers button', async ({ page }) => {
-            const layersButton = page.locator('svg.lucide-ellipsis-vertical').locator('..');
+            const layersButton = page
+                .locator('svg.lucide-ellipsis-vertical')
+                .locator('..');
             await expect(layersButton).toBeVisible();
             await layersButton.click();
 
-            const bringToFront = page.locator('svg.lucide-bring-to-front').locator('..');
-            const sendToBack = page.locator('svg.lucide-send-to-back').locator('..');
+            const bringToFront = page
+                .locator('svg.lucide-bring-to-front')
+                .locator('..');
+            const sendToBack = page
+                .locator('svg.lucide-send-to-back')
+                .locator('..');
             const arrowUp = page.locator('svg.lucide-arrow-up').locator('..');
-            const arrowDown = page.locator('svg.lucide-arrow-down').locator('..');
+            const arrowDown = page
+                .locator('svg.lucide-arrow-down')
+                .locator('..');
 
             await expect(bringToFront).toBeVisible();
             await expect(sendToBack).toBeVisible();
@@ -76,7 +90,9 @@ test.describe('Boars Elements', () => {
         });
 
         test('should display and edit the board name', async ({ page }) => {
-            const boardNameButton = page.getByRole('button', { name: 'Untitle-0' });
+            const boardNameButton = page.getByRole('button', {
+                name: 'Untitle-0',
+            });
             await expect(boardNameButton).toBeVisible();
             await boardNameButton.click();
 
@@ -111,8 +127,12 @@ test.describe('Boars Elements', () => {
             await expect(downloadMenu).toBeVisible();
 
             await downloadMenu.hover();
-            const downloadAsSVG = page.getByRole('menuitem', { name: 'Download as SVG' });
-            const downloadAsPNG = page.getByRole('menuitem', { name: 'Download as PNG' });
+            const downloadAsSVG = page.getByRole('menuitem', {
+                name: 'Download as SVG',
+            });
+            const downloadAsPNG = page.getByRole('menuitem', {
+                name: 'Download as PNG',
+            });
             const deleteButton = page.getByRole('button', { name: 'Delete' });
             await expect(downloadAsSVG).toBeVisible();
             await expect(downloadAsPNG).toBeVisible();
