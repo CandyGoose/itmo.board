@@ -40,7 +40,7 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions in org', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
-            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').first();
+            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').last();
             await expect(menuButton).toBeVisible();
             await menuButton.click();
         });
@@ -54,7 +54,22 @@ test.describe('Board Actions', () => {
             await expect(notification).toBeVisible();
         });
 
-        test('should rename the board in org', async ({ page }) => {});
+        test('should rename the board in org', async ({ page }) => {
+            await page.getByTestId('rename-item').click();
+
+            const nameInput = page.getByPlaceholder('Untitle-1');
+            await expect(nameInput).toBeVisible();
+            await nameInput.fill('New Name');
+            await page.getByRole('button', { name: 'Save' }).click();
+
+            const renamedBoard = page.getByText('New Name');
+            await expect(renamedBoard).toBeVisible();
+
+            await renamedBoard.click();
+            await page.getByRole('button', { name: 'New Name' }).click();
+            await page.getByPlaceholder('New Name').fill('Untitle-1');
+            await page.getByRole('button', { name: 'Save' }).click();
+        });
 
         test('should export the board as a PNG in org', async ({ page }) => {
             const downloadMenu = page.getByTestId('download-sub-menu');
@@ -77,7 +92,7 @@ test.describe('Board Actions', () => {
             const downloadMenu = page.getByTestId('download-sub-menu');
             await expect(downloadMenu).toBeVisible();
             await downloadMenu.hover();
-            
+
             const [download] = await Promise.all([
                 page.waitForEvent('download'),
                 page.getByRole('menuitem', { name: 'Download as SVG' }).click(),
