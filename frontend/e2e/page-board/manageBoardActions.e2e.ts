@@ -11,10 +11,6 @@ test.describe('Board Actions', () => {
 
         test('should copy the board link to clipboard on board', async ({ page }) => {});
 
-        test('should rename the board on board', async ({ page }) => {});
-
-        test('should navigate to the main menu on board', async ({ page }) => {});
-
         test('should delete the board on board', async ({ page }) => {});
     });
 
