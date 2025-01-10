@@ -32,7 +32,9 @@ test.describe('Shapes', () => {
 
             await textDiv.fill('New Note Content');
 
-            await expect(page.getByText('New Note Content').nth(1)).toBeVisible();
+            await expect(
+                page.getByText('New Note Content').nth(1),
+            ).toBeVisible();
         });
 
         test('should delete the note', async ({ page }) => {
@@ -40,17 +42,18 @@ test.describe('Shapes', () => {
 
             await note.dblclick();
 
-            const deleteButton = page.locator('svg.lucide-trash2').locator('..');
+            const deleteButton = page
+                .locator('svg.lucide-trash2')
+                .locator('..');
             await expect(deleteButton).toBeVisible();
             await deleteButton.dblclick();
 
-            if (!await note.isVisible()) {
+            if (!(await note.isVisible())) {
                 await deleteButton.click();
             }
             await expect(note).not.toBeVisible();
         });
     });
-
 
     test.describe('Squares', () => {
         test('should add a square to the board', async ({ page }) => {
@@ -95,11 +98,13 @@ test.describe('Shapes', () => {
             const square = page.locator('rect').nth(3);
 
             await square.click();
-            const deleteButton = page.locator('svg.lucide-trash2').locator('..');
+            const deleteButton = page
+                .locator('svg.lucide-trash2')
+                .locator('..');
             await expect(deleteButton).toBeVisible();
             await deleteButton.dblclick();
 
-            if (!await square.isVisible()) {
+            if (!(await square.isVisible())) {
                 await deleteButton.click();
             }
             await expect(square).not.toBeVisible();
@@ -148,11 +153,13 @@ test.describe('Shapes', () => {
             const circle = page.locator('ellipse').nth(1);
 
             await circle.click();
-            const deleteButton = page.locator('svg.lucide-trash2').locator('..');
+            const deleteButton = page
+                .locator('svg.lucide-trash2')
+                .locator('..');
             await expect(deleteButton).toBeVisible();
             await deleteButton.dblclick();
 
-            if (!await circle.isVisible()) {
+            if (!(await circle.isVisible())) {
                 await deleteButton.click();
             }
             await expect(circle).not.toBeVisible();

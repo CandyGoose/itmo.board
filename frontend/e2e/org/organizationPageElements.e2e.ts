@@ -23,7 +23,9 @@ test.describe('Home Page Elements', () => {
     });
 
     test('should display the language switch button', async ({ page }) => {
-        const langSwitch = page.getByRole('button', { name: 'Language Switch' });
+        const langSwitch = page.getByRole('button', {
+            name: 'Language Switch',
+        });
         await expect(langSwitch).toBeVisible();
     });
 
