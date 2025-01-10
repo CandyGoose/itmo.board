@@ -6,6 +6,8 @@ interface ImageUploadProps {
     onUploadComplete: (url: string, width?: number, height?: number) => void;
 }
 
+const dimensionsWorker = new Worker('/workers/imageUpload.worker.js');
+
 export const ImageUpload: React.FC<ImageUploadProps> = ({
     onClose,
     onUploadComplete,
@@ -15,25 +17,26 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     const [imageUrl, setImageUrl] = useState('');
     const [dragActive, setDragActive] = useState(false);
 
-    const getImageDimensions = (
-        fileOrBlob: File | Blob,
+    const getDimensionsFromWorker = (
+        file: File,
     ): Promise<{ width: number; height: number }> => {
         return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                resolve({ width: img.width, height: img.height });
+            dimensionsWorker.onmessage = (event) => {
+                const { success, width, height, error } = event.data;
+                if (success) {
+                    resolve({ width, height });
+                } else {
+                    reject(error);
+                }
             };
-            img.onerror = () => {
-                reject(new Error('Failed to load image for dimensions.'));
-            };
-            img.src = URL.createObjectURL(fileOrBlob);
+            dimensionsWorker.postMessage({ file });
         });
     };
 
     const uploadToServer = async (
         file: File,
     ): Promise<{ url: string; width?: number; height?: number }> => {
-        const { width, height } = await getImageDimensions(file);
+        const { width, height } = await getDimensionsFromWorker(file);
         const formData = new FormData();
         formData.append('file', file);
 
@@ -113,7 +116,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 type: blob.type,
             });
 
-            const { width, height } = await getImageDimensions(blob);
+            const { width, height } = await getDimensionsFromWorker(file);
 
             const { url: finalUrl } = await uploadToServer(file);
             onUploadComplete(finalUrl, width, height);
