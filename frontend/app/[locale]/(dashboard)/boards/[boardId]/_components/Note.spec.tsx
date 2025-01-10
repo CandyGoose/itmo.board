@@ -527,15 +527,26 @@ describe('calculateFontSize', () => {
         (document.createElement as jest.Mock).mockImplementation(() => ({
             getContext: () => null,
         }));
+        const initialFontSize = 40;
 
         const result = NoteModule.calculateFontSize(
             200,
             100,
             'Some text',
-            72,
+            initialFontSize,
             'Arial',
         );
 
-        expect(result).toBe(NoteModule.MIN_FONT_SIZE);
+        expect(result).toBe(initialFontSize);
+    });
+
+    it('should handle calculateFontSize when fontSize and fontName are not given', () => {
+        (document.createElement as jest.Mock).mockImplementation(() => ({
+            getContext: () => null,
+        }));
+
+        const result = NoteModule.calculateFontSize(200, 100, 'Some text');
+
+        expect(result).toBe(NoteModule.MAX_FONT_SIZE); // the fallback
     });
 });

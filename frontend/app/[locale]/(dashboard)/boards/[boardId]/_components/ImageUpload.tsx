@@ -47,9 +47,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = memo(
             e.preventDefault();
             e.stopPropagation();
             setDragActive(false);
-            if (!workerRef.current) return;
             const file = e.dataTransfer.files?.[0];
-            if (!file) return;
+            if (!file || !workerRef.current) return;
             workerRef.current.postMessage({
                 action: 'uploadFile',
                 file,
