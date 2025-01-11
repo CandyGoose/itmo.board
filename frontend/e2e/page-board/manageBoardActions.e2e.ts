@@ -40,7 +40,7 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions in org', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
-            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').last();
+            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').first();
             await expect(menuButton).toBeVisible();
             await menuButton.click();
         });
