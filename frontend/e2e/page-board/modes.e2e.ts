@@ -9,7 +9,9 @@ test.describe('Modes', () => {
     });
 
     test('should restrict actions for read-only', async ({ page }) => {
-        const toggleButton = page.locator('svg.lucide-pencil-ruler').locator('..');
+        const toggleButton = page
+            .locator('svg.lucide-pencil-ruler')
+            .locator('..');
         await toggleButton.click();
         await page.getByRole('menuitem', { name: 'View only' }).click();
 
@@ -19,7 +21,9 @@ test.describe('Modes', () => {
     });
 
     test('should allow editing', async ({ page }) => {
-        const toggleButton = page.locator('svg.lucide-pencil-ruler').locator('..');
+        const toggleButton = page
+            .locator('svg.lucide-pencil-ruler')
+            .locator('..');
         await toggleButton.click();
         await page.getByRole('menuitem', { name: 'Edit mode' }).click();
 
