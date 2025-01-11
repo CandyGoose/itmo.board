@@ -20,4 +20,8 @@ test.describe('Multi-User Collaboration', () => {
         await page2.getByText('Untitle-0').click();
     });
 
+    test.afterEach(async () => {
+        await context1.close();
+        await context2.close();
+    });
 });
