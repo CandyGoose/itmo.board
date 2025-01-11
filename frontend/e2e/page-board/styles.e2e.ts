@@ -16,7 +16,7 @@ test.describe('Styles', () => {
 
         await page.mouse.click(clickX, clickY);
         await page.waitForTimeout(500);
-        
+
         await page.getByRole('button', { name: 'styles' }).click();
 
         await expect(page.getByLabel('Line width')).toBeVisible();
