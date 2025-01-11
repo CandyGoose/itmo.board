@@ -7,7 +7,11 @@ test.describe('Create Board', () => {
         await page.goto('/');
     });
 
-    test('should found board', async ({ page }) => {});
+    test('should found one board', async ({ page }) => {
+        await page.getByPlaceholder('search boards').fill('untitle-0');
+        const board = page.getByText('Untitle-0');
+        await expect(board).toBeVisible();
+    });
 
     test('should show message if nothing found', async ({ page }) => {});
 });
