@@ -9,8 +9,10 @@ test.describe('Create Board', () => {
 
     test('should found one board', async ({ page }) => {
         await page.getByPlaceholder('search boards').fill('untitle-0');
-        const board = page.getByText('Untitle-0');
-        await expect(board).toBeVisible();
+        const board1 = page.getByText('Untitle-0');
+        const board2 = page.getByText('Untitle-1');
+        await expect(board1).toBeVisible();
+        await expect(board2).not.toBeVisible();
     });
 
     test('should found one board', async ({ page }) => {
