@@ -53,43 +53,33 @@ test.describe('Styles', () => {
         await page.getByRole('button', { name: 'styles' }).click();
     });
 
-    test.describe('Styles List', () => {
-        test('should display line width', async ({ page }) => {
-            await expect(page.getByLabel('Line width')).toBeVisible();
-        });
-
-        test('should display coordinates', async ({ page }) => {
-            await expect(page.getByLabel('X', { exact: true })).toBeVisible();
-            await expect(page.getByLabel('Y', { exact: true })).toBeVisible();
-        });
-
-        test('should display parameters', async ({ page }) => {
-            await expect(page.getByTestId('selection-tools-container').locator('div').filter({ hasText: 'WidthHeight' }).locator('#input1')).toBeVisible();
-            await expect(page.getByTestId('selection-tools-container').locator('div').filter({ hasText: 'WidthHeight' }).locator('#input2')).toBeVisible();
-        });
-
-        test('should display font', async ({ page }) => {
-            await expect(page.getByLabel('Font', { exact: true })).toBeVisible();
-        });
-
-        test('should display format', async ({ page }) => {
-            await expect(page.getByLabel('Bold')).toBeVisible();
-            await expect(page.getByLabel('Italic')).toBeVisible();
-            await expect(page.getByLabel('Strike Through')).toBeVisible();
-        });
-
-        test('should display alignment', async ({ page }) => {
-            await expect(page.getByLabel('Left Aligned')).toBeVisible();
-            await expect(page.getByLabel('Center Aligned')).toBeVisible();
-            await expect(page.getByLabel('Right Aligned')).toBeVisible();
-        });
+    test('should display line width', async ({ page }) => {
+        await expect(page.getByLabel('Line width')).toBeVisible();
     });
 
-    test.describe('Object Styles', () => {
-        test('should apply color to object', async ({ page }) => {});
+    test('should display coordinates', async ({ page }) => {
+        await expect(page.getByLabel('X', { exact: true })).toBeVisible();
+        await expect(page.getByLabel('Y', { exact: true })).toBeVisible();
+    });
 
-        test('should change font size of text', async ({ page }) => {});
+    test('should display parameters', async ({ page }) => {
+        await expect(page.getByTestId('selection-tools-container').locator('div').filter({ hasText: 'WidthHeight' }).locator('#input1')).toBeVisible();
+        await expect(page.getByTestId('selection-tools-container').locator('div').filter({ hasText: 'WidthHeight' }).locator('#input2')).toBeVisible();
+    });
 
-        test('should change font of text', async ({ page }) => {});
+    test('should display font', async ({ page }) => {
+        await expect(page.getByLabel('Font', { exact: true })).toBeVisible();
+    });
+
+    test('should display format', async ({ page }) => {
+        await expect(page.getByLabel('Bold')).toBeVisible();
+        await expect(page.getByLabel('Italic')).toBeVisible();
+        await expect(page.getByLabel('Strike Through')).toBeVisible();
+    });
+
+    test('should display alignment', async ({ page }) => {
+        await expect(page.getByLabel('Left Aligned')).toBeVisible();
+        await expect(page.getByLabel('Center Aligned')).toBeVisible();
+        await expect(page.getByLabel('Right Aligned')).toBeVisible();
     });
 });
