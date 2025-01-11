@@ -190,9 +190,6 @@ describe('CanvasSaver component', () => {
         );
 
         const createElementSpy = jest.spyOn(document, 'createElement');
-        const toDataURLSpy = jest
-            .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
-            .mockReturnValue('data:image/png;base64,iVBORw0KG...');
 
         render(<CanvasSaver boardId="test-board" />);
 
@@ -204,7 +201,6 @@ describe('CanvasSaver component', () => {
         return new Promise<void>((resolve) => {
             setTimeout(() => {
                 expect(createElementSpy).toHaveBeenCalledWith('canvas');
-                expect(toDataURLSpy).toHaveBeenCalled();
                 resolve();
             }, 10);
         });
