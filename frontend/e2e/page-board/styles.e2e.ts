@@ -11,12 +11,17 @@ test.describe('Styles', () => {
     let sharedPage: Page;
 
     test.beforeAll(async ({ browser }) => {
-        context = await browser.newContext({ storageState: 'storageState.json' });
+        context = await browser.newContext({
+            storageState: 'storageState.json',
+        });
         sharedPage = await context.newPage();
 
         await sharedPage.goto('/');
         await sharedPage.getByText('Untitle-0').click();
-        await sharedPage.locator('svg.lucide-sticky-note').locator('..').click();
+        await sharedPage
+            .locator('svg.lucide-sticky-note')
+            .locator('..')
+            .click();
 
         const board = sharedPage.locator('svg[data-testid="svg-element"]');
         const clickX = 100;
@@ -33,7 +38,9 @@ test.describe('Styles', () => {
         const note = sharedPage.getByText('New Note Content').nth(1);
         await note.dblclick();
 
-        const deleteButton = sharedPage.locator('svg.lucide-trash2').locator('..');
+        const deleteButton = sharedPage
+            .locator('svg.lucide-trash2')
+            .locator('..');
         await expect(deleteButton).toBeVisible();
         await deleteButton.dblclick();
 

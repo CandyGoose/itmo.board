@@ -7,8 +7,12 @@ test.describe('Multi-User Collaboration', () => {
     let context2: BrowserContext;
 
     test.beforeEach(async ({ browser }) => {
-        context1 = await browser.newContext({ storageState: 'storageState.json' });
-        context2 = await browser.newContext({ storageState: 'storageState.json' });
+        context1 = await browser.newContext({
+            storageState: 'storageState.json',
+        });
+        context2 = await browser.newContext({
+            storageState: 'storageState.json',
+        });
 
         const page1 = await context1.newPage();
         const page2 = await context2.newPage();
@@ -32,7 +36,10 @@ test.describe('Multi-User Collaboration', () => {
         await page1.waitForTimeout(500);
         const square1 = svg1.locator('rect').nth(3);
 
-        const square2 = svg2.locator('g').filter({ hasText: 'Teammate' }).locator('rect');
+        const square2 = svg2
+            .locator('g')
+            .filter({ hasText: 'Teammate' })
+            .locator('rect');
 
         const boundingBox = await square2.boundingBox();
         if (!boundingBox) {
@@ -50,9 +57,7 @@ test.describe('Multi-User Collaboration', () => {
         await page2.mouse.up();
 
         await square1.click();
-        const deleteButton = page1
-            .locator('svg.lucide-trash2')
-            .locator('..');
+        const deleteButton = page1.locator('svg.lucide-trash2').locator('..');
         await expect(deleteButton).toBeVisible();
         await deleteButton.dblclick();
 

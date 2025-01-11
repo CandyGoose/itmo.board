@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 
-const imageURL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Lava_Lake_Nyiragongo_2.jpg/1200px-Lava_Lake_Nyiragongo_2.jpg?20110725120304';
+const imageURL =
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Lava_Lake_Nyiragongo_2.jpg/1200px-Lava_Lake_Nyiragongo_2.jpg?20110725120304';
 const downloadPath = path.resolve(__dirname, './temp/test.jpg');
 
 test.use({ storageState: 'storageState.json' });
@@ -45,7 +46,10 @@ test.describe('Images', () => {
         await uploadButton.click();
 
         await page.getByTestId('svg-element').nth(1).click();
-        await page.locator('label').filter({ hasText: 'Select from computer' }).click();
+        await page
+            .locator('label')
+            .filter({ hasText: 'Select from computer' })
+            .click();
 
         const fileInput = page.locator('input[type="file"]');
         await fileInput.setInputFiles(downloadPath);
@@ -63,7 +67,9 @@ test.describe('Images', () => {
         await uploadButton.click();
 
         await page.getByTestId('svg-element').nth(1).click();
-        await page.getByPlaceholder('https://example.com/image.png').fill(imageURL);
+        await page
+            .getByPlaceholder('https://example.com/image.png')
+            .fill(imageURL);
         await page.getByRole('button', { name: 'Load' }).click();
 
         const image = page.locator('image').nth(1);

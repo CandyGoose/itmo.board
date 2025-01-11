@@ -13,12 +13,18 @@ test.describe('Board Actions', () => {
             await menuButton.click();
         });
 
-        test('should copy the board link to clipboard on board', async ({ page }) => {
-            const copyLinkButton = page.getByRole('menuitem', { name: 'Copy link' });
+        test('should copy the board link to clipboard on board', async ({
+            page,
+        }) => {
+            const copyLinkButton = page.getByRole('menuitem', {
+                name: 'Copy link',
+            });
             await expect(copyLinkButton).toBeVisible();
             await copyLinkButton.click();
 
-            const notification = page.getByRole('menuitem', { name: 'Copy link' });
+            const notification = page.getByRole('menuitem', {
+                name: 'Copy link',
+            });
             await expect(notification).toBeVisible();
         });
 
@@ -31,7 +37,9 @@ test.describe('Board Actions', () => {
 
             await expect(page.getByText('Untitle-1')).not.toBeVisible();
 
-            const newBoardButton = page.getByRole('button', { name: 'new board' });
+            const newBoardButton = page.getByRole('button', {
+                name: 'new board',
+            });
             await expect(newBoardButton).toBeVisible();
             await newBoardButton.click();
         });
@@ -40,17 +48,26 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions in org', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
-            const menuButton = page.locator('svg.lucide-ellipsis').locator('..').first();
+            const menuButton = page
+                .locator('svg.lucide-ellipsis')
+                .locator('..')
+                .first();
             await expect(menuButton).toBeVisible();
             await menuButton.click();
         });
 
-        test('should copy the board link to clipboard in org', async ({ page }) => {
-            const copyLinkButton = page.getByRole('menuitem', { name: 'Copy link' });
+        test('should copy the board link to clipboard in org', async ({
+            page,
+        }) => {
+            const copyLinkButton = page.getByRole('menuitem', {
+                name: 'Copy link',
+            });
             await expect(copyLinkButton).toBeVisible();
             await copyLinkButton.click();
 
-            const notification = page.getByRole('menuitem', { name: 'Copy link' });
+            const notification = page.getByRole('menuitem', {
+                name: 'Copy link',
+            });
             await expect(notification).toBeVisible();
         });
 
@@ -114,7 +131,9 @@ test.describe('Board Actions', () => {
 
             await expect(page.getByText('Untitle-1')).not.toBeVisible();
 
-            const newBoardButton = page.getByRole('button', { name: 'new board' });
+            const newBoardButton = page.getByRole('button', {
+                name: 'new board',
+            });
             await expect(newBoardButton).toBeVisible();
             await newBoardButton.click();
         });
