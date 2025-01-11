@@ -256,15 +256,19 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 y: point.y - canvasState.current.y,
             };
 
-            const liveLayers = storage.get('layers');
+            const offsetSquared = offset.x * offset.x + offset.y * offset.y;
 
-            for (const id of self.presence.selection) {
-                const layer = liveLayers.get(id);
-                if (layer) {
-                    layer.update({
-                        x: roundToTwoDecimals(layer.get('x') + offset.x),
-                        y: roundToTwoDecimals(layer.get('y') + offset.y),
-                    });
+            if (offsetSquared >= 0.0001) {
+                const liveLayers = storage.get('layers');
+
+                for (const id of self.presence.selection) {
+                    const layer = liveLayers.get(id);
+                    if (layer) {
+                        layer.update({
+                            x: roundToTwoDecimals(layer.get('x') + offset.x),
+                            y: roundToTwoDecimals(layer.get('y') + offset.y),
+                        });
+                    }
                 }
             }
             setCanvasState({ mode: CanvasMode.Translating, current: point });
@@ -511,10 +515,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
+            e.stopPropagation();
             if (!editable) {
                 setCanvasState({ mode: CanvasMode.None });
             }
-            e.stopPropagation();
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
             switch (canvasState.mode) {

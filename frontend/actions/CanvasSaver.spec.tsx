@@ -233,35 +233,35 @@ describe('CanvasSaver component', () => {
 });
 
 describe('embedImagesInSVG function', () => {
+    let mockWorkerInstance: Worker;
+
+    beforeAll(() => {
+        global.Worker = jest.fn(() => {
+            const worker = {
+                postMessage: jest.fn(),
+                terminate: jest.fn(),
+                onmessage: null as
+                    | ((this: Worker, ev: MessageEvent) => never)
+                    | null,
+
+                onerror: null,
+                onmessageerror: null,
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                dispatchEvent: jest.fn(() => false),
+            };
+
+            mockWorkerInstance = worker as unknown as Worker;
+
+            return mockWorkerInstance;
+        }) as unknown as typeof Worker;
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('replaces <image> href with base64 data if href is not already a data URL', async () => {
-        global.fetch = jest.fn().mockResolvedValue({
-            ok: true,
-            blob: async () =>
-                new Blob(['fake image content'], { type: 'image/png' }),
-        });
-
-        const svgEl = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'svg',
-        );
-        const imageEl = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'image',
-        );
-        imageEl.setAttribute('href', 'https://example.com/test.png');
-        svgEl.appendChild(imageEl);
-
-        await embedImagesInSVG(svgEl);
-
-        const updatedHref = imageEl.getAttribute('href');
-        expect(updatedHref).toMatch(/^data:/);
-    });
-
-    it('skips images if they already have a data: URL', async () => {
+    it('does nothing (does not instantiate worker) if there are no images to convert', async () => {
         const svgEl = document.createElementNS(
             'http://www.w3.org/2000/svg',
             'svg',
@@ -273,17 +273,12 @@ describe('embedImagesInSVG function', () => {
         imageEl.setAttribute('href', 'data:image/png;base64,abc123');
         svgEl.appendChild(imageEl);
 
-        global.fetch = jest.fn();
-
         await embedImagesInSVG(svgEl);
 
-        expect(global.fetch).not.toHaveBeenCalled();
-        expect(imageEl.getAttribute('href')).toBe(
-            'data:image/png;base64,abc123',
-        );
+        expect(global.Worker).not.toHaveBeenCalled();
     });
 
-    it('skips images with no href attribute', async () => {
+    it('instantiates worker and posts message with correct images', async () => {
         const svgEl = document.createElementNS(
             'http://www.w3.org/2000/svg',
             'svg',
@@ -292,19 +287,98 @@ describe('embedImagesInSVG function', () => {
             'http://www.w3.org/2000/svg',
             'image',
         );
-        // no href
+        imageEl.setAttribute('href', 'https://example.com/test.png');
         svgEl.appendChild(imageEl);
 
-        global.fetch = jest.fn();
+        const promise = embedImagesInSVG(svgEl);
 
-        await embedImagesInSVG(svgEl);
+        expect(global.Worker).toHaveBeenCalledWith(
+            '/workers/embedImages.worker.js',
+        );
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            type: 'start',
+            images: ['https://example.com/test.png'],
+        });
 
-        expect(global.fetch).not.toHaveBeenCalled();
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                base64DataURL: 'data:image/png;base64,MOCK_BASE64',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(imageEl.getAttribute('href')).toBe(
+            'data:image/png;base64,MOCK_BASE64',
+        );
     });
 
-    it('logs an error if fetch fails', async () => {
-        global.fetch = jest.fn().mockResolvedValue({ ok: false });
-        const consoleSpy = jest
+    it('handles multiple images and updates all hrefs correctly', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+
+        const imageEl1 = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl1.setAttribute('href', 'https://example.com/test1.png');
+        svgEl.appendChild(imageEl1);
+
+        const imageEl2 = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl2.setAttribute('href', 'https://example.com/test2.png');
+        svgEl.appendChild(imageEl2);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            type: 'start',
+            images: [
+                'https://example.com/test1.png',
+                'https://example.com/test2.png',
+            ],
+        });
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                base64DataURL: 'data:image/png;base64,BASE64_TEST1',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).not.toHaveBeenCalled();
+        expect(imageEl1.getAttribute('href')).toBe(
+            'data:image/png;base64,BASE64_TEST1',
+        );
+        expect(imageEl2.getAttribute('href')).toBe(
+            'https://example.com/test2.png',
+        );
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 1,
+                base64DataURL: 'data:image/png;base64,BASE64_TEST2',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(imageEl2.getAttribute('href')).toBe(
+            'data:image/png;base64,BASE64_TEST2',
+        );
+    });
+
+    it('logs a specific error if the worker returns an error for a given image', async () => {
+        const consoleErrorSpy = jest
             .spyOn(console, 'error')
             .mockImplementation(() => {});
 
@@ -319,14 +393,59 @@ describe('embedImagesInSVG function', () => {
         imageEl.setAttribute('href', 'https://example.com/test.png');
         svgEl.appendChild(imageEl);
 
-        await embedImagesInSVG(svgEl);
+        const promise = embedImagesInSVG(svgEl);
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-            expect.stringContaining(
-                'Error converting https://example.com/test.png to base64',
-            ),
-            expect.any(Error),
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                error: 'Mock conversion failure',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Error for image at index 0: Mock conversion failure',
         );
-        consoleSpy.mockRestore();
+        expect(imageEl.getAttribute('href')).toBe(
+            'https://example.com/test.png',
+        );
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    it('rejects (throws) if the worker itself errors (onerror)', async () => {
+        const consoleErrorSpy = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        const mockErrorEvent = {
+            message: 'Mock worker crash',
+        } as unknown as ErrorEvent;
+        mockWorkerInstance.onerror?.(mockErrorEvent);
+
+        await expect(promise).rejects.toEqual(mockErrorEvent);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Worker error:',
+            mockErrorEvent,
+        );
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
     });
 });
