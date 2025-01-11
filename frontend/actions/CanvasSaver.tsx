@@ -19,45 +19,66 @@ export default function CanvasSaver({ boardId }: SaverProps) {
     );
 }
 
-export async function embedImagesInSVG(svgElement: SVGSVGElement) {
-    const imageElements = svgElement.querySelectorAll('image');
+export async function embedImagesInSVG(
+    svgElement: SVGSVGElement,
+): Promise<void> {
+    const imageElements = Array.from(svgElement.querySelectorAll('image'));
 
-    const imagesArray = Array.from(imageElements);
+    const imagesToConvert = imageElements
+        .map((img, index) => ({
+            index,
+            url: img.getAttribute('href'),
+            element: img,
+        }))
+        .filter((item) => item.url && !item.url.startsWith('data:')) as Array<{
+        index: number;
+        url: string;
+        element: SVGImageElement;
+    }>;
 
-    for (const imageEl of imagesArray) {
-        const href = imageEl.getAttribute('href');
-        if (!href) continue;
+    if (imagesToConvert.length < 1) return;
 
-        // Skip if it's already a data URL
-        if (href.startsWith('data:')) continue;
+    const worker = new Worker('/workers/embedImages.worker.js');
 
-        try {
-            const response = await fetch(href, { cache: 'no-cache' });
-            if (!response.ok) throw new Error(`Failed to fetch ${href}`);
+    await new Promise<void>((resolve, reject) => {
+        let remaining = imagesToConvert.length;
 
-            const blob = await response.blob();
+        worker.postMessage({
+            type: 'start',
+            images: imagesToConvert.map((item) => item.url),
+        });
 
-            const reader = new FileReader();
-            const base64Promise = new Promise<string>((resolve, reject) => {
-                reader.onloadend = () => {
-                    if (typeof reader.result === 'string') {
-                        resolve(reader.result);
-                    } else {
-                        reject('Could not convert blob to base64 string');
-                    }
-                };
-                reader.onerror = (err) => reject(err);
-            });
+        worker.onmessage = (event) => {
+            const { index, base64DataURL, error } = event.data as {
+                index: number;
+                base64DataURL?: string;
+                error?: string;
+            };
 
-            reader.readAsDataURL(blob);
-            const base64DataURL = await base64Promise;
+            if (error) {
+                console.error(`Error for image at index ${index}: ${error}`);
+            } else if (base64DataURL) {
+                imagesToConvert[index].element.setAttribute(
+                    'href',
+                    base64DataURL,
+                );
+            }
 
-            imageEl.setAttribute('href', base64DataURL);
-        } catch (error) {
-            console.error(`Error converting ${href} to base64:`, error);
-        }
-    }
+            remaining -= 1;
+            if (remaining === 0) {
+                worker.terminate();
+                resolve();
+            }
+        };
+
+        worker.onerror = (errorEvent) => {
+            console.error('Worker error:', errorEvent);
+            worker.terminate();
+            reject(errorEvent);
+        };
+    });
 }
+
 const applyComputedStyles = (element: Element) => {
     const excludedTestIds = ['svg-element', 'svg-group'];
     if (!excludedTestIds.includes(element.getAttribute('data-testid') || '')) {
