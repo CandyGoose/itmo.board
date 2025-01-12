@@ -1,7 +1,7 @@
 'use client';
 
 import { Room } from '@/components/Room';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useStorage } from '@/liveblocks.config';
 import { LayerPreview } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/LayerPreview';
 import { boundingBox } from '@/hooks/useSelectionBounds';
@@ -82,10 +82,18 @@ export async function embedImagesInSVG(
 const applyComputedStyles = (element: Element) => {
     const excludedTestIds = ['svg-element', 'svg-group'];
     if (!excludedTestIds.includes(element.getAttribute('data-testid') || '')) {
+        const transformStyle = element
+            .getAttribute('style')
+            ?.match(/transform:\s*([^;]+)/)?.[1]; // Ensure transform is applied for chromium based browsers
         const computedStyles = window.getComputedStyle(element);
-        const styleString = Array.from(computedStyles)
-            .map((prop) => `${prop}: ${computedStyles.getPropertyValue(prop)};`)
-            .join(' ');
+        const styleString =
+            Array.from(computedStyles)
+                .map(
+                    (prop) =>
+                        `${prop}: ${computedStyles.getPropertyValue(prop)};`,
+                )
+                .join(' ') +
+            (transformStyle ? ` transform: ${transformStyle};` : '');
 
         (element as HTMLElement).setAttribute('style', styleString);
     }
@@ -102,25 +110,8 @@ function Renderer() {
         .filter((layer): layer is Layer => Boolean(layer));
     const bounds = boundingBox(layers) || { x: 0, y: 0, width: 0, height: 0 };
 
-    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-    const [screenHeight, setScreenHeight] = useState(window.innerHeight);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setScreenWidth(window.innerWidth);
-            setScreenHeight(window.innerHeight);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const scale = Math.min(
-        bounds.width > 0 ? screenWidth / bounds.width : 1,
-        bounds.height > 0 ? screenHeight / bounds.height : 1,
-    );
-    const translateX = bounds.width > 0 ? -bounds.x * scale : 0;
-    const translateY = bounds.height > 0 ? -bounds.y * scale : 0;
+    const translateX = bounds.width > 0 ? -bounds.x : 0;
+    const translateY = bounds.height > 0 ? -bounds.y : 0;
 
     const downloadSVG = useCallback((serializedSVG: string) => {
         const svgBlob = new Blob([serializedSVG], {
@@ -140,8 +131,8 @@ function Renderer() {
 
     const downloadPNG = useCallback(
         (serializedSVG: string) => {
-            const width = bounds.width * scale;
-            const height = bounds.height * scale;
+            const width = bounds.width;
+            const height = bounds.height;
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -172,15 +163,15 @@ function Renderer() {
                 'data:image/svg+xml;charset=utf-8,' +
                 encodeURIComponent(serializedSVG);
         },
-        [bounds.width, bounds.height, scale],
+        [bounds.width, bounds.height],
     );
 
     useEffect(() => {
         function handleDownload(e: CustomEvent) {
             if (!svgRef.current) return;
             const serializer = new XMLSerializer();
+            applyComputedStyles(svgRef.current);
             embedImagesInSVG(svgRef.current).then(() => {
-                applyComputedStyles(svgRef.current!);
                 let source = serializer.serializeToString(svgRef.current!);
                 if (
                     !source.match(
@@ -219,13 +210,13 @@ function Renderer() {
         <svg
             ref={svgRef}
             data-testid="svg-element"
-            width={screenWidth}
-            height={screenHeight}
+            width={bounds.width}
+            height={bounds.height}
             xmlns="http://www.w3.org/2000/svg"
         >
             <g
                 data-testid="svg-group"
-                transform={`translate(${translateX}, ${translateY}) scale(${scale})`}
+                transform={`translate(${translateX}, ${translateY})`}
                 width={bounds.width}
                 height={bounds.height}
             >
