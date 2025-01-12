@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import { ImageUpload } from './ImageUpload';
+import { render, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { ImageUpload } from './ImageUpload';
 
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => key,
@@ -9,31 +9,28 @@ jest.mock('next-intl', () => ({
 
 global.URL.createObjectURL = jest.fn(() => 'mocked-object-url');
 
+let mockWorkerInstance: Worker;
+
 beforeAll(() => {
-    global.fetch = jest.fn();
-});
+    global.Worker = jest.fn(() => {
+        const worker = {
+            postMessage: jest.fn(),
+            terminate: jest.fn(),
+            onmessage: null as
+                | ((this: Worker, ev: MessageEvent) => never)
+                | null,
 
-class MockImage {
-    width = 800;
-    height = 600;
-    onload: (() => void) | null = null;
-    onerror: (() => void) | null = null;
+            onerror: null,
+            onmessageerror: null,
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            dispatchEvent: jest.fn(() => false),
+        };
 
-    constructor() {
-        setTimeout(() => {
-            if (this.onload) {
-                this.onload();
-            }
-        }, 10);
-    }
+        mockWorkerInstance = worker as unknown as Worker;
 
-    set src(_url: string) {}
-}
-
-Object.defineProperty(window, 'Image', {
-    writable: true,
-    configurable: true,
-    value: MockImage,
+        return mockWorkerInstance;
+    }) as unknown as typeof Worker;
 });
 
 describe('ImageUpload component', () => {
@@ -66,14 +63,7 @@ describe('ImageUpload component', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('uploads a file (select from computer) and calls onUploadComplete with the correct URL and dimensions', async () => {
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({
-                url: 'http://mockapi.com/uploads/fake-image.png',
-            }),
-        } as Response);
-
+    it('uploads a file (select from computer) and calls onUploadComplete on worker success', async () => {
         const { getByLabelText } = setup();
 
         const fileInput = getByLabelText(
@@ -84,6 +74,24 @@ describe('ImageUpload component', () => {
         });
 
         fireEvent.change(fileInput, { target: { files: [file] } });
+
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledTimes(1);
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            action: 'uploadFile',
+            file: expect.any(File),
+            serverUrl: 'http://mockapi.com',
+        });
+
+        act(() => {
+            mockWorkerInstance.onmessage?.({
+                data: {
+                    success: true,
+                    url: 'http://mockapi.com/uploads/fake-image.png',
+                    width: 800,
+                    height: 600,
+                },
+            } as MessageEvent);
+        });
 
         await waitFor(() => {
             expect(mockOnUploadComplete).toHaveBeenCalledTimes(1);
@@ -96,10 +104,6 @@ describe('ImageUpload component', () => {
     });
 
     it('handles upload error gracefully (file upload)', async () => {
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: false,
-        } as Response);
-
         const { getByLabelText } = setup();
 
         const fileInput = getByLabelText(
@@ -108,21 +112,26 @@ describe('ImageUpload component', () => {
         const file = new File(['(⌐□_□)'], 'error-image.png', {
             type: 'image/png',
         });
+
         fireEvent.change(fileInput, { target: { files: [file] } });
+
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledTimes(1);
+
+        act(() => {
+            mockWorkerInstance.onmessage?.({
+                data: {
+                    success: false,
+                    error: 'Upload failed',
+                },
+            } as MessageEvent);
+        });
 
         await waitFor(() => {
             expect(mockOnUploadComplete).not.toHaveBeenCalled();
         });
     });
 
-    it('uploads via drag-and-drop and calls onUploadComplete', async () => {
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({
-                url: 'http://mockapi.com/uploads/drag-image.png',
-            }),
-        } as Response);
-
+    it('uploads via drag-and-drop and calls onUploadComplete on worker success', async () => {
         const { getByText } = setup();
 
         const dropZone = getByText('dragDropLabel').parentElement!;
@@ -138,31 +147,35 @@ describe('ImageUpload component', () => {
             },
         });
 
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledTimes(1);
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            action: 'uploadFile',
+            file: expect.any(File),
+            serverUrl: 'http://mockapi.com',
+        });
+
+        act(() => {
+            mockWorkerInstance.onmessage?.({
+                data: {
+                    success: true,
+                    url: 'http://mockapi.com/uploads/drag-image.png',
+                    width: 800,
+                    height: 600,
+                },
+            } as MessageEvent);
+        });
+
         await waitFor(() => {
             expect(mockOnUploadComplete).toHaveBeenCalledTimes(1);
         });
+
         const [url, width, height] = mockOnUploadComplete.mock.calls[0];
         expect(url).toBe('http://mockapi.com/uploads/drag-image.png');
         expect(width).toBe(800);
         expect(height).toBe(600);
     });
 
-    it('submits a URL and calls onUploadComplete', async () => {
-        // The first fetch will return a blob.
-        (global.fetch as jest.Mock).mockImplementationOnce(async () => ({
-            ok: true,
-            blob: async () =>
-                new Blob(['dummy-image-content'], { type: 'image/png' }),
-        }));
-
-        // The second fetch call for the upload
-        (global.fetch as jest.Mock).mockImplementationOnce(async () => ({
-            ok: true,
-            json: async () => ({
-                url: 'http://mockapi.com/uploads/url-submitted.png',
-            }),
-        }));
-
+    it('submits a URL and calls onUploadComplete on worker success', async () => {
         const { getByPlaceholderText, getByText } = setup();
 
         const urlInput = getByPlaceholderText('https://example.com/image.png');
@@ -172,20 +185,35 @@ describe('ImageUpload component', () => {
 
         fireEvent.click(getByText('loadButton'));
 
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledTimes(1);
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            action: 'uploadByUrl',
+            url: 'https://example.com/test.png',
+            serverUrl: 'http://mockapi.com',
+        });
+
+        act(() => {
+            mockWorkerInstance.onmessage?.({
+                data: {
+                    success: true,
+                    url: 'http://mockapi.com/uploads/url-submitted.png',
+                    width: 800,
+                    height: 600,
+                },
+            } as MessageEvent);
+        });
+
         await waitFor(() => {
             expect(mockOnUploadComplete).toHaveBeenCalledTimes(1);
         });
+
         const [url, width, height] = mockOnUploadComplete.mock.calls[0];
         expect(url).toBe('http://mockapi.com/uploads/url-submitted.png');
         expect(width).toBe(800);
         expect(height).toBe(600);
     });
 
-    it('handles error when fetching the user-submitted image URL', async () => {
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: false,
-        } as Response);
-
+    it('handles error when fetching the user-submitted image URL (worker error)', async () => {
         const { getByPlaceholderText, getByText } = setup();
 
         const urlInput = getByPlaceholderText('https://example.com/image.png');
@@ -195,8 +223,84 @@ describe('ImageUpload component', () => {
 
         fireEvent.click(getByText('loadButton'));
 
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledTimes(1);
+
+        act(() => {
+            mockWorkerInstance.onmessage?.({
+                data: {
+                    success: false,
+                    error: 'URL fetch failed',
+                },
+            } as MessageEvent);
+        });
+
         await waitFor(() => {
             expect(mockOnUploadComplete).not.toHaveBeenCalled();
         });
+    });
+
+    it('does not call worker when handleFileChange is triggered with no file', () => {
+        const { getByLabelText } = setup();
+
+        const fileInput = getByLabelText(
+            'selectFromComputer',
+        ) as HTMLInputElement;
+
+        fireEvent.change(fileInput, { target: { files: [] } });
+
+        expect(mockWorkerInstance.postMessage).not.toHaveBeenCalled();
+    });
+
+    it('does not call worker when handleSubmitUrl is triggered with no workerRef', () => {
+        const { getByPlaceholderText, getByText } = setup();
+
+        const urlInput = getByPlaceholderText('https://example.com/image.png');
+        fireEvent.change(urlInput, {
+            target: { value: 'https://example.com/test.png' },
+        });
+
+        mockWorkerInstance = null as unknown as Worker;
+
+        fireEvent.click(getByText('loadButton'));
+
+        expect(mockWorkerInstance).toBeNull();
+    });
+
+    it('does not call worker when handleDrop is triggered with no workerRef', () => {
+        const { getByText } = setup();
+
+        const dropZone = getByText('dragDropLabel').parentElement!;
+        const file = new File(['(⌐□_□)'], 'drag-image.png', {
+            type: 'image/png',
+        });
+
+        mockWorkerInstance = null as unknown as Worker;
+
+        fireEvent.dragEnter(dropZone);
+        fireEvent.dragOver(dropZone);
+        fireEvent.drop(dropZone, {
+            dataTransfer: {
+                files: [file],
+            },
+        });
+
+        expect(mockWorkerInstance).toBeNull();
+    });
+
+    it('does not call worker when handleFileChange is triggered with no workerRef', () => {
+        const { getByLabelText } = setup();
+
+        const fileInput = getByLabelText(
+            'selectFromComputer',
+        ) as HTMLInputElement;
+        const file = new File(['(⌐□_□)'], 'test-image.png', {
+            type: 'image/png',
+        });
+
+        mockWorkerInstance = null as unknown as Worker;
+
+        fireEvent.change(fileInput, { target: { files: [file] } });
+
+        expect(mockWorkerInstance).toBeNull();
     });
 });

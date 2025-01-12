@@ -19,6 +19,79 @@ export default function CanvasSaver({ boardId }: SaverProps) {
     );
 }
 
+export async function embedImagesInSVG(
+    svgElement: SVGSVGElement,
+): Promise<void> {
+    const imageElements = Array.from(svgElement.querySelectorAll('image'));
+
+    const imagesToConvert = imageElements
+        .map((img, index) => ({
+            index,
+            url: img.getAttribute('href'),
+            element: img,
+        }))
+        .filter((item) => item.url && !item.url.startsWith('data:')) as Array<{
+        index: number;
+        url: string;
+        element: SVGImageElement;
+    }>;
+
+    if (imagesToConvert.length < 1) return;
+
+    const worker = new Worker('/workers/embedImages.worker.js');
+
+    await new Promise<void>((resolve, reject) => {
+        let remaining = imagesToConvert.length;
+
+        worker.postMessage({
+            type: 'start',
+            images: imagesToConvert.map((item) => item.url),
+        });
+
+        worker.onmessage = (event) => {
+            const { index, base64DataURL, error } = event.data as {
+                index: number;
+                base64DataURL?: string;
+                error?: string;
+            };
+
+            if (error) {
+                console.error(`Error for image at index ${index}: ${error}`);
+            } else if (base64DataURL) {
+                imagesToConvert[index].element.setAttribute(
+                    'href',
+                    base64DataURL,
+                );
+            }
+
+            remaining -= 1;
+            if (remaining === 0) {
+                worker.terminate();
+                resolve();
+            }
+        };
+
+        worker.onerror = (errorEvent) => {
+            console.error('Worker error:', errorEvent);
+            worker.terminate();
+            reject(errorEvent);
+        };
+    });
+}
+
+const applyComputedStyles = (element: Element) => {
+    const excludedTestIds = ['svg-element', 'svg-group'];
+    if (!excludedTestIds.includes(element.getAttribute('data-testid') || '')) {
+        const computedStyles = window.getComputedStyle(element);
+        const styleString = Array.from(computedStyles)
+            .map((prop) => `${prop}: ${computedStyles.getPropertyValue(prop)};`)
+            .join(' ');
+
+        (element as HTMLElement).setAttribute('style', styleString);
+    }
+    Array.from(element.children).forEach(applyComputedStyles);
+};
+
 function Renderer() {
     const svgRef = useRef<SVGSVGElement>(null);
     const layerIds = useStorage((root) => root.layerIds);
@@ -105,28 +178,29 @@ function Renderer() {
     useEffect(() => {
         function handleDownload(e: CustomEvent) {
             if (!svgRef.current) return;
-
             const serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svgRef.current);
+            embedImagesInSVG(svgRef.current).then(() => {
+                applyComputedStyles(svgRef.current!);
+                let source = serializer.serializeToString(svgRef.current!);
+                if (
+                    !source.match(
+                        /^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,
+                    )
+                ) {
+                    source = source.replace(
+                        /^<svg/,
+                        '<svg xmlns="http://www.w3.org/2000/svg"',
+                    );
+                }
+                source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
 
-            if (
-                !source.match(
-                    /^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,
-                )
-            ) {
-                source = source.replace(
-                    /^<svg/,
-                    '<svg xmlns="http://www.w3.org/2000/svg"',
-                );
-            }
-            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-
-            const format = e.detail?.format;
-            if (format === 'svg') {
-                downloadSVG(source);
-            } else if (format === 'png') {
-                downloadPNG(source);
-            }
+                const format = e.detail?.format;
+                if (format === 'svg') {
+                    downloadSVG(source);
+                } else if (format === 'png') {
+                    downloadPNG(source);
+                }
+            });
         }
 
         window.addEventListener(
@@ -145,7 +219,6 @@ function Renderer() {
         <svg
             ref={svgRef}
             data-testid="svg-element"
-            className="h-[100vh] w-[100vw]"
             width={screenWidth}
             height={screenHeight}
             xmlns="http://www.w3.org/2000/svg"

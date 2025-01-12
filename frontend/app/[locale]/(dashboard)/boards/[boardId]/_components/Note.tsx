@@ -67,7 +67,7 @@ export const calculateFontSize = (
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return MIN_FONT_SIZE; // fallback
+    if (!ctx) return initialFontSize; // fallback
 
     let low = MIN_FONT_SIZE;
     let high = Math.min(initialFontSize, MAX_FONT_SIZE);
@@ -145,8 +145,8 @@ export const Note = ({
 
     useEffect(() => {
         if (containerRef.current) {
-            const contentWidth = containerRef.current.offsetWidth;
-            const contentHeight = containerRef.current.offsetHeight;
+            const contentWidth = containerRef.current.offsetWidth || width;
+            const contentHeight = containerRef.current.offsetHeight || height;
 
             const newFontSize = calculateFontSize(
                 contentWidth,
@@ -214,6 +214,9 @@ export const Note = ({
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
                 transform: `translate(${x}px, ${y}px) `,
+                color: textColor,
+                width: width,
+                height: height,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
@@ -223,14 +226,15 @@ export const Note = ({
                 className="h-full w-full flex flex-col items-center justify-center"
                 style={{
                     backgroundColor: backgroundColor,
+                    height: height,
+                    width: width,
                 }}
+                // @ts-expect-error: The xmlns will be added regardless of the type
+                xmlns="http://www.w3.org/1999/xhtml"
             >
                 <ContentEditable
                     html={value || 'Text' || ''}
-                    className={cn(
-                        'h-full w-full flex flex-col justify-center outline-none',
-                        fontName === 'Kalam' ? font.className : '',
-                    )}
+                    className={cn(fontName === 'Kalam' ? font.className : '')}
                     style={value ? textStyle : placeholderStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"

@@ -77,12 +77,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
-    const [isPanning, setIsPanning] = useState(false);
-    const [moved, setMoved] = useState(false);
-    const [lastPointerPosition, setLastPointerPosition] = useState({
-        x: 0,
-        y: 0,
-    });
 
     const selections = useOthersMapped((other) => other.presence.selection);
     const selection = useSelf((me) => me.presence.selection);
@@ -256,15 +250,19 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 y: point.y - canvasState.current.y,
             };
 
-            const liveLayers = storage.get('layers');
+            const offsetSquared = offset.x * offset.x + offset.y * offset.y;
 
-            for (const id of self.presence.selection) {
-                const layer = liveLayers.get(id);
-                if (layer) {
-                    layer.update({
-                        x: roundToTwoDecimals(layer.get('x') + offset.x),
-                        y: roundToTwoDecimals(layer.get('y') + offset.y),
-                    });
+            if (offsetSquared >= 0.0001) {
+                const liveLayers = storage.get('layers');
+
+                for (const id of self.presence.selection) {
+                    const layer = liveLayers.get(id);
+                    if (layer) {
+                        layer.update({
+                            x: roundToTwoDecimals(layer.get('x') + offset.x),
+                            y: roundToTwoDecimals(layer.get('y') + offset.y),
+                        });
+                    }
                 }
             }
             setCanvasState({ mode: CanvasMode.Translating, current: point });
@@ -300,33 +298,14 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         [editable, layerIds],
     );
 
-    // Start multi-selection if pointer moved sufficiently
-    const startMultiSelection = useCallback(
-        (current: Point, origin: Point) => {
-            if (!editable) return;
-            if (
-                Math.abs(current.x - origin.x) +
-                    Math.abs(current.y - origin.y) >
-                5
-            ) {
-                setCanvasState({
-                    mode: CanvasMode.SelectionNet,
-                    origin,
-                    current,
-                });
-            }
-        },
-        [editable],
-    );
-
     const continueDrawing = useMutation(
         ({ self, setMyPresence }, point: Point, e: React.PointerEvent) => {
             const { pencilDraft } = self.presence;
             if (canvasState.mode !== CanvasMode.Pencil || !pencilDraft) return;
 
             const roundedPoint: [number, number, number] = [
-                Number(point.x.toFixed(4)),
-                Number(point.y.toFixed(4)),
+                Math.round(point.x * 10000) / 10000,
+                Math.round(point.y * 10000) / 10000,
                 Number(e.pressure),
             ];
 
@@ -464,10 +443,9 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerDown = useCallback(
         (e: React.PointerEvent) => {
+            if (canvasState.mode === CanvasMode.Inserting) return;
+
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
-            if (canvasState.mode === CanvasMode.Inserting) {
-                return;
-            }
             if (canvasState.mode === CanvasMode.Pencil) {
                 startDrawing(point, e.pressure);
                 return;
@@ -490,11 +468,11 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         onLayerPointerDown(e, closePathId);
                         return;
                     }
-                    setIsPanning(true);
-                    setLastPointerPosition({ x: e.clientX, y: e.clientY });
+                    setCanvasState({
+                        mode: CanvasMode.Pressing,
+                        origin: { x: e.clientX, y: e.clientY },
+                    });
                 }
-            } else {
-                setCanvasState({ mode: CanvasMode.Pressing, origin: point });
             }
         },
         [
@@ -511,15 +489,25 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
+            if (canvasState.mode === CanvasMode.None) return;
+            e.stopPropagation();
             if (!editable) {
                 setCanvasState({ mode: CanvasMode.None });
             }
-            e.stopPropagation();
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
             switch (canvasState.mode) {
                 case CanvasMode.Pressing:
-                    startMultiSelection(point, canvasState.origin!);
+                    const dx = e.clientX - canvasState.origin.x;
+                    const dy = e.clientY - canvasState.origin.y;
+                    setCamera((prev) => ({
+                        x: prev.x + dx,
+                        y: prev.y + dy,
+                    }));
+                    setCanvasState({
+                        mode: CanvasMode.Pressing,
+                        origin: { x: e.clientX, y: e.clientY },
+                    });
                     break;
                 case CanvasMode.SelectionNet:
                     updateSelectionNet(point, canvasState.origin!);
@@ -534,16 +522,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     continueDrawing(point, e);
                     break;
                 default:
-                    if (isPanning) {
-                        const dx = e.clientX - lastPointerPosition.x;
-                        const dy = e.clientY - lastPointerPosition.y;
-                        setCamera((prev) => ({
-                            x: prev.x + dx,
-                            y: prev.y + dy,
-                        }));
-                        setLastPointerPosition({ x: e.clientX, y: e.clientY });
-                        setMoved(true);
-                    }
+                    break;
             }
             setMyPresence({ cursor: point });
         },
@@ -553,25 +532,21 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             scale,
             svgRect,
             canvasState,
-            isPanning,
-            startMultiSelection,
             updateSelectionNet,
             translateSelectedLayers,
             resizeSelectedLayers,
             continueDrawing,
-            lastPointerPosition,
         ],
     );
 
     const onPointerUp = useMutation(
         ({}, e) => {
-            setIsPanning(false);
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
             if (
                 canvasState.mode === CanvasMode.None ||
                 canvasState.mode === CanvasMode.Pressing
             ) {
-                if (!moved) unselectLayers();
+                unselectLayers();
                 setCanvasState({ mode: CanvasMode.None });
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
                 insertPath();
@@ -585,7 +560,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             } else {
                 setCanvasState({ mode: CanvasMode.None });
             }
-            setMoved(false);
             history.resume();
         },
         [
@@ -594,7 +568,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             editable,
             insertLayer,
             insertPath,
-            moved,
             scale,
             svgRect,
             unselectLayers,
@@ -603,7 +576,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerLeave = useMutation(({ setMyPresence }) => {
         setMyPresence({ cursor: null });
-        setIsPanning(false);
     }, []);
 
     // Handler that the <ImageUpload/> calls after finishing upload

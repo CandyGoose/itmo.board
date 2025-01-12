@@ -57,7 +57,7 @@ export const Info = ({
             }
         };
         request();
-    }, [board, boardId, router]);
+    }, [boardId, router]);
 
     if (!board) return <InfoSkeleton />;
 

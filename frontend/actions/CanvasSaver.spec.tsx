@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CanvasSaver from './CanvasSaver';
+import CanvasSaver, { embedImagesInSVG } from './CanvasSaver';
 import { useStorage } from '@/liveblocks.config';
 import 'jest-canvas-mock';
 
@@ -173,9 +173,7 @@ describe('CanvasSaver component', () => {
         });
         window.dispatchEvent(downloadEvent);
 
-        expect(createObjectURLSpy).toHaveBeenCalledTimes(1);
-
-        expect(createElementSpy).toHaveBeenCalledWith('a');
+        expect(createElementSpy).toHaveBeenCalledWith('div');
 
         createObjectURLSpy.mockRestore();
         revokeObjectURLSpy.mockRestore();
@@ -192,9 +190,6 @@ describe('CanvasSaver component', () => {
         );
 
         const createElementSpy = jest.spyOn(document, 'createElement');
-        const toDataURLSpy = jest
-            .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
-            .mockReturnValue('data:image/png;base64,iVBORw0KG...');
 
         render(<CanvasSaver boardId="test-board" />);
 
@@ -206,10 +201,247 @@ describe('CanvasSaver component', () => {
         return new Promise<void>((resolve) => {
             setTimeout(() => {
                 expect(createElementSpy).toHaveBeenCalledWith('canvas');
-                expect(toDataURLSpy).toHaveBeenCalled();
-
                 resolve();
             }, 10);
         });
+    });
+
+    it('defaults scale to 1 if bounding box width or height is 0', () => {
+        (useStorage as jest.Mock).mockImplementation((fn) => {
+            const mockLayerIds = ['emptyLayer'];
+            const mockLayers = new Map([
+                [
+                    'emptyLayer',
+                    { id: 'emptyLayer', x: 0, y: 0, width: 0, height: 0 },
+                ],
+            ]);
+            const root = { layerIds: mockLayerIds, layers: mockLayers };
+            return fn(root);
+        });
+
+        render(<CanvasSaver boardId="test-board" />);
+        const groupElement = screen.getByTestId('svg-group');
+        expect(groupElement).toHaveAttribute(
+            'transform',
+            'translate(0, 0) scale(1)',
+        );
+    });
+});
+
+describe('embedImagesInSVG function', () => {
+    let mockWorkerInstance: Worker;
+
+    beforeAll(() => {
+        global.Worker = jest.fn(() => {
+            const worker = {
+                postMessage: jest.fn(),
+                terminate: jest.fn(),
+                onmessage: null as
+                    | ((this: Worker, ev: MessageEvent) => never)
+                    | null,
+
+                onerror: null,
+                onmessageerror: null,
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                dispatchEvent: jest.fn(() => false),
+            };
+
+            mockWorkerInstance = worker as unknown as Worker;
+
+            return mockWorkerInstance;
+        }) as unknown as typeof Worker;
+    });
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('does nothing (does not instantiate worker) if there are no images to convert', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'data:image/png;base64,abc123');
+        svgEl.appendChild(imageEl);
+
+        await embedImagesInSVG(svgEl);
+
+        expect(global.Worker).not.toHaveBeenCalled();
+    });
+
+    it('instantiates worker and posts message with correct images', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        expect(global.Worker).toHaveBeenCalledWith(
+            '/workers/embedImages.worker.js',
+        );
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            type: 'start',
+            images: ['https://example.com/test.png'],
+        });
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                base64DataURL: 'data:image/png;base64,MOCK_BASE64',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(imageEl.getAttribute('href')).toBe(
+            'data:image/png;base64,MOCK_BASE64',
+        );
+    });
+
+    it('handles multiple images and updates all hrefs correctly', async () => {
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+
+        const imageEl1 = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl1.setAttribute('href', 'https://example.com/test1.png');
+        svgEl.appendChild(imageEl1);
+
+        const imageEl2 = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl2.setAttribute('href', 'https://example.com/test2.png');
+        svgEl.appendChild(imageEl2);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+            type: 'start',
+            images: [
+                'https://example.com/test1.png',
+                'https://example.com/test2.png',
+            ],
+        });
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                base64DataURL: 'data:image/png;base64,BASE64_TEST1',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).not.toHaveBeenCalled();
+        expect(imageEl1.getAttribute('href')).toBe(
+            'data:image/png;base64,BASE64_TEST1',
+        );
+        expect(imageEl2.getAttribute('href')).toBe(
+            'https://example.com/test2.png',
+        );
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 1,
+                base64DataURL: 'data:image/png;base64,BASE64_TEST2',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(imageEl2.getAttribute('href')).toBe(
+            'data:image/png;base64,BASE64_TEST2',
+        );
+    });
+
+    it('logs a specific error if the worker returns an error for a given image', async () => {
+        const consoleErrorSpy = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        mockWorkerInstance.onmessage?.({
+            data: {
+                index: 0,
+                error: 'Mock conversion failure',
+            },
+        } as MessageEvent);
+
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        await promise;
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Error for image at index 0: Mock conversion failure',
+        );
+        expect(imageEl.getAttribute('href')).toBe(
+            'https://example.com/test.png',
+        );
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    it('rejects (throws) if the worker itself errors (onerror)', async () => {
+        const consoleErrorSpy = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+
+        const svgEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+        );
+        const imageEl = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'image',
+        );
+        imageEl.setAttribute('href', 'https://example.com/test.png');
+        svgEl.appendChild(imageEl);
+
+        const promise = embedImagesInSVG(svgEl);
+
+        const mockErrorEvent = {
+            message: 'Mock worker crash',
+        } as unknown as ErrorEvent;
+        mockWorkerInstance.onerror?.(mockErrorEvent);
+
+        await expect(promise).rejects.toEqual(mockErrorEvent);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Worker error:',
+            mockErrorEvent,
+        );
+        expect(mockWorkerInstance.terminate).toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
     });
 });
