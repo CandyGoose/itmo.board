@@ -79,13 +79,22 @@ export async function embedImagesInSVG(
     });
 }
 
-const applyComputedStyles = (element: Element) => {
+const applyComputedStyles = (
+    sourceElement: Element,
+    targetElement: Element,
+) => {
     const excludedTestIds = ['svg-element', 'svg-group'];
-    if (!excludedTestIds.includes(element.getAttribute('data-testid') || '')) {
-        const transformStyle = element
+
+    if (
+        !excludedTestIds.includes(
+            sourceElement.getAttribute('data-testid') || '',
+        )
+    ) {
+        const transformStyle = sourceElement
             .getAttribute('style')
-            ?.match(/transform:\s*([^;]+)/)?.[1]; // Ensure transform is applied for chromium based browsers
-        const computedStyles = window.getComputedStyle(element);
+            ?.match(/transform:\s*([^;]+)/)?.[1]; // Ensure transform is applied for Chromium-based browsers
+
+        const computedStyles = window.getComputedStyle(sourceElement);
         const styleString =
             Array.from(computedStyles)
                 .map(
@@ -95,9 +104,13 @@ const applyComputedStyles = (element: Element) => {
                 .join(' ') +
             (transformStyle ? ` transform: ${transformStyle};` : '');
 
-        (element as HTMLElement).setAttribute('style', styleString);
+        targetElement.setAttribute('style', styleString);
     }
-    Array.from(element.children).forEach(applyComputedStyles);
+
+    // Recursively apply to children
+    Array.from(sourceElement.children).forEach((child, index) => {
+        applyComputedStyles(child, targetElement.children[index]);
+    });
 };
 
 function Renderer() {
@@ -170,9 +183,10 @@ function Renderer() {
         function handleDownload(e: CustomEvent) {
             if (!svgRef.current) return;
             const serializer = new XMLSerializer();
-            applyComputedStyles(svgRef.current);
-            embedImagesInSVG(svgRef.current).then(() => {
-                let source = serializer.serializeToString(svgRef.current!);
+            const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
+            applyComputedStyles(svgRef.current, svgClone);
+            embedImagesInSVG(svgClone).then(() => {
+                let source = serializer.serializeToString(svgClone);
                 if (
                     !source.match(
                         /^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,
