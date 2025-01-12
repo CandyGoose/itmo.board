@@ -169,10 +169,7 @@ describe('CanvasSaver component', () => {
 
         render(<CanvasSaver boardId="test-board" />);
         const groupElement = screen.getByTestId('svg-group');
-        expect(groupElement).toHaveAttribute(
-            'transform',
-            'translate(0, 0)',
-        );
+        expect(groupElement).toHaveAttribute('transform', 'translate(0, 0)');
     });
 });
 
