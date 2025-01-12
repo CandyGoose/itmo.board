@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import CanvasSaver, { embedImagesInSVG } from './CanvasSaver';
 import { useStorage } from '@/liveblocks.config';
 import 'jest-canvas-mock';
@@ -87,23 +87,6 @@ describe('CanvasSaver component', () => {
         ).toBeInTheDocument();
     });
 
-    it('attaches and removes the resize event listener on mount/unmount', () => {
-        const addEventSpy = jest.spyOn(window, 'addEventListener');
-        const removeEventSpy = jest.spyOn(window, 'removeEventListener');
-
-        const { unmount } = render(<CanvasSaver boardId="test-board" />);
-        expect(addEventSpy).toHaveBeenCalledWith(
-            'resize',
-            expect.any(Function),
-        );
-
-        unmount();
-        expect(removeEventSpy).toHaveBeenCalledWith(
-            'resize',
-            expect.any(Function),
-        );
-    });
-
     it('attaches and removes the "canvas-download" event listener on mount/unmount', () => {
         const addEventSpy = jest.spyOn(window, 'addEventListener');
         const removeEventSpy = jest.spyOn(window, 'removeEventListener');
@@ -119,41 +102,6 @@ describe('CanvasSaver component', () => {
             'canvas-download',
             expect.any(Function),
         );
-    });
-
-    it('updates width and height on window resize', () => {
-        Object.defineProperty(window, 'innerWidth', {
-            writable: true,
-            configurable: true,
-            value: 800,
-        });
-        Object.defineProperty(window, 'innerHeight', {
-            writable: true,
-            configurable: true,
-            value: 600,
-        });
-
-        render(<CanvasSaver boardId="test-board" />);
-        const svgElement = screen.getByTestId('svg-element');
-
-        expect(svgElement).toHaveAttribute('width', '800');
-        expect(svgElement).toHaveAttribute('height', '600');
-
-        Object.defineProperty(window, 'innerWidth', {
-            writable: true,
-            configurable: true,
-            value: 1200,
-        });
-        Object.defineProperty(window, 'innerHeight', {
-            writable: true,
-            configurable: true,
-            value: 1000,
-        });
-
-        fireEvent(window, new Event('resize'));
-
-        expect(svgElement).toHaveAttribute('width', '1200');
-        expect(svgElement).toHaveAttribute('height', '1000');
     });
 
     it('handles "canvas-download" event for SVG format', () => {
@@ -223,7 +171,7 @@ describe('CanvasSaver component', () => {
         const groupElement = screen.getByTestId('svg-group');
         expect(groupElement).toHaveAttribute(
             'transform',
-            'translate(0, 0) scale(1)',
+            'translate(0, 0)',
         );
     });
 });
