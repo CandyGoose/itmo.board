@@ -52,6 +52,7 @@ import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
 import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
 import { ImageUpload } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageUpload';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -98,7 +99,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     });
     const [transparentFill, setTransparentFill] = useState(false);
     const [lineWidth, setLineWidth] = useState<number>(2);
-    const [fontName, setFontName] = useState<string>('Kalam');
+    const [fontName, setFontName] = useState<string>(Fonts[0]);
     const [fontSize, setFontSize] = useState<number>(14);
     const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Center);
     const [textFormat, setTextFormat] = useState<TextFormat[]>([

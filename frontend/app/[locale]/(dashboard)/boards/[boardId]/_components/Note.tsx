@@ -1,14 +1,9 @@
-import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
-import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
+import { colorToCss, getContrastingTextColor } from '@/lib/utils';
 import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
 import { useMutation } from '@/liveblocks.config';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-
-const font = Kalam({
-    subsets: ['latin'],
-    weight: ['400'],
-});
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
@@ -68,7 +63,7 @@ export const calculateFontSize = (
     height: number,
     text: string,
     initialFontSize = MAX_FONT_SIZE,
-    fontName = 'Kalam',
+    fontName = Fonts[0],
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -243,10 +238,10 @@ export const Note = ({
             >
                 <ContentEditable
                     html={value || 'Text' || ''}
-                    className={cn(fontName === 'Kalam' ? font.className : '')}
                     style={textStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"
+                    data-testid="note-content-editable"
                 />
             </div>
         </foreignObject>
