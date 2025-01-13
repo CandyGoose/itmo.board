@@ -16,6 +16,7 @@ import {
     Side,
     TextAlign,
     TextFormat,
+    TextLayer,
     XYWH,
 } from '@/types/canvas';
 import {
@@ -199,6 +200,18 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         type: LayerType.Ellipse,
                     } as EllipseLayer;
                     break;
+                case LayerType.Text:
+                    layerData = {
+                        ...baseProps,
+                        type: LayerType.Text,
+                        value: '',
+                        fontName,
+                        fontSize,
+                        textAlign,
+                        textFormat,
+                    } as TextLayer;
+                    break;
+
                 case LayerType.Note:
                     layerData = {
                         ...baseProps,

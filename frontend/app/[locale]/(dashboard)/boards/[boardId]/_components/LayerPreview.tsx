@@ -1,13 +1,21 @@
 'use client';
 
 import { memo } from 'react';
-import { LayerType } from '@/types/canvas';
+import {
+    EllipseLayer,
+    ImageLayer,
+    LayerType,
+    NoteLayer,
+    RectangleLayer,
+    TextLayer,
+} from '@/types/canvas';
 import { colorToCss } from '@/lib/utils';
 import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 import { ImageLayerComponent } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageLayer';
+import { Text } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Text';
 import { useStorage } from '@/liveblocks.config';
 
 interface LayerPreviewProps {
@@ -44,7 +52,7 @@ export const LayerPreview = memo(
                 return (
                     <Ellipse
                         id={id}
-                        layer={layer}
+                        layer={layer as EllipseLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
@@ -53,16 +61,24 @@ export const LayerPreview = memo(
                 return (
                     <Rectangle
                         id={id}
-                        layer={layer}
+                        layer={layer as RectangleLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
+                    />
+                );
+            case LayerType.Text:
+                return (
+                    <Text
+                        id={id}
+                        layer={layer as TextLayer}
+                        onPointerDown={onLayerPointerDown}
                     />
                 );
             case LayerType.Note:
                 return (
                     <Note
                         id={id}
-                        layer={layer}
+                        layer={layer as NoteLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
@@ -71,7 +87,7 @@ export const LayerPreview = memo(
                 return (
                     <ImageLayerComponent
                         id={id}
-                        layer={layer}
+                        layer={layer as ImageLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />
