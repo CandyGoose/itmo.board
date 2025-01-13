@@ -1,81 +1,120 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { Info, InfoSkeleton } from './Info';
+
+import { Info } from './Info';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { useRenameModal } from '@/store/useRenameModal';
-import { getBoardById } from '@/actions/Board';
-import { useOrganization } from '@clerk/nextjs';
+import { NextIntlClientProvider } from 'next-intl';
 import { useRouter } from 'next/navigation';
+
+jest.mock('convex/react', () => {
+    const actual = jest.requireActual('convex/react');
+    return {
+        ...actual,
+        useQuery: jest.fn(),
+    };
+});
 
 jest.mock('@/store/useRenameModal', () => ({
     useRenameModal: jest.fn(),
-}));
-
-jest.mock('@/actions/Board', () => ({
-    getBoardById: jest.fn(),
-}));
-
-jest.mock('@/actions/CanvasSaver', () => ({
-    __esModule: true,
-    default: () => <div data-testid="canvas-saver-mock" />,
-}));
-
-jest.mock('@clerk/nextjs', () => ({
-    useOrganization: jest.fn(),
 }));
 
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
 }));
 
-jest.mock('next-intl', () => ({
-    useTranslations: () => (key: string) => key,
-}));
+const client = new ConvexReactClient('http://fake.server');
+const messages = {
+    tools: {
+        copyLink: 'Copy link',
+        delete: 'Delete',
+        rename: 'Rename',
+        download: 'Download',
+        downloadAsSVG: 'Download as SVG',
+        downloadAsPNG: 'Download as PNG',
+    },
+};
 
-describe('Info Component', () => {
-    const mockOnOpen = jest.fn();
-    const mockRouter = { back: jest.fn() };
+function TestProviders({ children }: { children: React.ReactNode }) {
+    return (
+        <NextIntlClientProvider locale="en" messages={messages}>
+            <ConvexProvider client={client}>{children}</ConvexProvider>
+        </NextIntlClientProvider>
+    );
+}
+
+describe('Info component', () => {
+    const boardId = 'board-123';
+    const mockUseQuery = useQuery as jest.Mock;
+    const mockUseRenameModal = useRenameModal as jest.Mock;
+    const mockUseRouter = useRouter as jest.Mock;
+
+    function renderInfo(boardId: string) {
+        return render(
+            <TestProviders>
+                <Info boardId={boardId} />
+            </TestProviders>
+        );
+    }
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useRenameModal as unknown as jest.Mock).mockReturnValue({
-            onOpen: mockOnOpen,
-        });
-
-        (useRouter as jest.Mock).mockReturnValue(mockRouter);
-
-        (useOrganization as jest.Mock).mockReturnValue({
-            membership: true,
+        mockUseRouter.mockReturnValue({
+            push: jest.fn(),
         });
     });
 
-    test('рендерит InfoSkeleton при отсутствии данных о доске', async () => {
-        (getBoardById as jest.Mock).mockResolvedValueOnce(null);
+    test('рендерит InfoSkeleton, если useQuery вернул undefined (данные не загрузились)', () => {
+        mockUseQuery.mockReturnValue(undefined);
+        mockUseRenameModal.mockReturnValue({
+            onOpen: jest.fn(),
+            isOpen: false,
+            initialValues: { id: '', title: '' },
+        });
 
-        render(<Info boardId="123" editable={false} setEditable={jest.fn()} />);
-
+        renderInfo(boardId);
         expect(screen.getByRole('status')).toBeInTheDocument();
-
-        await waitFor(() => expect(mockRouter.back).toHaveBeenCalled());
     });
 
-    test('вызывает onOpen при клике на кнопку Rename', async () => {
-        (getBoardById as jest.Mock).mockResolvedValueOnce({
-            _id: '123',
-            title: 'Test Board',
+    test('рендерит основной контент, если useQuery вернул данные', () => {
+        mockUseQuery.mockReturnValue({
+            _id: boardId,
+            title: 'My Test Board',
         });
-        (useOrganization as jest.Mock).mockReturnValue({ membership: true });
+        mockUseRenameModal.mockReturnValue({
+            onOpen: jest.fn(),
+            isOpen: false,
+            initialValues: { id: '', title: '' },
+        });
 
-        render(<Info boardId="123" editable={true} setEditable={jest.fn()} />);
+        renderInfo(boardId);
 
-        const renameButton = await screen.findByText('Test Board');
-        fireEvent.click(renameButton);
+        const linkEl = screen.getByRole('link', { name: /board/i });
+        expect(linkEl).toHaveAttribute('href', '/');
 
-        expect(mockOnOpen).toHaveBeenCalledWith('123', 'Test Board');
+        expect(screen.getByRole('button', { name: /my test board/i })).toBeInTheDocument();
     });
 
-    test('рендерит скелет', () => {
-        render(<InfoSkeleton />);
-        const skeleton = screen.getByRole('status', { hidden: true });
-        expect(skeleton).toBeInTheDocument();
+    test('при клике на rename вызывает onOpen(boardId, title)', () => {
+        const mockOnOpen = jest.fn();
+
+        mockUseQuery.mockReturnValue({
+            _id: boardId,
+            title: 'My Test Board',
+        });
+        mockUseRenameModal.mockReturnValue({
+            onOpen: mockOnOpen,
+            isOpen: false,
+            initialValues: { id: '', title: '' },
+        });
+
+        renderInfo(boardId);
+
+        const renameBtn = screen.getByRole('button', { name: /my test board/i });
+        fireEvent.click(renameBtn);
+
+        expect(mockOnOpen).toHaveBeenCalledWith('board-123', 'My Test Board');
     });
 });
