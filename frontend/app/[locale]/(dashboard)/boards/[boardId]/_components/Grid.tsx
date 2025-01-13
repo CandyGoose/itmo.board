@@ -117,7 +117,7 @@ export const Grid: React.FC<GridProps> = memo(
             <canvas
                 id="gridCanvas"
                 ref={canvasRef}
-                className={'bg-[var(--background-color)]'}
+                className={'bg-[var(--background-canvas-color)]'}
                 style={{
                     position: 'absolute',
                     top: 0,
