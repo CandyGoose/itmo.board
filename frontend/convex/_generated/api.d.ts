@@ -9,12 +9,12 @@
  */
 
 import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-import type * as Board from "../Board.js";
-import type * as Boards from "../Boards.js";
+    ApiFromModules,
+    FilterApi,
+    FunctionReference,
+} from 'convex/server';
+import type * as Board from '../Board.js';
+import type * as Boards from '../Boards.js';
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,14 +25,14 @@ import type * as Boards from "../Boards.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  Board: typeof Board;
-  Boards: typeof Boards;
+    Board: typeof Board;
+    Boards: typeof Boards;
 }>;
 export declare const api: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "public">
+    typeof fullApi,
+    FunctionReference<any, 'public'>
 >;
 export declare const internal: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "internal">
+    typeof fullApi,
+    FunctionReference<any, 'internal'>
 >;
