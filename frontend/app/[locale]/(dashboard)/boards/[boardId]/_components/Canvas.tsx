@@ -956,11 +956,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                                 .map((id) => layersMap.get(id))
                                 .filter(Boolean) as Layer[]
                         }
-                        onColorChange={
-                            selection.length === 1
-                                ? setLayerColor
-                                : setLastUsedColor
-                        }
+                        onColorChange={(color) => {
+                            setLastUsedColor(color);
+                            if (selection.length === 1) {
+                                setLayerColor(color);
+                            }
+                        }}
                         lineWidth={lineWidth}
                         onLineWidthChange={
                             selection.length === 1
