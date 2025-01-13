@@ -77,7 +77,7 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
                     title={board.title}
                     imageUrl={board.imageUrl}
                     authorId={board.authorId}
-                    createdAt={new Date(board.createdAt || '')}
+                    createdAt={new Date(board.createdAt || '').toISOString()}
                     orgId={board.orgId}
                 />
             ))}
