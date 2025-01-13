@@ -24,7 +24,6 @@ export default function Page() {
                     src="/login-logo.svg"
                     width={700}
                     height={700}
-                    priority={true}
                 />
             </div>
             <div className="px-3 w-full h-full md:pr-4 flex items-center justify-center">
