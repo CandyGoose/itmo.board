@@ -3,6 +3,7 @@ export const Overlay = () => {
         <div
             id="overlay"
             className="opacity-0 group-hover:opacity-30 transition-opacity h-full w-full bg-black"
+            data-testid="overlay"
         />
     );
 };
