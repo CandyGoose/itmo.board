@@ -842,13 +842,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     break;
                 }
                 case 'Delete':
-                    if (
-                        selection.some(
-                            (id) => layers.get(id)?.type !== LayerType.Note,
-                        )
-                    ) {
-                        deleteLayers();
-                    }
+                    deleteLayers();
                     break;
                 case 'c':
                     if (e.ctrlKey || e.metaKey) {
