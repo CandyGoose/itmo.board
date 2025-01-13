@@ -10,6 +10,14 @@ import YandexMetrika from '@/metrika/YandexMetrika';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import Loading from './loading';
 import { enUS, ruRU } from '@clerk/localizations';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: {
+        template: 'itmo.board | %s',
+        default: 'itmo.board',
+    },
+};
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
