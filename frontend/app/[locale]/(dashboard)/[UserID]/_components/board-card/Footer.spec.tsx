@@ -5,28 +5,27 @@ import { Footer } from './Footer';
 describe('Footer Component', () => {
     const defaultProps = {
         title: 'Sample Title',
-        authorLabel: 'John Doe',
         createdAtLabel: '2023-01-01',
         disabled: false,
     };
 
-    test('renders title, author label, and created at label', () => {
+    test('renders title correctly', () => {
         render(<Footer {...defaultProps} />);
 
-        expect(screen.getByText('Sample Title')).toBeInTheDocument();
-
-        expect(screen.getByText('John Doe, 2023-01-01')).toBeInTheDocument();
+        const titleElement = screen.getByText(defaultProps.title);
+        expect(titleElement).toBeInTheDocument();
+        expect(titleElement).toHaveClass('text-[13px]');
     });
 
-    test('button should be enabled when `disabled` prop is false', () => {
-        render(<Footer {...defaultProps} disabled={false} />);
+    test('renders createdAtLabel correctly', () => {
+        render(<Footer {...defaultProps} />);
 
-        const button = screen.getByRole('button');
-        expect(button).toBeEnabled();
-        expect(button).not.toHaveClass('cursor-not-allowed opacity-75');
+        const createdAtElement = screen.getByText(defaultProps.createdAtLabel);
+        expect(createdAtElement).toBeInTheDocument();
+        expect(createdAtElement).toHaveClass('text-[11px]');
     });
 
-    test('button should be disabled when `disabled` prop is true', () => {
+    test('button has correct styles when disabled', () => {
         render(<Footer {...defaultProps} disabled={true} />);
 
         const button = screen.getByRole('button');
@@ -34,12 +33,34 @@ describe('Footer Component', () => {
         expect(button).toHaveClass('cursor-not-allowed opacity-75');
     });
 
-    test('hover effects for author and created at labels are applied', () => {
+    test('button has correct styles when enabled', () => {
+        render(<Footer {...defaultProps} disabled={false} />);
+
+        const button = screen.getByRole('button');
+        expect(button).toBeEnabled();
+        expect(button).toHaveClass('opacity-0 group-hover:opacity-100');
+    });
+
+    test('createdAtLabel has correct hover styles', () => {
         render(<Footer {...defaultProps} />);
 
-        const authorInfo = screen.getByText('John Doe, 2023-01-01');
-        expect(authorInfo).toHaveClass(
+        const createdAtElement = screen.getByText(defaultProps.createdAtLabel);
+        expect(createdAtElement).toHaveClass(
             'opacity-0 group-hover:opacity-100 transition-opacity',
         );
+    });
+
+    test('title is truncated correctly', () => {
+        render(<Footer {...defaultProps} />);
+
+        const titleElement = screen.getByText(defaultProps.title);
+        expect(titleElement).toHaveClass('truncate max-w-[calc(100%-20px)]');
+    });
+
+    test('createdAtLabel is truncated correctly', () => {
+        render(<Footer {...defaultProps} />);
+
+        const createdAtElement = screen.getByText(defaultProps.createdAtLabel);
+        expect(createdAtElement).toHaveClass('truncate');
     });
 });
