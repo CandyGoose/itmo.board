@@ -94,7 +94,9 @@ describe('FontPicker', () => {
         expect(select).toBeInTheDocument();
 
         Fonts.forEach((font) => {
-            expect(screen.getByRole('option', { name: font })).toBeInTheDocument();
+            expect(
+                screen.getByRole('option', { name: font }),
+            ).toBeInTheDocument();
         });
     });
 
