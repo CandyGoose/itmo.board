@@ -31,11 +31,11 @@ interface BoardCardProps {
 }
 
 export const BoardCard = ({
-                              id,
-                              title,
-                              createdAt,
-                              imageUrl,
-                          }: BoardCardProps) => {
+    id,
+    title,
+    createdAt,
+    imageUrl,
+}: BoardCardProps) => {
     const router = useRouter();
     const locale = useLocale() as LocaleKey;
     const [loading, setLoading] = useState(false);
