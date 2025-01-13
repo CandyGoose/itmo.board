@@ -3,7 +3,7 @@
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Board, createBoard } from '@/actions/Board';
-import {Loader2Icon, Plus} from 'lucide-react';
+import { Loader2Icon, Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -50,7 +50,7 @@ export const NewBoardButton = ({
                     className={cn(
                         'text-white h-10 w-10 stroke-1 transform transition-transform duration-500',
                         !disabled &&
-                        'group-hover:rotate-45 group-hover:scale-125',
+                            'group-hover:rotate-45 group-hover:scale-125',
                     )}
                 />
             )}
