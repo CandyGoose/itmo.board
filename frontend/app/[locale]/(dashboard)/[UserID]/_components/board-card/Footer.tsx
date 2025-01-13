@@ -3,14 +3,14 @@ import { cn } from '@/lib/utils';
 interface FooterProps {
     title: string;
     authorLabel: string;
-    createdAtLabel: string;
+    createdLabel: string;
     disabled: boolean;
 }
 
 export const Footer = ({
     title,
     authorLabel,
-    createdAtLabel,
+    createdLabel,
     disabled,
 }: FooterProps) => {
     return (
@@ -19,7 +19,7 @@ export const Footer = ({
                 {title}
             </p>
             <p className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] text-muted-foreground truncate">
-                {authorLabel}, {createdAtLabel}
+                {authorLabel}, {createdLabel}
             </p>
             <button
                 disabled={disabled}
