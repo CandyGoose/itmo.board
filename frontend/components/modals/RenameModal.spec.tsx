@@ -1,21 +1,18 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
 import { RenameModal } from './RenameModal';
 import { useRenameModal } from '@/store/useRenameModal';
-import { renameBoard } from '@/actions/Board';
-import { useRouter } from 'next/navigation';
+import { useApiMutation } from '@/hooks/useApiMutation';
 import { toast } from 'sonner';
 
 jest.mock('@/store/useRenameModal', () => ({
     useRenameModal: jest.fn(),
 }));
 
-jest.mock('@/actions/Board', () => ({
-    renameBoard: jest.fn(),
-}));
-
-jest.mock('next/navigation', () => ({
-    useRouter: jest.fn(),
+jest.mock('@/hooks/useApiMutation', () => ({
+    useApiMutation: jest.fn(),
 }));
 
 jest.mock('sonner', () => ({
@@ -26,86 +23,106 @@ jest.mock('sonner', () => ({
 }));
 
 describe('RenameModal', () => {
+    const mockUseRenameModal = useRenameModal as jest.Mock;
+    const mockUseApiMutation = useApiMutation as jest.Mock;
+
     const mockOnClose = jest.fn();
-    const mockPush = jest.fn();
+    const mockMutate = jest.fn();
+    const pending = false;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        (useRouter as jest.Mock).mockReturnValue({
-            push: mockPush,
-        });
-
-        (useRenameModal as unknown as jest.Mock).mockReturnValue({
+        mockUseRenameModal.mockReturnValue({
             isOpen: true,
             onClose: mockOnClose,
-            initialValues: { id: '1', title: 'Initial Title' },
+            initialValues: { id: 'board-123', title: 'Initial Title' },
+        });
+
+        mockUseApiMutation.mockReturnValue({
+            mutate: mockMutate,
+            pending,
         });
     });
 
-    test('рендерит модалку с правильным заголовком и значением ввода', () => {
+    test('рендерит модалку и отображает текущее название', () => {
         render(<RenameModal />);
 
-        expect(
-            screen.getByRole('heading', { name: /edit board title/i }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-        expect(
-            screen.getByText(/enter a new title for this board/i),
-        ).toBeInTheDocument();
-
-        const input = screen.getByRole('textbox');
-        expect(input).toHaveValue('Initial Title');
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        expect(input.value).toBe('Initial Title');
     });
 
-    test('обновляет состояние ввода при изменении текста', () => {
+    test('обновляет поле ввода при вводе текста', () => {
         render(<RenameModal />);
 
-        const input = screen.getByRole('textbox');
-
-        fireEvent.change(input, { target: { value: 'New Board Title' } });
-        expect(input).toHaveValue('New Board Title');
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'New Title' } });
+        expect(input.value).toBe('New Title');
     });
 
-    test('вызывает renameBoard и закрывает модалку при успешной отправке', async () => {
-        (renameBoard as jest.Mock).mockResolvedValueOnce(undefined);
+    test('отправляет форму, вызывает mutate и при успехе закрывает модалку', async () => {
+        mockMutate.mockResolvedValueOnce(undefined);
 
         render(<RenameModal />);
 
         const input = screen.getByRole('textbox');
+        fireEvent.change(input, { target: { value: 'New Title' } });
+
         const saveButton = screen.getByRole('button', { name: /save/i });
-
-        fireEvent.change(input, { target: { value: 'New Board Title' } });
-
         fireEvent.click(saveButton);
 
         await waitFor(() => {
-            expect(renameBoard).toHaveBeenCalledWith('1', 'New Board Title');
-            expect(mockPush).toHaveBeenCalledWith('/');
+            expect(mockMutate).toHaveBeenCalledWith({
+                id: 'board-123',
+                title: 'New Title',
+            });
+
+            expect(toast.success).toHaveBeenCalledWith('Board renamed');
             expect(mockOnClose).toHaveBeenCalled();
-            expect(toast.success).toHaveBeenCalledWith('Board renamed.');
         });
-
-        expect(screen.queryByText(/board renamed\./i)).not.toBeInTheDocument();
     });
 
-    test('обрабатывает ошибку при вызове renameBoard', async () => {
-        (renameBoard as jest.Mock).mockRejectedValueOnce(new Error('Error'));
+    test('отправляет форму и обрабатывает ошибку (toast.error), не закрывая модалку', async () => {
+        mockMutate.mockRejectedValueOnce(new Error('Server Error'));
 
         render(<RenameModal />);
 
         const input = screen.getByRole('textbox');
+        fireEvent.change(input, { target: { value: 'New Title' } });
+
         const saveButton = screen.getByRole('button', { name: /save/i });
-
-        fireEvent.change(input, { target: { value: 'New Board Title' } });
-
         fireEvent.click(saveButton);
 
         await waitFor(() => {
-            expect(renameBoard).toHaveBeenCalledWith('1', 'New Board Title');
-            expect(toast.error).toHaveBeenCalledWith('Failed to rename board.');
+            expect(mockMutate).toHaveBeenCalledWith({
+                id: 'board-123',
+                title: 'New Title',
+            });
+            expect(toast.error).toHaveBeenCalledWith('Failed to rename board');
+            expect(mockOnClose).not.toHaveBeenCalled();
+        });
+    });
+
+    test('кнопка Save становится disabled при pending=true', () => {
+        mockUseApiMutation.mockReturnValue({
+            mutate: mockMutate,
+            pending: true,
         });
 
-        expect(mockOnClose).not.toHaveBeenCalled();
+        render(<RenameModal />);
+
+        const saveButton = screen.getByRole('button', { name: /save/i });
+        expect(saveButton).toBeDisabled();
+    });
+
+    test('нажатие на Cancel вызывает onClose', () => {
+        render(<RenameModal />);
+
+        const cancelButton = screen.getByRole('button', { name: /cancel/i });
+        fireEvent.click(cancelButton);
+
+        expect(mockOnClose).toHaveBeenCalled();
     });
 });
