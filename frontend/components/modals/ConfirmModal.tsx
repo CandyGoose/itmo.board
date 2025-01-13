@@ -47,6 +47,7 @@ export const ConfirmModal = ({
                     <AlertDialogAction
                         disabled={disabled}
                         onClick={handleConfirm}
+                        className="alert-dialog-action"
                     >
                         Confirm
                     </AlertDialogAction>

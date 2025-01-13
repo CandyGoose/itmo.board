@@ -20,7 +20,10 @@ exports.getById = async (req, res) => {
 
 exports.getByOrgId = async (req, res) => {
     try {
-        const boards = await Board.find({ orgId: req.params.orgId });
+        // Сортируем по `createdAt` в порядке убывания (-1)
+        const boards = await Board.find({ orgId: req.params.orgId }).sort({
+            createdAt: -1,
+        });
         return res.status(200).json(boards);
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -29,7 +32,16 @@ exports.getByOrgId = async (req, res) => {
 
 exports.createBoard = async (req, res) => {
     try {
-        const board = await Board.create(req.body);
+        const { title, orgId, authorId, imageUrl } = req.body;
+
+        const board = await Board.create({
+            title,
+            orgId,
+            authorId,
+            imageUrl,
+            createdAt: new Date(), // Сохраняем в UTC
+        });
+
         return res.status(200).json(board);
     } catch (error) {
         return res.status(500).json({ error: error.message });

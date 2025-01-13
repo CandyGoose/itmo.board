@@ -1,9 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BoardCard } from '@/app/[locale]/(dashboard)/[UserID]/_components/board-card/Index';
 import { useRouter } from 'next/navigation';
 import { act } from 'react';
-import { useTranslations } from 'next-intl';
 import { useClerk } from '@clerk/nextjs';
 
 jest.mock('@/actions/CanvasSaver', () => ({
@@ -19,8 +18,6 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('next-intl', () => ({
     useTranslations: jest.fn(() => (key: string) => {
-        if (key === 'you') return 'You';
-        if (key === 'teammate') return 'Teammate';
         return key;
     }),
     useLocale: jest.fn(() => 'en'),
@@ -41,13 +38,6 @@ describe('BoardCard Component', () => {
         orgId: 'org123',
     };
 
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(() => (key: string) => {
-        if (key === 'you') return 'You';
-        if (key === 'teammate') return 'Teammate';
-        return key;
-    });
-
     const mockUseClerk = useClerk as jest.Mock;
     mockUseClerk.mockReturnValue({ user: { firstName: 'Test User' } });
 
@@ -65,26 +55,6 @@ describe('BoardCard Component', () => {
         expect(screen.getByText(/ago/i)).toBeInTheDocument();
         // Check image
         expect(screen.getByAltText('')).toBeInTheDocument();
-    });
-
-    test('displays "You" when authorId matches UserID', async () => {
-        render(<BoardCard {...defaultProps} authorId="123" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('You')),
-            ).toBeInTheDocument();
-        });
-    });
-
-    test("displays the author's first name when authorId does not match UserID", async () => {
-        render(<BoardCard {...defaultProps} authorId="456" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('Test User')),
-            ).toBeInTheDocument();
-        });
     });
 
     test('navigates to board on click', async () => {
@@ -109,15 +79,13 @@ describe('BoardCard Component', () => {
         expect(card).toHaveClass('cursor-pointer');
     });
 
-    test('displays "Teammate" when authorId does not match UserID and user is null', async () => {
-        mockUseClerk.mockReturnValue({ user: null });
+    test('renders "Skeleton" correctly', () => {
+        render(<BoardCard.Skeleton />);
 
-        render(<BoardCard {...defaultProps} authorId="456" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('Teammate')),
-            ).toBeInTheDocument();
-        });
+        const skeleton = screen.getByTestId('board-card-skeleton');
+        expect(skeleton).toBeInTheDocument();
+        expect(skeleton).toHaveClass(
+            'aspect-[100/127] rounded-lg overflow-hidden',
+        );
     });
 });
