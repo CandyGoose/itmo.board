@@ -830,8 +830,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 return;
             }
 
-            switch (e.key) {
-                case 'z': {
+            switch (e.code) {
+                case 'KeyZ': {
                     if (e.ctrlKey || e.metaKey) {
                         if (e.shiftKey) {
                             history.redo();
@@ -845,17 +845,17 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 case 'Delete':
                     deleteLayers();
                     break;
-                case 'c':
+                case 'KeyC':
                     if (e.ctrlKey || e.metaKey) {
                         copyLayers();
                     }
                     break;
-                case 'v':
+                case 'KeyV':
                     if (e.ctrlKey || e.metaKey) {
                         pasteLayers();
                     }
                     break;
-                case 'a':
+                case 'KeyA':
                     if (e.ctrlKey || e.metaKey) {
                         e.preventDefault();
                         selectAllLayers();
