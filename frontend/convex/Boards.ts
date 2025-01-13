@@ -1,36 +1,16 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
-import { getAllOrThrow } from "convex-helpers/server/relationships";
 
 export const getAllByOrgId = query({
   args: {
     orgId: v.string(),
     search: v.optional(v.string()),
-    favorites: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
       throw new Error("Unauthenticated!");
-    }
-
-    if (args.favorites) {
-      const favoritedBoards = await ctx.db
-        .query("userFavorites")
-        .withIndex("by_user_org", (q) => {
-          return q.eq("userId", identity.subject).eq("orgId", args.orgId);
-        })
-        .order("desc")
-        .collect();
-
-      const ids = favoritedBoards.map((board) => board.boardId);
-
-      const boards = await getAllOrThrow(ctx.db, ids);
-
-      return boards.map((board) => {
-        return { ...board, isFavorite: true };
-      });
     }
 
     const title = args.search as string;
@@ -51,23 +31,23 @@ export const getAllByOrgId = query({
         .collect();
     }
 
-    const boardsWithFavoriteRelation = boards.map(async (board) => {
+    const boardsWithRelation = boards.map(async (board) => {
       return ctx.db
-        .query("userFavorites")
+        .query("userBoards")
         .withIndex("by_user_board", (q) => {
           return q.eq("userId", identity.subject).eq("boardId", board._id);
         })
         .unique()
-        .then((favorite) => {
+        .then((relation) => {
           return {
             ...board,
-            isFavorite: !!favorite,
+            isRelation: !!relation,
           };
         });
     });
 
-    const boardsWithFavoriteBoolean = Promise.all(boardsWithFavoriteRelation);
+    const boardsWithBoolean = Promise.all(boardsWithRelation);
 
-    return boardsWithFavoriteBoolean;
+    return boardsWithBoolean;
   },
 });
