@@ -33,12 +33,14 @@ export async function getBoardById(
 }
 
 export async function createBoard(userId: string, orgId: string) {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const boards = await getAllBoards(userId, orgId);
     return await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/boards`, {
         title: 'Untitle-' + boards.length,
-        orgId: orgId,
+        orgId,
         authorId: userId,
         imageUrl: `/placeholders/${Math.floor(Math.random() * 10) + 1}.svg`,
+        timezone,
     });
 }
 

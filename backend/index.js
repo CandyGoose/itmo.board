@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 });
 
 mongoose
-    .connect('mongodb://localhost:27017/mango')
+    .connect('mongodb://127.0.0.1:27017/mango')
     .then(() => {
         console.log('Database connected');
     })
