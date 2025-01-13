@@ -20,7 +20,8 @@ exports.getById = async (req, res) => {
 
 exports.getByOrgId = async (req, res) => {
     try {
-        const boards = await Board.find({ orgId: req.params.orgId });
+        // Сортируем по `createdAt` в порядке убывания (-1)
+        const boards = await Board.find({ orgId: req.params.orgId }).sort({ createdAt: -1 });
         return res.status(200).json(boards);
     } catch (error) {
         return res.status(500).json({ error: error.message });
