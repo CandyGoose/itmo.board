@@ -184,4 +184,3 @@ export type Layer =
     | PathLayer
     | ImageLayer
     | TextLayer;
-

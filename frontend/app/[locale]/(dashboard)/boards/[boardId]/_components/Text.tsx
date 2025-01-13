@@ -10,7 +10,8 @@ import React, {
     useState,
 } from 'react';
 import {
-    calculateFontSize, padding,
+    calculateFontSize,
+    padding,
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 interface TextProps {
@@ -18,6 +19,8 @@ interface TextProps {
     layer: TextLayer;
     onPointerDown: (e: React.PointerEvent, id: string) => void;
 }
+
+const PLACEHOLDER_COLOR = '#aaa';
 
 export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const {
@@ -55,12 +58,11 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     useEffect(() => {
         if (containerRef.current) {
             const contentWidth = containerRef.current.offsetWidth || width;
-            const contentHeight =
-                containerRef.current.offsetHeight|| height;
+            const contentHeight = containerRef.current.offsetHeight || height;
 
             const newFontSize = calculateFontSize(
-                contentWidth - (padding * 2),
-                contentHeight - (padding * 2),
+                contentWidth - padding * 2,
+                contentHeight - padding * 2,
                 value,
                 fontSize,
                 fontName,
@@ -93,7 +95,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: (fill && value) ? colorToCss(fill) : PLACEHOLDER_COLOR,
+            color: fill && value ? colorToCss(fill) : PLACEHOLDER_COLOR,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
@@ -105,8 +107,6 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         }),
         [currFontSize, fill, value, fontName, applyTextAlign, applyTextFormat],
     );
-
-    const PLACEHOLDER_COLOR = '#aaa';
 
     return (
         <foreignObject

@@ -151,8 +151,8 @@ export const Note = ({
             const contentHeight = containerRef.current.offsetHeight || height;
 
             const newFontSize = calculateFontSize(
-                contentWidth - (padding * 2),
-                contentHeight - (padding * 2),
+                contentWidth - padding * 2,
+                contentHeight - padding * 2,
                 value,
                 fontSize,
                 fontName,
