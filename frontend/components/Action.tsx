@@ -26,7 +26,8 @@ import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteBoard } from '@/actions/Board';
+import { useApiMutation } from "@/hooks/useApiMutation";
+import { api } from "@/convex/_generated/api";
 import { useTranslations } from 'next-intl';
 
 interface ActionsProps {
@@ -48,9 +49,8 @@ export const Actions = ({
     disable,
     defaultOpen,
 }: ActionsProps) => {
+    const { mutate, pending } = useApiMutation(api.Board.deleteById);
     const { onOpen } = useRenameModal();
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
     const t = useTranslations('tools');
 
     const onCopyLink = () => {
@@ -60,17 +60,14 @@ export const Actions = ({
             .catch(() => toast.error('Failed to copy link'));
     };
 
-    const onDelete = async () => {
-        try {
-            setLoading(true);
-            await deleteBoard(id);
-            toast.success('Delete successfully.');
-            router.push('/');
-        } catch {
-            toast.error('Failed to delete.');
-        } finally {
-            setLoading(false);
-        }
+    const onDelete = () => {
+        mutate({ id })
+            .then(() => {
+                toast.success("Board deleted");
+            })
+            .catch(() => {
+                toast.error("Failed to delete board");
+            });
     };
 
     const handleDownloadSVG = useCallback(() => {
@@ -87,7 +84,9 @@ export const Actions = ({
 
     return (
         <DropdownMenu defaultOpen={defaultOpen}>
-            <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild title={title}>
+                {children}
+            </DropdownMenuTrigger>
             <DropdownMenuContent
                 onClick={(e) => e.stopPropagation()}
                 side={side}
@@ -142,7 +141,7 @@ export const Actions = ({
                 <ConfirmModal
                     header="Delete board?"
                     description="This will delete the board and all of its contents."
-                    disabled={loading}
+                    disabled={pending}
                     onConfirm={onDelete}
                 >
                     <Button
