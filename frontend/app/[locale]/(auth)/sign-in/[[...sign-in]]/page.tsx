@@ -2,11 +2,14 @@ import { SignIn } from '@clerk/nextjs';
 import Image from 'next/legacy/image';
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({
-    params: { locale },
-}: {
-    params: { locale: string };
-}) {
+type metaProps = {
+    params: Promise<{locale:string}>
+}
+
+export async function generateMetadata(
+    {params}: metaProps
+) {
+    const locale = (await params).locale;
     const t = await getTranslations({ locale, namespace: 'Metadata' });
 
     return {
@@ -23,6 +26,7 @@ export default function Page() {
                     src="/login-logo.svg"
                     width={700}
                     height={700}
+                    priority={true}
                 />
             </div>
             <div className="px-3 w-full h-full md:pr-4 flex items-center justify-center">
