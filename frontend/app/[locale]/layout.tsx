@@ -1,4 +1,5 @@
 import '../globals.css';
+import ConvexClietProvider from "@/providers/convex-client-provider";
 import React, { ReactNode, Suspense } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
@@ -35,11 +36,13 @@ export default async function LocaleLayout({
                         <ClerkProvider>
                             <body>
                                 <Suspense fallback={<Loading />}>
-                                    <ThemeProvider>
-                                        {children}
-                                        <ModalProvider />
-                                        <Toaster />
-                                    </ThemeProvider>
+                                    <ConvexClietProvider>
+                                        <ThemeProvider>
+                                            {children}
+                                            <ModalProvider />
+                                            <Toaster />
+                                        </ThemeProvider>
+                                    </ConvexClietProvider>
                                 </Suspense>
                             </body>
                         </ClerkProvider>
