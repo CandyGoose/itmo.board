@@ -1,7 +1,12 @@
 import { Plus } from 'lucide-react';
 import { OrganizationProfile } from '@clerk/nextjs';
 
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/Dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
 
