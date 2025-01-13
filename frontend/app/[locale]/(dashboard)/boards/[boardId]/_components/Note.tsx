@@ -13,6 +13,11 @@ const font = Kalam({
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
+const PLACEHOLDER_COLOR = {
+    light: '#aaa',
+    dark: '#555',
+};
+
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
     text: string,
@@ -180,29 +185,32 @@ export const Note = ({
         return { textAlign: alignmentMap[textAlign] || 'center' };
     }, [textAlign]);
 
+    const placeholderTextColor = useMemo(() => {
+        const baseColor = fill ? getContrastingTextColor(fill) : '#000';
+        return baseColor === '#000' || baseColor === 'black'
+            ? PLACEHOLDER_COLOR.dark
+            : PLACEHOLDER_COLOR.light;
+    }, [fill]);
+
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: textColor,
+            color: value ? textColor : placeholderTextColor,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
         }),
-        [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
-    );
-
-    const PLACEHOLDER_COLOR = '#aaa';
-
-    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
-        ...textStyle,
-        color: PLACEHOLDER_COLOR,
-    });
-
-    const placeholderStyle = useMemo<CSSProperties>(
-        () => getPlaceholderStyle(textStyle),
-        [textStyle],
+        [
+            currFontSize,
+            textColor,
+            fontName,
+            applyTextAlign,
+            applyTextFormat,
+            placeholderTextColor,
+            value,
+        ],
     );
 
     return (
@@ -235,7 +243,7 @@ export const Note = ({
                 <ContentEditable
                     html={value || 'Text' || ''}
                     className={cn(fontName === 'Kalam' ? font.className : '')}
-                    style={value ? textStyle : placeholderStyle}
+                    style={textStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"
                 />
