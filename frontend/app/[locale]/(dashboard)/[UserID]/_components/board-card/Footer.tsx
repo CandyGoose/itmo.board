@@ -6,11 +6,7 @@ interface FooterProps {
     disabled: boolean;
 }
 
-export const Footer = ({
-    title,
-    createdAtLabel,
-    disabled,
-}: FooterProps) => {
+export const Footer = ({ title, createdAtLabel, disabled }: FooterProps) => {
     return (
         <div className="relative p-3">
             <p className="text-[13px] truncate max-w-[calc(100%-20px)]">
