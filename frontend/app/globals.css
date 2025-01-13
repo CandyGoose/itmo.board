@@ -114,3 +114,25 @@ html {
     color: white !important;
     background-color: var(--secondary) !important;
 }
+
+@layer utilities {
+    /* Удаление скроллбара */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none;    /* Firefox */
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none; /* WebKit-based browsers (Chrome, Safari) */
+    }
+
+    /* Обеспечение плавной прокрутки */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Стили для Confirm в темной теме */
+    .dark .alert-dialog-action {
+        color: black !important;
+    }
+}
