@@ -47,15 +47,6 @@ export const Info = ({
 
     const { membership } = useOrganization();
 
-    // get all organizations of a user
-    // const organizationsList = useOrganizationList();
-    // const userOrganizations = organizationsList.userMemberships;
-    //
-    // const checkMembership = () => {
-    //     if (!board) return false;
-    //     console.log('AAAAAAAA', userOrganizations);
-    // }
-
     useEffect(() => {
         const request = async () => {
             const response = await getBoardById(boardId);
