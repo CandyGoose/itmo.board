@@ -21,6 +21,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@clerk/localizations": "^3.9.7",
     "@clerk/nextjs": "^6.9.9",
     "@liveblocks/client": "^1.12.0",
     "@liveblocks/node": "^1.12.0",
@@ -66,6 +67,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.14",
     "@types/node": "22.10.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.1",

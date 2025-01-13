@@ -52,6 +52,7 @@ import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
 import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
 import { ImageUpload } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageUpload';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -92,13 +93,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const canRedo = useCanRedo();
 
     const [lastUsedColor, setLastUsedColor] = useState<Color>({
-        r: 0,
-        g: 0,
-        b: 0,
+        r: 33,
+        g: 150,
+        b: 243,
     });
     const [transparentFill, setTransparentFill] = useState(false);
     const [lineWidth, setLineWidth] = useState<number>(2);
-    const [fontName, setFontName] = useState<string>('Kalam');
+    const [fontName, setFontName] = useState<string>(Fonts[0]);
     const [fontSize, setFontSize] = useState<number>(14);
     const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Center);
     const [textFormat, setTextFormat] = useState<TextFormat[]>([
@@ -450,29 +451,27 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 startDrawing(point, e.pressure);
                 return;
             }
-            if (e.button === 0) {
-                if (e.shiftKey) {
-                    setCanvasState({
-                        mode: CanvasMode.SelectionNet,
-                        origin: point,
-                        current: point,
-                    });
-                } else {
-                    const closePathId = clickCloseToAnyPath(
-                        layerIds,
-                        layers,
-                        point,
-                        10,
-                    );
-                    if (closePathId) {
-                        onLayerPointerDown(e, closePathId);
-                        return;
-                    }
-                    setCanvasState({
-                        mode: CanvasMode.Pressing,
-                        origin: { x: e.clientX, y: e.clientY },
-                    });
+            if ((e.button === 0 && e.shiftKey) || e.button === 1) {
+                setCanvasState({
+                    mode: CanvasMode.SelectionNet,
+                    origin: point,
+                    current: point,
+                });
+            } else if (e.button === 0) {
+                const closePathId = clickCloseToAnyPath(
+                    layerIds,
+                    layers,
+                    point,
+                    10,
+                );
+                if (closePathId) {
+                    onLayerPointerDown(e, closePathId);
+                    return;
                 }
+                setCanvasState({
+                    mode: CanvasMode.Pressing,
+                    origin: { x: e.clientX, y: e.clientY },
+                });
             }
         },
         [
@@ -489,7 +488,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
-            if (canvasState.mode === CanvasMode.None) return;
             e.stopPropagation();
             if (!editable) {
                 setCanvasState({ mode: CanvasMode.None });
@@ -845,13 +843,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     break;
                 }
                 case 'Delete':
-                    if (
-                        selection.some(
-                            (id) => layers.get(id)?.type !== LayerType.Note,
-                        )
-                    ) {
-                        deleteLayers();
-                    }
+                    deleteLayers();
                     break;
                 case 'c':
                     if (e.ctrlKey || e.metaKey) {

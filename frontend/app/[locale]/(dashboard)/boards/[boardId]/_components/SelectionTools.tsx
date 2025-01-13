@@ -11,6 +11,7 @@ import { TwoValueInput } from './TwoValueInput';
 import { FontPicker } from './FontPicker';
 import { TextFormatPicker } from './TextFormatPicker';
 import { useTranslations } from 'next-intl';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export interface SelectionToolsProps {
     selectedLayers: Layer[];
@@ -142,7 +143,7 @@ export const SelectionTools = memo(
                     <>
                         <FontPicker
                             fontName={
-                                selectedLayer.fontName ?? fontName ?? 'Kalam'
+                                selectedLayer.fontName ?? fontName ?? Fonts[0]
                             }
                             onFontChange={onFontChange}
                             fontSize={selectedLayer.fontSize ?? fontSize ?? 14}

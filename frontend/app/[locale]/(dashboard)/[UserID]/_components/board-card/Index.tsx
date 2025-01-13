@@ -6,12 +6,18 @@ import { Overlay } from './Overlay';
 import { Footer } from './Footer';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useClerk } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Actions } from '@/components/Action';
 import { MoreHorizontal } from 'lucide-react';
 import CanvasSaver from '@/actions/CanvasSaver';
+import { enUS, ru } from 'date-fns/locale';
+
+const dateFnsLocaleMap = {
+    en: enUS,
+    ru: ru,
+};
 
 interface BoardCardProps {
     id: string;
@@ -31,6 +37,7 @@ export const BoardCard = ({
 }: BoardCardProps) => {
     const t = useTranslations('utils');
     const router = useRouter();
+    const locale = useLocale();
     const params = useParams();
     const { user } = useClerk();
     const [authorLabel, setAuthorLabel] = useState(
@@ -54,6 +61,8 @@ export const BoardCard = ({
 
     const createdAtLabel = formatDistanceToNow(new Date(createdAt), {
         addSuffix: true,
+        // @ts-expect-error: Indexing works
+        locale: dateFnsLocaleMap[locale],
     });
 
     const onClick = () => {

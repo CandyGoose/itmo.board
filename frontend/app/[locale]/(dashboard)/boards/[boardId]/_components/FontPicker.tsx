@@ -4,12 +4,7 @@ import {
     MIN_FONT_SIZE,
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 import { useTranslations } from 'next-intl';
-import { Kalam } from 'next/font/google';
-
-const font = Kalam({
-    subsets: ['latin'],
-    weight: ['400'],
-});
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 interface FontPickerProps {
     fontName: string;
@@ -48,25 +43,15 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                                    text-[var(--text-color)]
                                    border-[var(--border)]"
                     >
-                        <option value="Kalam" className={font.className}>
-                            Kalam
-                        </option>
-                        <option value="Arial" style={{ fontFamily: 'Arial' }}>
-                            Arial
-                        </option>
-                        <option
-                            value="Times New Roman"
-                            style={{ fontFamily: 'Times New Roman' }}
-                        >
-                            Times New Roman
-                        </option>
-                        <option
-                            value="Courier New"
-                            style={{ fontFamily: 'Courier New' }}
-                        >
-                            Courier New
-                        </option>
-                        {/* Add more fonts as needed */}
+                        {Fonts.map((font) => (
+                            <option
+                                key={font}
+                                value={font}
+                                style={{ fontFamily: font }}
+                            >
+                                {font}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
