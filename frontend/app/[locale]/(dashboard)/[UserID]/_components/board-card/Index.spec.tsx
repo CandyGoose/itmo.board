@@ -23,6 +23,7 @@ jest.mock('next-intl', () => ({
         if (key === 'teammate') return 'Teammate';
         return key;
     }),
+    useLocale: jest.fn(() => 'en'),
 }));
 
 jest.mock('@clerk/nextjs', () => ({

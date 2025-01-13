@@ -101,22 +101,22 @@ describe('FontPicker', () => {
     });
 
     it('select shows the correct initial font', () => {
-        renderComponent({ fontName: 'Arial' });
+        renderComponent({ fontName: Fonts[0] });
 
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
-        expect(select.value).toBe('Arial');
+        expect(select.value).toBe(Fonts[0]);
     });
 
     it('calls onFontChange when a different font is selected', async () => {
         renderComponent({});
 
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
-        await userEvent.selectOptions(select, 'Arial');
+        await userEvent.selectOptions(select, Fonts[1]);
 
         expect(mockOnFontChange).toHaveBeenCalledTimes(1);
-        expect(mockOnFontChange).toHaveBeenCalledWith('Arial');
+        expect(mockOnFontChange).toHaveBeenCalledWith(Fonts[1]);
 
-        expect(select.value).toBe('Arial');
+        expect(select.value).toBe(Fonts[1]);
     });
 
     it('renders the font size label with translated text', () => {
