@@ -1,4 +1,18 @@
 import { SignUp } from '@clerk/nextjs';
+import { getTranslations } from 'next-intl/server';
+
+type metaProps = {
+    params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: metaProps) {
+    const locale = (await params).locale;
+    const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+    return {
+        title: t('sign-up'),
+    };
+}
 
 export default function Page() {
     return (
