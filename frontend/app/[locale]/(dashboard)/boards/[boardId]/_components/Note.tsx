@@ -189,6 +189,7 @@ export const Note = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            padding: '0.5rem',
         }),
         [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
     );
@@ -215,6 +216,7 @@ export const Note = ({
             style={{
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
+                padding: '0.5rem',
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
