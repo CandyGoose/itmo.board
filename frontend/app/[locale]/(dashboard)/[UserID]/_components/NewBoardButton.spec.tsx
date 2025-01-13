@@ -1,115 +1,81 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NewBoardButton } from './NewBoardButton';
-import { createBoard } from '@/actions/Board';
 import { toast } from 'sonner';
-import { useParams } from 'next/navigation';
 import '@testing-library/jest-dom';
-import { useTranslations } from 'next-intl';
 
-jest.mock('@/actions/Board');
-jest.mock('sonner');
 jest.mock('next/navigation', () => ({
-    useParams: jest.fn(),
+    useRouter: jest.fn(),
 }));
-jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(),
+
+jest.mock('sonner', () => ({
+    toast: {
+        success: jest.fn(),
+        error: jest.fn(),
+    },
+}));
+
+jest.mock('@/hooks/useApiMutation', () => ({
+    useApiMutation: jest.fn(),
 }));
 
 describe('NewBoardButton', () => {
-    const orgId = 'org1';
-    const onBoardCreated = jest.fn();
-    const mockUseTranslations = useTranslations as jest.Mock;
+    const orgId = 'ORG_ID';
+
+    const { useRouter } = jest.requireMock('next/navigation');
+
+    const { useApiMutation } = jest.requireMock('@/hooks/useApiMutation');
+    const mockMutate = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockUseTranslations.mockImplementation(() => () => 'New Board');
+
+        useRouter.mockReturnValue({
+            push: jest.fn(),
+            refresh: jest.fn(),
+        });
+
+        useApiMutation.mockReturnValue({
+            mutate: mockMutate,
+            pending: false,
+        });
     });
 
-    test('должна быть активной кнопкой по умолчанию', () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+    test('рендерит кнопку "New Board"', () => {
+        render(<NewBoardButton orgId={orgId} />);
 
-        render(
-            <NewBoardButton orgId={orgId} onBoardCreated={onBoardCreated} />,
-        );
-
-        const button = screen.getByRole('button');
-        expect(button).toBeEnabled();
+        expect(screen.getByText('New Board')).toBeInTheDocument();
     });
 
-    test('должна быть неактивной кнопкой, если передан пропс disabled', () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
+    test('показывает toast.success при успешном создании доски', async () => {
+        mockMutate.mockResolvedValueOnce(undefined);
 
-        render(
-            <NewBoardButton
-                orgId={orgId}
-                onBoardCreated={onBoardCreated}
-                disabled
-            />,
-        );
+        render(<NewBoardButton orgId={orgId} />);
 
-        const button = screen.getByRole('button');
+        const button = screen.getByRole('button', { name: /new board/i });
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith('Board Created');
+        });
+    });
+
+    test('показывает toast.error при ошибке создания доски', async () => {
+        mockMutate.mockRejectedValueOnce(new Error('Failed'));
+
+        render(<NewBoardButton orgId={orgId} />);
+
+        const button = screen.getByRole('button', { name: /new board/i });
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(toast.error).toHaveBeenCalledWith('Failed to create board');
+        });
+    });
+
+    test('кнопка становится disabled, если передан проп disabled', () => {
+        render(<NewBoardButton orgId={orgId} disabled />);
+
+        const button = screen.getByRole('button', { name: /new board/i });
         expect(button).toBeDisabled();
-    });
-
-    test('должна показывать toast с успехом и вызвать onBoardCreated при успешном создании доски', async () => {
-        const newBoard = {
-            _id: '1',
-            title: 'New Board',
-            authorId: 'user1',
-            orgId,
-        };
-        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
-        (createBoard as jest.Mock).mockResolvedValue({ data: newBoard });
-
-        render(
-            <NewBoardButton orgId={orgId} onBoardCreated={onBoardCreated} />,
-        );
-
-        const button = screen.getByRole('button');
-
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith('Created successfully.');
-            expect(onBoardCreated).toHaveBeenCalledWith(newBoard);
-        });
-    });
-
-    test('должна показывать toast с ошибкой при неудачном создании доски', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
-        (createBoard as jest.Mock).mockRejectedValue(
-            new Error('Failed to create'),
-        );
-
-        render(
-            <NewBoardButton orgId={orgId} onBoardCreated={onBoardCreated} />,
-        );
-
-        const button = screen.getByRole('button');
-
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Failed to create.');
-        });
-    });
-
-    test('должна не вызывать onBoardCreated при неудачном создании доски', async () => {
-        (useParams as jest.Mock).mockReturnValue({ UserID: 'user1' });
-        (createBoard as jest.Mock).mockRejectedValue(
-            new Error('Failed to create'),
-        );
-
-        render(
-            <NewBoardButton orgId={orgId} onBoardCreated={onBoardCreated} />,
-        );
-
-        const button = screen.getByRole('button');
-
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(onBoardCreated).not.toHaveBeenCalled();
-        });
     });
 });
