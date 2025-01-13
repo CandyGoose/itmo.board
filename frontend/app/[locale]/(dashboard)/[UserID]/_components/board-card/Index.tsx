@@ -1,13 +1,13 @@
 'use client';
 
 import { formatDistanceToNow } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Overlay } from './Overlay';
 import { Footer } from './Footer';
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { useClerk } from '@clerk/nextjs';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { Actions } from '@/components/Action';
 import { MoreHorizontal } from 'lucide-react';
@@ -17,13 +17,15 @@ import { enUS, ru } from 'date-fns/locale';
 const dateFnsLocaleMap = {
     en: enUS,
     ru: ru,
-};
+} as const;
+
+type LocaleKey = keyof typeof dateFnsLocaleMap;
 
 interface BoardCardProps {
     id: string;
     title: string;
     authorId: string;
-    createdAt: Date;
+    createdAt: string;
     imageUrl: string;
     orgId: string;
 }
@@ -31,37 +33,18 @@ interface BoardCardProps {
 export const BoardCard = ({
     id,
     title,
-    authorId,
     createdAt,
     imageUrl,
 }: BoardCardProps) => {
-    const t = useTranslations('utils');
     const router = useRouter();
-    const locale = useLocale();
-    const params = useParams();
-    const { user } = useClerk();
-    const [authorLabel, setAuthorLabel] = useState(
-        params.UserID === authorId ? t('you') : t('teammate'),
-    );
+    const locale = useLocale() as LocaleKey;
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const getFirstName = async (userID: string) => {
-            if (userID === authorId) {
-                setAuthorLabel(t('you'));
-            } else if (user) {
-                setAuthorLabel(user.firstName || t('teammate'));
-            } else {
-                setAuthorLabel(t('teammate'));
-            }
-        };
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const zonedDate = toZonedTime(new Date(createdAt), timezone);
 
-        getFirstName(params.UserID as string);
-    }, [params.UserID, authorId, t, user]);
-
-    const createdAtLabel = formatDistanceToNow(new Date(createdAt), {
+    const createdAtLabel = formatDistanceToNow(zonedDate, {
         addSuffix: true,
-        // @ts-expect-error: Indexing works
         locale: dateFnsLocaleMap[locale],
     });
 
@@ -80,7 +63,7 @@ export const BoardCard = ({
         <div
             className="group aspect-[100/127] border rounded-lg flex cursor-pointer
             flex-col justify-between overflow-hidden relative"
-            data-testid={`board-card-${id}`} // Уникальный data-testid
+            data-testid={`board-card-${id}`}
             onClick={onClick}
         >
             <div className="relative flex-1">
@@ -97,7 +80,6 @@ export const BoardCard = ({
             </div>
             <Footer
                 title={title}
-                authorLabel={authorLabel}
                 createdAtLabel={createdAtLabel}
                 disabled={loading}
             />
