@@ -8,10 +8,12 @@ describe('Hint Component', () => {
         render(
             <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>
+            </Hint>,
         );
 
-        expect(screen.getByRole('button', { name: 'Hover me' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: 'Hover me' }),
+        ).toBeInTheDocument();
     });
 
     it('displays tooltip on hover', async () => {
@@ -20,7 +22,7 @@ describe('Hint Component', () => {
         render(
             <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>
+            </Hint>,
         );
 
         await user.hover(screen.getByRole('button', { name: 'Hover me' }));
@@ -35,7 +37,7 @@ describe('Hint Component', () => {
         render(
             <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>
+            </Hint>,
         );
 
         const trigger = screen.getByRole('button', { name: 'Hover me' });
