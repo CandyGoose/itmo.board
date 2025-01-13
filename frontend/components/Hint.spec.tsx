@@ -1,48 +1,49 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { Hint } from '@/components/Hint';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import Hint from './Hint';
 import '@testing-library/jest-dom';
-describe('Hint component', () => {
-    it('displays the tooltip on hover', async () => {
+
+describe('Hint Component', () => {
+    it('renders children correctly', () => {
         render(
-            <Hint label="Test label" side="top" align="center">
+            <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>,
+            </Hint>
         );
 
-        userEvent.hover(screen.getByText('Hover me'));
-
-        const tooltip = await screen.findByRole('tooltip');
-        expect(tooltip).toHaveTextContent('Test label');
+        expect(screen.getByRole('button', { name: 'Hover me' })).toBeInTheDocument();
     });
 
-    it('accepts and applies sideOffset and alignOffset props', async () => {
+    it('displays tooltip on hover', async () => {
+        const user = userEvent.setup();
+
         render(
-            <Hint
-                label="Offset Test"
-                side="top"
-                align="center"
-                sideOffset={10}
-                alignOffset={5}
-            >
+            <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>,
+            </Hint>
         );
 
-        userEvent.hover(screen.getByText('Hover me'));
+        await user.hover(screen.getByRole('button', { name: 'Hover me' }));
 
-        await waitFor(() => screen.getByRole('tooltip'));
-        expect(screen.getByRole('tooltip')).toHaveTextContent('Offset Test');
+        const tooltip = await screen.findByRole('tooltip');
+        expect(tooltip).toHaveTextContent('Test tooltip');
     });
 
-    it('renders with the correct label', async () => {
+    it('hides tooltip when mouse leaves', async () => {
+        const user = userEvent.setup();
+
         render(
-            <Hint label="Tooltip Label">
+            <Hint label="Test tooltip">
                 <button>Hover me</button>
-            </Hint>,
+            </Hint>
         );
-        await userEvent.hover(screen.getByText('Hover me'));
-        const tooltip = await screen.findByRole('tooltip');
-        expect(tooltip).toHaveTextContent('Tooltip Label');
+
+        const trigger = screen.getByRole('button', { name: 'Hover me' });
+
+        await user.hover(trigger);
+
+        await user.unhover(trigger);
+
+        expect(screen.queryByText('Test tooltip')).not.toBeInTheDocument();
     });
 });
