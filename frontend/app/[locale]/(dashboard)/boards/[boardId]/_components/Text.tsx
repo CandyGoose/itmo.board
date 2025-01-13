@@ -9,7 +9,10 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { calculateFontSize, font } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import {
+    calculateFontSize,
+    font,
+} from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 interface TextProps {
     id: string;
