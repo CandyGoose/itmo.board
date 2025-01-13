@@ -450,29 +450,27 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 startDrawing(point, e.pressure);
                 return;
             }
-            if (e.button === 0) {
-                if (e.shiftKey) {
-                    setCanvasState({
-                        mode: CanvasMode.SelectionNet,
-                        origin: point,
-                        current: point,
-                    });
-                } else {
-                    const closePathId = clickCloseToAnyPath(
-                        layerIds,
-                        layers,
-                        point,
-                        10,
-                    );
-                    if (closePathId) {
-                        onLayerPointerDown(e, closePathId);
-                        return;
-                    }
-                    setCanvasState({
-                        mode: CanvasMode.Pressing,
-                        origin: { x: e.clientX, y: e.clientY },
-                    });
+            if ((e.button === 0 && e.shiftKey) || e.button === 1) {
+                setCanvasState({
+                    mode: CanvasMode.SelectionNet,
+                    origin: point,
+                    current: point,
+                });
+            } else if (e.button === 0) {
+                const closePathId = clickCloseToAnyPath(
+                    layerIds,
+                    layers,
+                    point,
+                    10,
+                );
+                if (closePathId) {
+                    onLayerPointerDown(e, closePathId);
+                    return;
                 }
+                setCanvasState({
+                    mode: CanvasMode.Pressing,
+                    origin: { x: e.clientX, y: e.clientY },
+                });
             }
         },
         [
@@ -489,7 +487,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
-            if (canvasState.mode === CanvasMode.None) return;
             e.stopPropagation();
             if (!editable) {
                 setCanvasState({ mode: CanvasMode.None });
