@@ -33,7 +33,15 @@ export const RenameModal = () => {
             e.preventDefault();
             await renameBoard(initialValues.id, title);
             toast.success('Board renamed.');
-            router.push('/');
+
+            const currentPath = window.location.pathname;
+
+            if (currentPath.includes(`/boards/${initialValues.id}`)) {
+                window.location.reload();
+            } else {
+                router.push('/');
+            }
+
             onClose();
         } catch {
             toast.error('Failed to rename board.');
@@ -71,7 +79,11 @@ export const RenameModal = () => {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button disabled={loading} type="submit">
+                        <Button
+                            disabled={loading}
+                            type="submit"
+                            className="alert-dialog-action"
+                        >
                             Save
                         </Button>
                     </DialogFooter>
