@@ -170,7 +170,7 @@ describe('Note component', () => {
         const foreignObjectElement = screen.getByTestId('note-foreign-object');
         const editableDiv = foreignObjectElement.querySelector('div');
 
-        expect(editableDiv).not.toHaveClass('kalam-font');
+        expect(editableDiv).not.toHaveStyle(`font-family: ${Fonts[0]}`);
     });
 
     it('should apply text alignment correctly for left alignment', () => {
