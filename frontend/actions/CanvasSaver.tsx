@@ -1,11 +1,12 @@
 'use client';
 
 import { Room } from '@/components/Room';
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useStorage } from '@/liveblocks.config';
 import { LayerPreview } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/LayerPreview';
 import { boundingBox } from '@/hooks/useSelectionBounds';
 import { Layer } from '@/types/canvas';
+import Script from 'next/script';
 
 interface SaverProps {
     boardId: string;
@@ -221,28 +222,31 @@ function Renderer() {
     }, [downloadPNG, downloadSVG]);
 
     return (
-        <svg
-            ref={svgRef}
-            data-testid="svg-element"
-            width={bounds.width}
-            height={bounds.height}
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <g
-                data-testid="svg-group"
-                transform={`translate(${translateX}, ${translateY})`}
+        <>
+            <Script src="/workers/embedImages.worker.js" strategy="worker" />
+            <svg
+                ref={svgRef}
+                data-testid="svg-element"
                 width={bounds.width}
                 height={bounds.height}
+                xmlns="http://www.w3.org/2000/svg"
             >
-                {layerIds?.map((layerId) => (
-                    <LayerPreview
-                        key={layerId}
-                        id={layerId}
-                        onLayerPointerDown={() => {}}
-                        selectionColor={undefined}
-                    />
-                ))}
-            </g>
-        </svg>
+                <g
+                    data-testid="svg-group"
+                    transform={`translate(${translateX}, ${translateY})`}
+                    width={bounds.width}
+                    height={bounds.height}
+                >
+                    {layerIds?.map((layerId) => (
+                        <LayerPreview
+                            key={layerId}
+                            id={layerId}
+                            onLayerPointerDown={() => {}}
+                            selectionColor={undefined}
+                        />
+                    ))}
+                </g>
+            </svg>
+        </>
     );
 }
