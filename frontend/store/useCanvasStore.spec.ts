@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCanvasStore } from './useCanvasStore';
 import { Layer, LayerType, TextAlign } from '@/types/canvas';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 describe('useCanvasStore', () => {
     const sampleLayer: Layer = {
@@ -48,7 +49,7 @@ describe('useCanvasStore', () => {
         fill: { r: 255, g: 255, b: 0 },
         value: 'Note',
         lineWidth: 1,
-        fontName: 'Arial',
+        fontName: Fonts[0],
         fontSize: 12,
         textAlign: TextAlign.Left,
         textFormat: [],

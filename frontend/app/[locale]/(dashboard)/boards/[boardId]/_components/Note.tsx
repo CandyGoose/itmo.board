@@ -1,17 +1,17 @@
-import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
-import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
+import { colorToCss, getContrastingTextColor } from '@/lib/utils';
 import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
 import { useMutation } from '@/liveblocks.config';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-
-const font = Kalam({
-    subsets: ['latin'],
-    weight: ['400'],
-});
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
+
+const PLACEHOLDER_COLOR = {
+    light: '#aaa',
+    dark: '#555',
+};
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
@@ -63,7 +63,7 @@ export const calculateFontSize = (
     height: number,
     text: string,
     initialFontSize = MAX_FONT_SIZE,
-    fontName = 'Kalam',
+    fontName = Fonts[0],
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -180,29 +180,33 @@ export const Note = ({
         return { textAlign: alignmentMap[textAlign] || 'center' };
     }, [textAlign]);
 
+    const placeholderTextColor = useMemo(() => {
+        const baseColor = fill ? getContrastingTextColor(fill) : '#000';
+        return baseColor === '#000' || baseColor === 'black'
+            ? PLACEHOLDER_COLOR.dark
+            : PLACEHOLDER_COLOR.light;
+    }, [fill]);
+
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: textColor,
+            color: value ? textColor : placeholderTextColor,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            padding: '0.5rem',
         }),
-        [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
-    );
-
-    const PLACEHOLDER_COLOR = '#aaa';
-
-    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
-        ...textStyle,
-        color: PLACEHOLDER_COLOR,
-    });
-
-    const placeholderStyle = useMemo<CSSProperties>(
-        () => getPlaceholderStyle(textStyle),
-        [textStyle],
+        [
+            currFontSize,
+            textColor,
+            fontName,
+            applyTextAlign,
+            applyTextFormat,
+            placeholderTextColor,
+            value,
+        ],
     );
 
     return (
@@ -223,7 +227,7 @@ export const Note = ({
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center"
+                className="flex flex-col justify-center"
                 style={{
                     backgroundColor: backgroundColor,
                     height: height,
@@ -234,10 +238,10 @@ export const Note = ({
             >
                 <ContentEditable
                     html={value || 'Text' || ''}
-                    className={cn(fontName === 'Kalam' ? font.className : '')}
-                    style={value ? textStyle : placeholderStyle}
+                    style={textStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"
+                    data-testid="note-content-editable"
                 />
             </div>
         </foreignObject>

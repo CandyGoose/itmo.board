@@ -52,5 +52,9 @@
     "board": "Board",
     "viewOnly": "View only",
     "editMode": "Edit mode"
+  },
+  "Metadata": {
+    "sign-in": "Sign in",
+    "sign-up": "Sign up"
   }
 }
