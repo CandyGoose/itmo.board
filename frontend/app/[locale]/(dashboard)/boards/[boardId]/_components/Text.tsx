@@ -9,7 +9,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { calculateFontSize } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { calculateFontSize, font } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 interface TextProps {
     id: string;
@@ -23,7 +23,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         y,
         width,
         height,
-        fill, // Цвет текста
+        fill,
         value = 'Text',
         fontName,
         fontSize,
@@ -34,7 +34,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const padding = 10; // Отступы от текста до края контейнера
+    const padding = 10;
 
     const updateValue = useMutation(({ storage }, newValue: string) => {
         const liveLayers = storage.get('layers');
@@ -51,9 +51,9 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
 
     useEffect(() => {
         if (containerRef.current) {
-            const contentWidth = containerRef.current.offsetWidth - padding * 2; // Учитываем горизонтальные отступы
+            const contentWidth = containerRef.current.offsetWidth - padding * 2;
             const contentHeight =
-                containerRef.current.offsetHeight - padding * 2; // Учитываем вертикальные отступы
+                containerRef.current.offsetHeight - padding * 2;
 
             const newFontSize = calculateFontSize(
                 contentWidth,
@@ -90,23 +90,25 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: fill ? colorToCss(fill) : '#000',
+            color: fill ? colorToCss(fill) : PLACEHOLDER_COLOR,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            backgroundColor: 'transparent', // Всегда прозрачный фон
-            padding: `${padding}px`, // Отступы от краёв контейнера
-            boxSizing: 'border-box', // Учитываем отступы в общей ширине/высоте
+            backgroundColor: 'transparent',
+            padding: `${padding}px`,
+            boxSizing: 'border-box',
         }),
         [currFontSize, fill, fontName, applyTextAlign, applyTextFormat],
     );
 
+    const PLACEHOLDER_COLOR = '#aaa';
+
     const placeholderStyle = useMemo<CSSProperties>(
         () => ({
             ...textStyle,
-            color: '#aaa',
+            color: PLACEHOLDER_COLOR,
         }),
         [textStyle],
     );
@@ -131,6 +133,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                     html={value || 'Text'}
                     className={cn(
                         'h-full w-full flex flex-col justify-center outline-none',
+                        font.className,
                     )}
                     style={value ? textStyle : placeholderStyle}
                     onChange={handleContentChange}

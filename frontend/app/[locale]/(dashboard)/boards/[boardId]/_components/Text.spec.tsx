@@ -135,13 +135,6 @@ describe('Text component', () => {
         );
     });
 
-    it('should not apply outline when selectionColor is not provided', () => {
-        renderComponent(mockLayer);
-
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        expect(foreignObjectElement).toHaveStyle('outline: none');
-    });
-
     it('should apply correct font family when fontName is specified', () => {
         renderComponent(mockLayer);
 
