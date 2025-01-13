@@ -29,7 +29,16 @@ exports.getByOrgId = async (req, res) => {
 
 exports.createBoard = async (req, res) => {
     try {
-        const board = await Board.create(req.body);
+        const { title, orgId, authorId, imageUrl } = req.body;
+
+        const board = await Board.create({
+            title,
+            orgId,
+            authorId,
+            imageUrl,
+            createdAt: new Date(), // Сохраняем в UTC
+        });
+
         return res.status(200).json(board);
     } catch (error) {
         return res.status(500).json({ error: error.message });
