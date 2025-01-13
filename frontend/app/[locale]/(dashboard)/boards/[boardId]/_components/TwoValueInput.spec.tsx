@@ -85,7 +85,7 @@ describe('TwoValueInput Component', () => {
         expect(defaultProps.onChange2).toHaveBeenCalledWith(56.78);
     });
 
-    test('handles empty input by passing NaN to onChange handlers', () => {
+    test('handles empty input by passing 0 to onChange handlers', () => {
         render(<TwoValueInput {...defaultProps} />);
         const firstInput = screen.getByLabelText(
             'First Label',
@@ -97,7 +97,7 @@ describe('TwoValueInput Component', () => {
         fireEvent.change(firstInput, { target: { value: '' } });
         fireEvent.change(secondInput, { target: { value: '' } });
 
-        expect(defaultProps.onChange1).toHaveBeenCalledWith(NaN);
-        expect(defaultProps.onChange2).toHaveBeenCalledWith(NaN);
+        expect(defaultProps.onChange1).toHaveBeenCalledWith(0);
+        expect(defaultProps.onChange2).toHaveBeenCalledWith(0);
     });
 });

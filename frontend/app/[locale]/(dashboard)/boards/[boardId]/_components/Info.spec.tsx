@@ -14,12 +14,21 @@ jest.mock('@/actions/Board', () => ({
     getBoardById: jest.fn(),
 }));
 
+jest.mock('@/actions/CanvasSaver', () => ({
+    __esModule: true,
+    default: () => <div data-testid="canvas-saver-mock" />,
+}));
+
 jest.mock('@clerk/nextjs', () => ({
     useOrganization: jest.fn(),
 }));
 
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
+}));
+
+jest.mock('next-intl', () => ({
+    useTranslations: () => (key: string) => key,
 }));
 
 describe('Info Component', () => {

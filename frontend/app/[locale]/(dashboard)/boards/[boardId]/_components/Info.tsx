@@ -19,6 +19,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { useOrganization } from '@clerk/nextjs';
+import CanvasSaver from '@/actions/CanvasSaver';
+import { useTranslations } from 'next-intl';
 
 const font = Poppins({
     subsets: ['latin'],
@@ -41,6 +43,7 @@ export const Info = ({
     const { onOpen } = useRenameModal();
     const [board, setBoard] = useState<Board>();
     const router = useRouter();
+    const t = useTranslations('tools');
 
     const { membership } = useOrganization();
 
@@ -63,7 +66,7 @@ export const Info = ({
             }
         };
         request();
-    }, [board, boardId, router]);
+    }, [boardId, router]);
 
     if (!board) return <InfoSkeleton />;
 
@@ -85,7 +88,7 @@ export const Info = ({
                                     font.className,
                                 )}
                             >
-                                Board
+                                {t('board')}
                             </span>
                         </Link>
                     </Button>
@@ -117,6 +120,9 @@ export const Info = ({
                         </Hint>
                     </div>
                 </Actions>
+                <div style={{ display: 'none' }}>
+                    <CanvasSaver boardId={boardId} />
+                </div>
             </div>
 
             <DropdownMenu>
@@ -142,13 +148,13 @@ export const Info = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                     <DropdownMenuItem onClick={() => setEditable(false)}>
-                        View only
+                        {t('viewOnly')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => setEditable(true)}
                         disabled={!membership}
                     >
-                        Edit mode
+                        {t('editMode')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

@@ -9,9 +9,23 @@ import { ModalProvider } from '@/providers/ModalProvider';
 import YandexMetrika from '@/metrika/YandexMetrika';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import Loading from './loading';
+import { enUS, ruRU } from '@clerk/localizations';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: {
+        template: 'itmo.board | %s',
+        default: 'itmo.board',
+    },
+};
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
+};
+
+const clerkLocaleMap = {
+    en: enUS,
+    ru: ruRU,
 };
 
 export default async function LocaleLayout({
@@ -32,7 +46,8 @@ export default async function LocaleLayout({
                 <YandexMetrika />
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ErrorBoundary>
-                        <ClerkProvider>
+                        {/*@ts-expect-error: Ignore clerk locale map error*/}
+                        <ClerkProvider localization={clerkLocaleMap[locale]}>
                             <body>
                                 <Suspense fallback={<Loading />}>
                                     <ThemeProvider>

@@ -7,6 +7,7 @@ import {
     MAX_FONT_SIZE,
     MIN_FONT_SIZE,
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => {
@@ -16,12 +17,6 @@ jest.mock('next-intl', () => ({
         };
         return messages[key];
     },
-}));
-
-jest.mock('next/font/google', () => ({
-    Kalam: () => ({
-        className: 'mock-kalam-class',
-    }),
 }));
 
 jest.mock('@/liveblocks.config', () => ({
@@ -34,7 +29,7 @@ const FontPickerWrapper: React.FC<{
     onFontChange?: jest.Mock;
     onFontSizeChange?: jest.Mock;
 }> = ({
-    initialFontName = 'Kalam',
+    initialFontName = Fonts[0],
     initialFontSize = 12,
     onFontChange = jest.fn(),
     onFontSizeChange = jest.fn(),
@@ -98,37 +93,30 @@ describe('FontPicker', () => {
         const select = screen.getByLabelText('Font');
         expect(select).toBeInTheDocument();
 
-        expect(
-            screen.getByRole('option', { name: 'Kalam' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Arial' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Times New Roman' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Courier New' }),
-        ).toBeInTheDocument();
+        Fonts.forEach((font) => {
+            expect(
+                screen.getByRole('option', { name: font }),
+            ).toBeInTheDocument();
+        });
     });
 
     it('select shows the correct initial font', () => {
-        renderComponent({ fontName: 'Arial' });
+        renderComponent({ fontName: Fonts[0] });
 
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
-        expect(select.value).toBe('Arial');
+        expect(select.value).toBe(Fonts[0]);
     });
 
     it('calls onFontChange when a different font is selected', async () => {
         renderComponent({});
 
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
-        await userEvent.selectOptions(select, 'Arial');
+        await userEvent.selectOptions(select, Fonts[1]);
 
         expect(mockOnFontChange).toHaveBeenCalledTimes(1);
-        expect(mockOnFontChange).toHaveBeenCalledWith('Arial');
+        expect(mockOnFontChange).toHaveBeenCalledWith(Fonts[1]);
 
-        expect(select.value).toBe('Arial');
+        expect(select.value).toBe(Fonts[1]);
     });
 
     it('renders the font size label with translated text', () => {

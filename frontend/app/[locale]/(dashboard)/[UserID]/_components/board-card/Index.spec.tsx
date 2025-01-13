@@ -6,6 +6,11 @@ import { act } from 'react';
 import { useTranslations } from 'next-intl';
 import { useClerk } from '@clerk/nextjs';
 
+jest.mock('@/actions/CanvasSaver', () => ({
+    __esModule: true,
+    default: () => <div data-testid="canvas-saver-mock" />,
+}));
+
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
     useParams: jest.fn(() => ({ UserID: '123' })),
@@ -18,6 +23,7 @@ jest.mock('next-intl', () => ({
         if (key === 'teammate') return 'Teammate';
         return key;
     }),
+    useLocale: jest.fn(() => 'en'),
 }));
 
 jest.mock('@clerk/nextjs', () => ({

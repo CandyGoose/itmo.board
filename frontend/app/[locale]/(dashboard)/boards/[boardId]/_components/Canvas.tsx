@@ -6,6 +6,7 @@ import {
     CanvasState,
     Color,
     EllipseLayer,
+    ImageLayer,
     Layer,
     LayerType,
     NoteLayer,
@@ -27,6 +28,7 @@ import {
     penPointsToPathLayer,
     pointerEventToCanvasPoint,
     resizeBounds,
+    roundToTwoDecimals,
 } from '@/lib/utils';
 import { Info } from './Info';
 import { ToolBar } from './Toolbar';
@@ -50,6 +52,8 @@ import {
 import { LiveObject } from '@liveblocks/client';
 import { useDeleteLayers } from '@/hooks/useDeleteLayers';
 import { Path } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Path';
+import { ImageUpload } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageUpload';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 20;
@@ -75,12 +79,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
-    const [isPanning, setIsPanning] = useState(false);
-    const [moved, setMoved] = useState(false);
-    const [lastPointerPosition, setLastPointerPosition] = useState({
-        x: 0,
-        y: 0,
-    });
 
     const selections = useOthersMapped((other) => other.presence.selection);
     const selection = useSelf((me) => me.presence.selection);
@@ -96,18 +94,22 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const canRedo = useCanRedo();
 
     const [lastUsedColor, setLastUsedColor] = useState<Color>({
-        r: 0,
-        g: 0,
-        b: 0,
+        r: 33,
+        g: 150,
+        b: 243,
     });
     const [transparentFill, setTransparentFill] = useState(false);
     const [lineWidth, setLineWidth] = useState<number>(2);
-    const [fontName, setFontName] = useState<string>('Kalam');
+    const [fontName, setFontName] = useState<string>(Fonts[0]);
     const [fontSize, setFontSize] = useState<number>(14);
     const [textAlign, setTextAlign] = useState<TextAlign>(TextAlign.Center);
     const [textFormat, setTextFormat] = useState<TextFormat[]>([
         TextFormat.None,
     ]);
+
+    const [showImageUpload, setShowImageUpload] = useState(false);
+    const [pendingImagePosition, setPendingImagePosition] =
+        useState<Point | null>(null);
 
     useEffect(() => {
         if (svgRef.current) {
@@ -138,7 +140,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 (canvasState.layerType === LayerType.Text ||
                     canvasState.layerType === LayerType.Note ||
                     canvasState.layerType === LayerType.Rectangle ||
-                    canvasState.layerType === LayerType.Ellipse)) ||
+                    canvasState.layerType === LayerType.Ellipse ||
+                    canvasState.layerType === LayerType.Image)) ||
             canvasState.mode === CanvasMode.Pencil
         );
     }, [canvasState]);
@@ -164,7 +167,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     }, [selections]);
 
     const insertLayer = useMutation(
-        ({ storage, setMyPresence }, layerType: LayerType, position: Point) => {
+        (
+            { storage, setMyPresence },
+            layerType: LayerType,
+            position: Point,
+            imageData?: { url: string; width?: number; height?: number },
+        ) => {
             const liveLayers = storage.get('layers');
             const liveLayerIds = storage.get('layerIds');
             const id = nanoid();
@@ -215,6 +223,15 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         textFormat,
                     } as NoteLayer;
                     break;
+                case LayerType.Image:
+                    layerData = {
+                        ...baseProps,
+                        type: LayerType.Image,
+                        width: imageData?.width ?? 100,
+                        height: imageData?.height ?? 100,
+                        src: imageData?.url ?? '',
+                    } as ImageLayer;
+                    break;
                 default:
                     throw new Error(`Invalid layer type: ${layerType}`);
             }
@@ -247,15 +264,19 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 y: point.y - canvasState.current.y,
             };
 
-            const liveLayers = storage.get('layers');
+            const offsetSquared = offset.x * offset.x + offset.y * offset.y;
 
-            for (const id of self.presence.selection) {
-                const layer = liveLayers.get(id);
-                if (layer) {
-                    layer.update({
-                        x: layer.get('x') + offset.x,
-                        y: layer.get('y') + offset.y,
-                    });
+            if (offsetSquared >= 0.0001) {
+                const liveLayers = storage.get('layers');
+
+                for (const id of self.presence.selection) {
+                    const layer = liveLayers.get(id);
+                    if (layer) {
+                        layer.update({
+                            x: roundToTwoDecimals(layer.get('x') + offset.x),
+                            y: roundToTwoDecimals(layer.get('y') + offset.y),
+                        });
+                    }
                 }
             }
             setCanvasState({ mode: CanvasMode.Translating, current: point });
@@ -291,33 +312,14 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         [editable, layerIds],
     );
 
-    // Start multi-selection if pointer moved sufficiently
-    const startMultiSelection = useCallback(
-        (current: Point, origin: Point) => {
-            if (!editable) return;
-            if (
-                Math.abs(current.x - origin.x) +
-                    Math.abs(current.y - origin.y) >
-                5
-            ) {
-                setCanvasState({
-                    mode: CanvasMode.SelectionNet,
-                    origin,
-                    current,
-                });
-            }
-        },
-        [editable],
-    );
-
     const continueDrawing = useMutation(
         ({ self, setMyPresence }, point: Point, e: React.PointerEvent) => {
             const { pencilDraft } = self.presence;
             if (canvasState.mode !== CanvasMode.Pencil || !pencilDraft) return;
 
             const roundedPoint: [number, number, number] = [
-                Number(point.x.toFixed(4)),
-                Number(point.y.toFixed(4)),
+                Math.round(point.x * 10000) / 10000,
+                Math.round(point.y * 10000) / 10000,
                 Number(e.pressure),
             ];
 
@@ -455,37 +457,34 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerDown = useCallback(
         (e: React.PointerEvent) => {
+            if (canvasState.mode === CanvasMode.Inserting) return;
+
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
-            if (canvasState.mode === CanvasMode.Inserting) {
-                return;
-            }
             if (canvasState.mode === CanvasMode.Pencil) {
                 startDrawing(point, e.pressure);
                 return;
             }
-            if (e.button === 0) {
-                if (e.shiftKey) {
-                    setCanvasState({
-                        mode: CanvasMode.SelectionNet,
-                        origin: point,
-                        current: point,
-                    });
-                } else {
-                    const closePathId = clickCloseToAnyPath(
-                        layerIds,
-                        layers,
-                        point,
-                        10,
-                    );
-                    if (closePathId) {
-                        onLayerPointerDown(e, closePathId);
-                        return;
-                    }
-                    setIsPanning(true);
-                    setLastPointerPosition({ x: e.clientX, y: e.clientY });
+            if ((e.button === 0 && e.shiftKey) || e.button === 1) {
+                setCanvasState({
+                    mode: CanvasMode.SelectionNet,
+                    origin: point,
+                    current: point,
+                });
+            } else if (e.button === 0) {
+                const closePathId = clickCloseToAnyPath(
+                    layerIds,
+                    layers,
+                    point,
+                    10,
+                );
+                if (closePathId) {
+                    onLayerPointerDown(e, closePathId);
+                    return;
                 }
-            } else {
-                setCanvasState({ mode: CanvasMode.Pressing, origin: point });
+                setCanvasState({
+                    mode: CanvasMode.Pressing,
+                    origin: { x: e.clientX, y: e.clientY },
+                });
             }
         },
         [
@@ -502,15 +501,24 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
+            e.stopPropagation();
             if (!editable) {
                 setCanvasState({ mode: CanvasMode.None });
             }
-            e.stopPropagation();
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
 
             switch (canvasState.mode) {
                 case CanvasMode.Pressing:
-                    startMultiSelection(point, canvasState.origin!);
+                    const dx = e.clientX - canvasState.origin.x;
+                    const dy = e.clientY - canvasState.origin.y;
+                    setCamera((prev) => ({
+                        x: prev.x + dx,
+                        y: prev.y + dy,
+                    }));
+                    setCanvasState({
+                        mode: CanvasMode.Pressing,
+                        origin: { x: e.clientX, y: e.clientY },
+                    });
                     break;
                 case CanvasMode.SelectionNet:
                     updateSelectionNet(point, canvasState.origin!);
@@ -525,16 +533,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     continueDrawing(point, e);
                     break;
                 default:
-                    if (isPanning) {
-                        const dx = e.clientX - lastPointerPosition.x;
-                        const dy = e.clientY - lastPointerPosition.y;
-                        setCamera((prev) => ({
-                            x: prev.x + dx,
-                            y: prev.y + dy,
-                        }));
-                        setLastPointerPosition({ x: e.clientX, y: e.clientY });
-                        setMoved(true);
-                    }
+                    break;
             }
             setMyPresence({ cursor: point });
         },
@@ -544,34 +543,34 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             scale,
             svgRect,
             canvasState,
-            isPanning,
-            startMultiSelection,
             updateSelectionNet,
             translateSelectedLayers,
             resizeSelectedLayers,
             continueDrawing,
-            lastPointerPosition,
         ],
     );
 
     const onPointerUp = useMutation(
         ({}, e) => {
-            setIsPanning(false);
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
             if (
                 canvasState.mode === CanvasMode.None ||
                 canvasState.mode === CanvasMode.Pressing
             ) {
-                if (!moved) unselectLayers();
+                unselectLayers();
                 setCanvasState({ mode: CanvasMode.None });
             } else if (canvasState.mode === CanvasMode.Pencil && editable) {
                 insertPath();
             } else if (canvasState.mode === CanvasMode.Inserting && editable) {
-                insertLayer(canvasState.layerType!, point);
+                if (canvasState.layerType === LayerType.Image) {
+                    setPendingImagePosition(point);
+                    setShowImageUpload(true);
+                } else {
+                    insertLayer(canvasState.layerType!, point);
+                }
             } else {
                 setCanvasState({ mode: CanvasMode.None });
             }
-            setMoved(false);
             history.resume();
         },
         [
@@ -580,7 +579,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             editable,
             insertLayer,
             insertPath,
-            moved,
             scale,
             svgRect,
             unselectLayers,
@@ -589,8 +587,19 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerLeave = useMutation(({ setMyPresence }) => {
         setMyPresence({ cursor: null });
-        setIsPanning(false);
     }, []);
+
+    // Handler that the <ImageUpload/> calls after finishing upload
+    const handleImageUploadComplete = useCallback(
+        (url: string, width?: number, height?: number) => {
+            setShowImageUpload(false);
+            if (!pendingImagePosition) return;
+            const imageData = { url, width, height };
+            insertLayer(LayerType.Image, pendingImagePosition, imageData);
+            setPendingImagePosition(null);
+        },
+        [pendingImagePosition, insertLayer],
+    );
 
     const deleteLayers = useDeleteLayers();
 
@@ -637,7 +646,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 setPasteCount((prev) => prev + 1);
             }
         },
-        [pasteCount],
+        [pasteCount, editable],
     );
 
     const selectAllLayers = useMutation(({ storage, setMyPresence }) => {
@@ -847,13 +856,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     break;
                 }
                 case 'Delete':
-                    if (
-                        selection.some(
-                            (id) => layers.get(id)?.type !== LayerType.Note,
-                        )
-                    ) {
-                        deleteLayers();
-                    }
+                    deleteLayers();
                     break;
                 case 'c':
                     if (e.ctrlKey || e.metaKey) {
@@ -895,9 +898,17 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     return (
         <main
-            className={cn('h-full w-full relative bg-neutral-100 touch-none')}
+            className={cn('h-full w-full relative touch-none')}
             data-testid="canvas-main"
         >
+            {svgRect && (
+                <Grid
+                    camera={camera}
+                    scale={scale}
+                    width={svgRect.width}
+                    height={svgRect.height}
+                />
+            )}
             {/* Container for aligning buttons in the top-right corner */}
             <div className="absolute top-2 right-2 flex items-center gap-2">
                 <Participants className="h-12 w-12" />
@@ -928,6 +939,13 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 moveForward={moveForward}
                 moveBackward={moveBackward}
             />
+
+            {showImageUpload && (
+                <ImageUpload
+                    onClose={() => setShowImageUpload(false)}
+                    onUploadComplete={handleImageUploadComplete}
+                />
+            )}
 
             {editable &&
                 showSelectionTools &&
@@ -991,7 +1009,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         data-testid="selection-tools"
                     />
                 )}
-
             <svg
                 ref={svgRef}
                 data-testid="svg-element"
@@ -1003,14 +1020,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 onPointerUp={onPointerUp}
                 tabIndex={0}
             >
-                {svgRect && (
-                    <Grid
-                        camera={camera}
-                        scale={scale}
-                        width={svgRect.width}
-                        height={svgRect.height}
-                    />
-                )}
                 <g
                     data-testid="svg-group"
                     transform={`translate(${camera.x}, ${camera.y}) scale(${scale})`}

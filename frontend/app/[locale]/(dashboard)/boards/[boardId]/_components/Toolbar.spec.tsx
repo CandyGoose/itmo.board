@@ -42,6 +42,7 @@ describe('ToolBar Component', () => {
         rectangle: 'rectangle',
         ellipse: 'ellipse',
         stickyNote: 'sticky note',
+        image: 'image',
     };
     const mockUseTranslations = useTranslations as jest.Mock;
     mockUseTranslations.mockImplementation(
@@ -199,6 +200,18 @@ describe('ToolBar Component', () => {
         expect(mockSetCanvasState).toHaveBeenCalledWith({
             mode: CanvasMode.Inserting,
             layerType: LayerType.Note,
+        });
+    });
+
+    it('sets mode to inserting and layerType to image when Image button is clicked', () => {
+        setup();
+
+        const noteButton = screen.getByTestId('tool-button-image');
+        fireEvent.click(noteButton);
+
+        expect(mockSetCanvasState).toHaveBeenCalledWith({
+            mode: CanvasMode.Inserting,
+            layerType: LayerType.Image,
         });
     });
 

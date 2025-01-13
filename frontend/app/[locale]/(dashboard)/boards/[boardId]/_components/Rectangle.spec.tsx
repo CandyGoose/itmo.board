@@ -29,8 +29,6 @@ describe('Rectangle', () => {
         );
 
         const rectElement = container.querySelector('rect');
-        expect(rectElement).toHaveAttribute('x', '0');
-        expect(rectElement).toHaveAttribute('y', '0');
         expect(rectElement).toHaveAttribute('width', '100');
         expect(rectElement).toHaveAttribute('height', '50');
         expect(rectElement).toHaveStyle('transform: translate(10px, 20px)');

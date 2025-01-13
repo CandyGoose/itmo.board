@@ -48,7 +48,10 @@ mongoose
     });
 app.use(bodyParser.json());
 
-require('./views/board.view')(app);
+app.use('/uploads', express.static('uploads'));
+
+require('./views/ImageUpload.view')(app);
+require('./views/Board.view')(app);
 
 app.listen(port, () => {
     console.log(`Server is running at site: http://localhost:${port}`);
