@@ -201,6 +201,7 @@ export const Note = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            padding: '0.5rem',
         }),
         [
             currFontSize,
@@ -231,7 +232,7 @@ export const Note = ({
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center"
+                className="flex flex-col justify-center"
                 style={{
                     backgroundColor: backgroundColor,
                     height: height,
