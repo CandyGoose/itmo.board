@@ -943,38 +943,29 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                                 .map((id) => layersMap.get(id))
                                 .filter(Boolean) as Layer[]
                         }
-                        onColorChange={
-                            selection.length === 1
-                                ? setLayerColor
-                                : setLastUsedColor
-                        }
+                        onColorChange={(color) => {
+                            setLastUsedColor(color);
+                            if (selection.length === 1) {
+                                setLayerColor(color);
+                            }
+                        }}
                         lineWidth={lineWidth}
                         onLineWidthChange={
-                            selection.length === 1
-                                ? setLayerLineWidth
-                                : setLineWidth
+                            selection.length === 1 ? setLayerLineWidth : setLineWidth
                         }
                         fontName={fontName}
-                        onFontChange={
-                            selection.length === 1 ? setLayerFont : setFontName
-                        }
+                        onFontChange={selection.length === 1 ? setLayerFont : setFontName}
                         fontSize={fontSize}
                         onFontSizeChange={
-                            selection.length === 1
-                                ? setLayerFontSize
-                                : setFontSize
+                            selection.length === 1 ? setLayerFontSize : setFontSize
                         }
                         fontAlign={textAlign}
                         onTextAlignChange={
-                            selection.length === 1
-                                ? setLayerTextAlign
-                                : setTextAlign
+                            selection.length === 1 ? setLayerTextAlign : setTextAlign
                         }
                         fontFormat={textFormat}
                         onTextFormatChange={
-                            selection.length === 1
-                                ? setLayerTextFormat
-                                : setTextFormat
+                            selection.length === 1 ? setLayerTextFormat : setTextFormat
                         }
                         onPositionChange={(x, y) => {
                             if (selection.length === 1) {
@@ -988,9 +979,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         }}
                         transparentFill={transparentFill}
                         onTransparentFillChange={
-                            selection.length === 1
-                                ? setLayerTransparent
-                                : setTransparentFill
+                            selection.length === 1 ? setLayerTransparent : setTransparentFill
                         }
                         className="top-[65px]"
                         data-testid="selection-tools"
