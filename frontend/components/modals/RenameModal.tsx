@@ -14,32 +14,28 @@ import {
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { renameBoard } from '@/actions/Board';
-import { useRouter } from 'next/navigation';
+import { useApiMutation } from "@/hooks/useApiMutation";
+import { api } from "@/convex/_generated/api";
 
 export const RenameModal = () => {
+    const { mutate, pending } = useApiMutation(api.Board.updateById);
     const { isOpen, onClose, initialValues } = useRenameModal();
     const [title, setTitle] = useState(initialValues.title);
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         setTitle(initialValues.title);
     }, [initialValues.title]);
 
-    const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-        try {
-            setLoading(true);
-            e.preventDefault();
-            await renameBoard(initialValues.id, title);
-            toast.success('Board renamed.');
-            router.push('/');
-            onClose();
-        } catch {
-            toast.error('Failed to rename board.');
-        } finally {
-            setLoading(false);
-        }
+    const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+        mutate({ id: initialValues.id, title })
+            .then(() => {
+                toast.success("Board renamed");
+                onClose();
+            })
+            .catch(() => {
+                toast.error("Failed to rename board");
+            });
     };
 
     return (
@@ -54,7 +50,7 @@ export const RenameModal = () => {
                 </DialogDescription>
                 <form onSubmit={onSubmit} className="space-y-4">
                     <Input
-                        disabled={loading}
+                        disabled={pending}
                         required
                         maxLength={60}
                         value={title}
@@ -71,7 +67,7 @@ export const RenameModal = () => {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button disabled={loading} type="submit">
+                        <Button disabled={pending} type="submit">
                             Save
                         </Button>
                     </DialogFooter>
