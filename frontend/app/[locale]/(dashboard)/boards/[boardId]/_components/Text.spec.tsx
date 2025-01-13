@@ -54,14 +54,13 @@ describe('Text component', () => {
         jest.clearAllMocks();
     });
 
-    const renderComponent = (layer: TextLayer, selectionColor?: string) => {
+    const renderComponent = (layer: TextLayer) => {
         return render(
             <svg>
                 <TextModule.Text
                     id={layer.id}
                     layer={layer}
                     onPointerDown={onPointerDown}
-                    selectionColor={selectionColor}
                 />
             </svg>,
         );
@@ -134,20 +133,6 @@ describe('Text component', () => {
             expect.any(Object),
             'text-1',
         );
-    });
-
-    it('should apply selection color when provided', () => {
-        renderComponent(mockLayer, '#FF00FF');
-
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        expect(foreignObjectElement).toHaveStyle('outline: 1px solid #FF00FF');
-    });
-
-    it('should not apply outline when selectionColor is not provided', () => {
-        renderComponent(mockLayer);
-
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        expect(foreignObjectElement).toHaveStyle('outline: none');
     });
 
     it('should apply correct font family when fontName is specified', () => {
@@ -335,13 +320,6 @@ describe('Text component', () => {
         expect(editableDiv?.textContent).toBe('Third change');
     });
 
-    it('should not apply any outline when selectionColor is an empty string', () => {
-        renderComponent(mockLayer, '');
-
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        expect(foreignObjectElement).toHaveStyle('outline: none');
-    });
-
     it('should apply multiple styles correctly without conflicts', () => {
         const multiStyleLayer: TextLayer = {
             ...mockLayer,
@@ -351,13 +329,12 @@ describe('Text component', () => {
             fill: { r: 0, g: 255, b: 0 },
         };
 
-        renderComponent(multiStyleLayer, '#00FF00');
+        renderComponent(multiStyleLayer);
 
         const foreignObjectElement = screen.getByTestId('text-foreign-object');
         expect(foreignObjectElement).toHaveStyle(
             'background-color: transparent;',
         );
-        expect(foreignObjectElement).toHaveStyle('outline: 1px solid #00FF00');
 
         const editableDiv =
             foreignObjectElement.querySelector('div.kalam-font');
