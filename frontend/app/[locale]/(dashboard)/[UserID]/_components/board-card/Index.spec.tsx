@@ -66,13 +66,15 @@ describe('BoardCard', () => {
         return render(
             <TestProviders>
                 <BoardCard {...defaultProps} {...extraProps} />
-            </TestProviders>
+            </TestProviders>,
         );
     }
 
     test('рендерит ссылку с правильным href', () => {
         renderBoardCard();
-        const linkElement = screen.getByRole('link', { name: /my test board/i });
+        const linkElement = screen.getByRole('link', {
+            name: /my test board/i,
+        });
         expect(linkElement).toHaveAttribute('href', '/boards/board-123');
     });
 
@@ -94,7 +96,7 @@ describe('BoardCard.Skeleton', () => {
         render(
             <TestProviders>
                 <BoardCard.Skeleton />
-            </TestProviders>
+            </TestProviders>,
         );
         expect(screen.getByTestId('board-card-skeleton')).toBeInTheDocument();
     });

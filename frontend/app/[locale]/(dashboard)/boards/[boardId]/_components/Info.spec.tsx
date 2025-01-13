@@ -55,7 +55,7 @@ describe('Info component', () => {
         return render(
             <TestProviders>
                 <Info boardId={boardId} />
-            </TestProviders>
+            </TestProviders>,
         );
     }
 
@@ -94,7 +94,9 @@ describe('Info component', () => {
         const linkEl = screen.getByRole('link', { name: /board/i });
         expect(linkEl).toHaveAttribute('href', '/');
 
-        expect(screen.getByRole('button', { name: /my test board/i })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: /my test board/i }),
+        ).toBeInTheDocument();
     });
 
     test('при клике на rename вызывает onOpen(boardId, title)', () => {
@@ -112,7 +114,9 @@ describe('Info component', () => {
 
         renderInfo(boardId);
 
-        const renameBtn = screen.getByRole('button', { name: /my test board/i });
+        const renameBtn = screen.getByRole('button', {
+            name: /my test board/i,
+        });
         fireEvent.click(renameBtn);
 
         expect(mockOnOpen).toHaveBeenCalledWith('board-123', 'My Test Board');

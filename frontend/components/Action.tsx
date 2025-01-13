@@ -26,8 +26,8 @@ import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useApiMutation } from "@/hooks/useApiMutation";
-import { api } from "@/convex/_generated/api";
+import { useApiMutation } from '@/hooks/useApiMutation';
+import { api } from '@/convex/_generated/api';
 import { useTranslations } from 'next-intl';
 
 interface ActionsProps {
@@ -63,10 +63,10 @@ export const Actions = ({
     const onDelete = () => {
         mutate({ id })
             .then(() => {
-                toast.success("Board deleted");
+                toast.success('Board deleted');
             })
             .catch(() => {
-                toast.error("Failed to delete board");
+                toast.error('Failed to delete board');
             });
     };
 

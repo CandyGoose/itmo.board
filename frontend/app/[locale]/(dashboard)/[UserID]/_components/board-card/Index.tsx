@@ -1,17 +1,17 @@
 'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { Overlay } from "./Overlay";
+import Image from 'next/image';
+import Link from 'next/link';
+import { Overlay } from './Overlay';
 
-import { formatDistanceToNow } from "date-fns";
-import { useAuth } from "@clerk/nextjs";
-import { Footer } from "./Footer";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { Actions } from "@/components/Action";
-import { MoreHorizontal } from "lucide-react";
-import {useState} from "react";
-import {router} from "next/client";
+import { formatDistanceToNow } from 'date-fns';
+import { useAuth } from '@clerk/nextjs';
+import { Footer } from './Footer';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Actions } from '@/components/Action';
+import { MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { router } from 'next/client';
 
 interface BoardCardProps {
     id: string;
@@ -24,16 +24,16 @@ interface BoardCardProps {
 }
 
 const BoardCard = ({
-                       id,
-                       title,
-                       imageUrl,
-                       authorId,
-                       authorName,
-                       createdAt,
-                       orgId,
-                   }: BoardCardProps) => {
+    id,
+    title,
+    imageUrl,
+    authorId,
+    authorName,
+    createdAt,
+    orgId,
+}: BoardCardProps) => {
     const { userId } = useAuth();
-    const authorLabel = userId === authorId ? "You" : authorName;
+    const authorLabel = userId === authorId ? 'You' : authorName;
     const createdLabel = formatDistanceToNow(createdAt, { addSuffix: true });
 
     const [loading, setLoading] = useState(false);
@@ -51,8 +51,11 @@ const BoardCard = ({
 
     return (
         <Link href={`/boards/${id}`}>
-            <div className="group aspect-[98/120] border rounded-lg flex cursor-pointer
-            flex-col justify-between overflow-hidden relative" onClick={onClick}>
+            <div
+                className="group aspect-[98/120] border rounded-lg flex cursor-pointer
+            flex-col justify-between overflow-hidden relative"
+                onClick={onClick}
+            >
                 <div className="relative bg-amber-50 flex-1">
                     <Image
                         src={imageUrl}

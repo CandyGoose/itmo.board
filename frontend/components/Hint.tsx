@@ -5,29 +5,29 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/Tooltip';
-import React from "react";
+import React from 'react';
 
 interface HintProps {
-    label: string,
-    children: React.ReactNode,
-    side?: 'top' | 'bottom' | 'left' | 'right',
-    align?: 'start' | 'center' | 'end',
-    sideOffset?: number,
-    alignOffset?: number,
-    tooltipArrow?: boolean,
-    deleyDuration?: number
+    label: string;
+    children: React.ReactNode;
+    side?: 'top' | 'bottom' | 'left' | 'right';
+    align?: 'start' | 'center' | 'end';
+    sideOffset?: number;
+    alignOffset?: number;
+    tooltipArrow?: boolean;
+    deleyDuration?: number;
 }
 
 const Hint = ({
-                  label,
-                  children,
-                  side,
-                  align,
-                  sideOffset,
-                  alignOffset,
-                  tooltipArrow,
-                  deleyDuration
-              }: HintProps) => {
+    label,
+    children,
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    tooltipArrow,
+    deleyDuration,
+}: HintProps) => {
     return (
         <TooltipProvider>
             <Tooltip delayDuration={100}>

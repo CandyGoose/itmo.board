@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { useApiMutation } from "@/hooks/useApiMutation";
-import { api } from "@/convex/_generated/api";
+import { useApiMutation } from '@/hooks/useApiMutation';
+import { api } from '@/convex/_generated/api';
 
 export const RenameModal = () => {
     const { mutate, pending } = useApiMutation(api.Board.updateById);
@@ -30,11 +30,11 @@ export const RenameModal = () => {
         e.preventDefault();
         mutate({ id: initialValues.id, title })
             .then(() => {
-                toast.success("Board renamed");
+                toast.success('Board renamed');
                 onClose();
             })
             .catch(() => {
-                toast.error("Failed to rename board");
+                toast.error('Failed to rename board');
             });
     };
 

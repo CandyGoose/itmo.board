@@ -1,22 +1,22 @@
 'use client';
 
-import Image from "next/image";
-import { Poppins } from "next/font/google";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { Id } from "@/convex/_generated/dataModel";
-import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import Image from 'next/image';
+import { Poppins } from 'next/font/google';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { api } from '@/convex/_generated/api';
+import { useQuery } from 'convex/react';
+import { Id } from '@/convex/_generated/dataModel';
+import { Button } from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import Hint from '@/components/Hint';
-import { useRenameModal } from "@/store/useRenameModal";
-import { Actions } from "@/components/Action";
-import { Menu } from "lucide-react";
+import { useRenameModal } from '@/store/useRenameModal';
+import { Actions } from '@/components/Action';
+import { Menu } from 'lucide-react';
 
 const font = Poppins({
-    subsets: ["latin"],
-    weight: ["600"],
+    subsets: ['latin'],
+    weight: ['600'],
 });
 
 interface InfoProps {
@@ -29,7 +29,7 @@ const TabSeparator = () => {
 
 export const Info = ({ boardId }: InfoProps) => {
     const { onOpen } = useRenameModal();
-    const data = useQuery(api.Board.get, { id: boardId as Id<"boards"> });
+    const data = useQuery(api.Board.get, { id: boardId as Id<'boards'> });
 
     if (!data) {
         return <InfoSkeleton />;
@@ -45,15 +45,20 @@ export const Info = ({ boardId }: InfoProps) => {
             >
                 <Button asChild className="px-2 " variant="board">
                     <Link href="/">
-                        <Image src="/logo.svg" alt="board logo" width={40} height={40} />
+                        <Image
+                            src="/logo.svg"
+                            alt="board logo"
+                            width={40}
+                            height={40}
+                        />
                         <span
                             className={cn(
-                                "font-semibold text-xl ml-2",
-                                font.className
+                                'font-semibold text-xl ml-2',
+                                font.className,
                             )}
                         >
-              Board
-            </span>
+                            Board
+                        </span>
                     </Link>
                 </Button>
             </Hint>
@@ -74,7 +79,12 @@ export const Info = ({ boardId }: InfoProps) => {
                 </Button>
             </Hint>
             <TabSeparator />
-            <Actions id={data._id} title={data.title} side="bottom" sideOffset={15}>
+            <Actions
+                id={data._id}
+                title={data.title}
+                side="bottom"
+                sideOffset={15}
+            >
                 <div>
                     <Hint
                         label="Main menu"
