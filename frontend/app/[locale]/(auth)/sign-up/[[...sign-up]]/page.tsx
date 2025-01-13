@@ -1,11 +1,12 @@
 import { SignUp } from '@clerk/nextjs';
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({
-    params: { locale },
-}: {
-    params: { locale: string };
-}) {
+type metaProps = {
+    params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: metaProps) {
+    const locale = (await params).locale;
     const t = await getTranslations({ locale, namespace: 'Metadata' });
 
     return {
