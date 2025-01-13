@@ -23,16 +23,27 @@ describe('Room Component', () => {
     const mockChildren = <div>Room Content</div>;
 
     it('renders LiveblocksProvider with correct authEndpoint', () => {
-        render(<Room roomId={mockRoomId} fallback={mockFallback}>{mockChildren}</Room>);
+        render(
+            <Room roomId={mockRoomId} fallback={mockFallback}>
+                {mockChildren}
+            </Room>,
+        );
 
         expect(LiveblocksProvider).toHaveBeenCalledWith(
-            expect.objectContaining({ authEndpoint: '/api/liveblocks-auth', throttle: 16 }),
-            expect.anything()
+            expect.objectContaining({
+                authEndpoint: '/api/liveblocks-auth',
+                throttle: 16,
+            }),
+            expect.anything(),
         );
     });
 
     it('renders RoomProvider with correct id and initialPresence/initialStorage', () => {
-        render(<Room roomId={mockRoomId} fallback={mockFallback}>{mockChildren}</Room>);
+        render(
+            <Room roomId={mockRoomId} fallback={mockFallback}>
+                {mockChildren}
+            </Room>,
+        );
 
         expect(RoomProvider).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -48,7 +59,7 @@ describe('Room Component', () => {
                     layerIds: expect.any(Object),
                 },
             }),
-            expect.anything()
+            expect.anything(),
         );
     });
 });

@@ -18,7 +18,8 @@ describe('Footer Component', () => {
 
         // Проверяем текст для автора и даты
         const authorAndDateMatcher = (_content, element) =>
-            element.textContent === `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
+            element.textContent ===
+            `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
 
         expect(screen.getByText(authorAndDateMatcher)).toBeInTheDocument();
     });
@@ -43,7 +44,8 @@ describe('Footer Component', () => {
         render(<Footer {...defaultProps} />);
 
         const authorAndDateMatcher = (_content, element) =>
-            element.textContent === `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
+            element.textContent ===
+            `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
 
         const authorInfo = screen.getByText(authorAndDateMatcher);
         expect(authorInfo).toHaveClass(
