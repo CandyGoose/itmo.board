@@ -141,3 +141,4 @@ function mimeToExtension(mimeType) {
             return '';
     }
 }
+exports.mimeToExtension = mimeToExtension;

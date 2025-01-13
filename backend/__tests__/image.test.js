@@ -6,8 +6,28 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const imageUploadRoutes = require('../views/ImageUpload.view');
 const app = express();
 const path = require('path');
+const {
+    uploadFileByUrl,
+    mimeToExtension,
+} = require('../controllers/ImageUpload');
 
 let mongoServer;
+global.fetch = jest.fn();
+
+function createMockReqRes(overrides = {}) {
+    const req = {
+        protocol: 'http',
+        get: jest.fn().mockReturnValue('localhost:3000'),
+        body: {},
+        file: null,
+        ...overrides,
+    };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+    };
+    return { req, res };
+}
 
 describe('Image Upload Tests', () => {
     beforeAll(async () => {
@@ -70,5 +90,91 @@ describe('Image Upload Tests', () => {
         expect(response.body).toHaveProperty('error');
 
         fs.unlinkSync(tmpFilePath);
+    });
+});
+
+describe('uploadFileByUrl', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should respond with 400 if url is not provided', async () => {
+        const { req, res } = createMockReqRes();
+        await uploadFileByUrl(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: 'URL not provided' });
+    });
+
+    it('should handle fetch failures (non-OK response)', async () => {
+        const { req, res } = createMockReqRes({
+            body: { url: 'http://example.com/test.png' },
+        });
+
+        // Mock fetch returning a 404 or similar
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 404,
+            statusText: 'Not Found',
+        });
+
+        await uploadFileByUrl(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            error: 'Failed to upload file from URL',
+        });
+    });
+
+    it('should reject unsupported MIME type', async () => {
+        const { req, res } = createMockReqRes({
+            body: { url: 'http://example.com/test.exe' },
+        });
+
+        global.fetch.mockResolvedValue({
+            ok: true,
+            headers: {
+                get: () => 'application/octet-stream', // unsupported
+            },
+            arrayBuffer: async () => new ArrayBuffer(8),
+        });
+
+        await uploadFileByUrl(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            error: 'Unsupported image mime type',
+        });
+    });
+
+    it('should handle exceptions and return 500', async () => {
+        const { req, res } = createMockReqRes({
+            body: { url: 'http://example.com/test.png' },
+        });
+
+        global.fetch.mockImplementation(() => {
+            throw new Error('Network failure');
+        });
+
+        await uploadFileByUrl(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            error: 'Failed to upload file from URL',
+        });
+    });
+});
+
+describe('mimeToExtension', () => {
+    test('should return correct extension for known mime types', () => {
+        expect(mimeToExtension('image/jpeg')).toBe('.jpg');
+        expect(mimeToExtension('image/png')).toBe('.png');
+        expect(mimeToExtension('image/gif')).toBe('.gif');
+        expect(mimeToExtension('image/svg+xml')).toBe('.svg');
+    });
+
+    test('should return empty string for unknown mime types', () => {
+        expect(mimeToExtension('application/json')).toBe('');
+        expect(mimeToExtension('text/plain')).toBe('');
     });
 });
