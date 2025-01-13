@@ -30,7 +30,7 @@ import { useOthers, useSelf } from '@/liveblocks.config';
 
 describe('Participants Component', () => {
     it('renders up to MAX_SHOWN_USERS participants', () => {
-        const mockUsers = Array(6)
+        const mockUsers = Array(12)
             .fill(0)
             .map((_, idx) => ({
                 connectionId: `user-${idx + 1}`,
@@ -42,7 +42,7 @@ describe('Participants Component', () => {
         render(<Participants />);
 
         const userAvatars = screen.getAllByTestId('user-avatar');
-        expect(userAvatars).toHaveLength(5); // MAX_SHOWN_USERS + "X more"
+        expect(userAvatars).toHaveLength(11); // MAX_SHOWN_USERS + "X more"
         expect(screen.getByText('+2')).toBeInTheDocument();
     });
 

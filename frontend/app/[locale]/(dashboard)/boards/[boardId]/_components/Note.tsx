@@ -1,17 +1,17 @@
-import { Kalam } from 'next/font/google';
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
-import { cn, colorToCss, getContrastingTextColor } from '@/lib/utils';
+import { colorToCss, getContrastingTextColor } from '@/lib/utils';
 import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
 import { useMutation } from '@/liveblocks.config';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-
-export const font = Kalam({
-    subsets: ['latin'],
-    weight: ['400'],
-});
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
+
+const PLACEHOLDER_COLOR = {
+    light: '#aaa',
+    dark: '#555',
+};
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
@@ -63,11 +63,11 @@ export const calculateFontSize = (
     height: number,
     text: string,
     initialFontSize = MAX_FONT_SIZE,
-    fontName = 'Kalam',
+    fontName = Fonts[0],
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return MIN_FONT_SIZE; // fallback
+    if (!ctx) return initialFontSize; // fallback
 
     let low = MIN_FONT_SIZE;
     let high = Math.min(initialFontSize, MAX_FONT_SIZE);
@@ -145,8 +145,8 @@ export const Note = ({
 
     useEffect(() => {
         if (containerRef.current) {
-            const contentWidth = containerRef.current.offsetWidth;
-            const contentHeight = containerRef.current.offsetHeight;
+            const contentWidth = containerRef.current.offsetWidth || width;
+            const contentHeight = containerRef.current.offsetHeight || height;
 
             const newFontSize = calculateFontSize(
                 contentWidth,
@@ -180,61 +180,68 @@ export const Note = ({
         return { textAlign: alignmentMap[textAlign] || 'center' };
     }, [textAlign]);
 
+    const placeholderTextColor = useMemo(() => {
+        const baseColor = fill ? getContrastingTextColor(fill) : '#000';
+        return baseColor === '#000' || baseColor === 'black'
+            ? PLACEHOLDER_COLOR.dark
+            : PLACEHOLDER_COLOR.light;
+    }, [fill]);
+
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: textColor,
+            color: value ? textColor : placeholderTextColor,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            padding: '0.5rem',
         }),
-        [currFontSize, textColor, fontName, applyTextAlign, applyTextFormat],
-    );
-
-    const PLACEHOLDER_COLOR = '#aaa';
-
-    const getPlaceholderStyle = (textStyle: CSSProperties): CSSProperties => ({
-        ...textStyle,
-        color: PLACEHOLDER_COLOR,
-    });
-
-    const placeholderStyle = useMemo<CSSProperties>(
-        () => getPlaceholderStyle(textStyle),
-        [textStyle],
+        [
+            currFontSize,
+            textColor,
+            fontName,
+            applyTextAlign,
+            applyTextFormat,
+            placeholderTextColor,
+            value,
+        ],
     );
 
     return (
         <foreignObject
-            x={x}
-            y={y}
             width={width}
             height={height}
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
                 outline: outlineStyle,
                 backgroundColor: backgroundColor,
+                transform: `translate(${x}px, ${y}px) `,
+                color: textColor,
+                width: width,
+                height: height,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center"
+                className="flex flex-col justify-center"
                 style={{
                     backgroundColor: backgroundColor,
+                    height: height,
+                    width: width,
                 }}
+                // @ts-expect-error: The xmlns will be added regardless of the type
+                xmlns="http://www.w3.org/1999/xhtml"
             >
                 <ContentEditable
                     html={value || 'Text'}
-                    className={cn(
-                        'h-full w-full flex flex-col justify-center outline-none',
-                        fontName === 'Kalam' ? font.className : '',
-                    )}
-                    style={value ? textStyle : placeholderStyle}
+                    style={textStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"
+                    data-testid="note-content-editable"
                 />
             </div>
         </foreignObject>

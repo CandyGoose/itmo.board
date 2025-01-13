@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import {
     EllipseLayer,
+    ImageLayer,
     LayerType,
     NoteLayer,
     RectangleLayer,
@@ -13,6 +14,7 @@ import { Path } from './Path';
 import { Rectangle } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Rectangle';
 import { Ellipse } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Ellipse';
 import { Note } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { ImageLayerComponent } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/ImageLayer';
 import { Text } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Text';
 import { useStorage } from '@/liveblocks.config';
 
@@ -78,6 +80,15 @@ export const LayerPreview = memo(
                     <Note
                         id={id}
                         layer={layer as NoteLayer}
+                        onPointerDown={onLayerPointerDown}
+                        selectionColor={selectionColor}
+                    />
+                );
+            case LayerType.Image:
+                return (
+                    <ImageLayerComponent
+                        id={id}
+                        layer={layer as ImageLayer}
                         onPointerDown={onLayerPointerDown}
                         selectionColor={selectionColor}
                     />

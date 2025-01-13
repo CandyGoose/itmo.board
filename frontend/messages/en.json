@@ -22,13 +22,14 @@
     "bringToBack": "bring to back",
     "moveForward": "move forward",
     "moveBackward": "move backward",
-    "delete": "delete",
+    "delete": "Delete",
     "pen": "pen",
     "select": "select",
     "more": "more",
     "rectangle": "rectangle",
     "ellipse": "ellipse",
     "stickyNote": "sticky note",
+    "image": "image",
     "lineWidth": "Line width",
     "transparentFill": "Transparent fill",
     "width": "Width",
@@ -36,6 +37,24 @@
     "font": "Font",
     "fontSize": "Font size",
     "undo": "undo",
-    "redo": "redo"
+    "redo": "redo",
+    "uploadOrPasteAnImage": "Upload or paste an image",
+    "dragDropLabel": "Drag & drop image here",
+    "orLabel": "or",
+    "selectFromComputer": "Select from computer",
+    "imageUrl": "Image URL",
+    "loadButton": "Load",
+    "copyLink": "Copy link",
+    "rename": "Rename",
+    "download": "Download",
+    "downloadAsSVG": "Download as SVG",
+    "downloadAsPNG": "Download as PNG",
+    "board": "Board",
+    "viewOnly": "View only",
+    "editMode": "Edit mode"
+  },
+  "Metadata": {
+    "sign-in": "Sign in",
+    "sign-up": "Sign up"
   }
 }

@@ -38,7 +38,7 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                     />
                     <div
                         role="presentation"
-                        className="w-1/3 border border-[var(--border)]"
+                        className="bg-[var(--text-color)] w-1/3"
                         style={{ height: `${lineWidth}px` }}
                     />
                 </div>

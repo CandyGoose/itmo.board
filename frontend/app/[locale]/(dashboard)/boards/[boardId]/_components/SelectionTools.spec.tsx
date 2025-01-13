@@ -10,6 +10,7 @@ import {
     TextAlign,
     TextFormat,
 } from '@/types/canvas';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 jest.mock('./ColorPicker', () => ({
     ColorPicker: jest.fn(({ onChangeAction }) => (
@@ -121,7 +122,7 @@ describe('SelectionTools', () => {
         onColorChange: jest.fn(),
         lineWidth: 2,
         onLineWidthChange: jest.fn(),
-        fontName: 'Arial',
+        fontName: Fonts[0],
         onFontChange: jest.fn(),
         fontSize: 12,
         onFontSizeChange: jest.fn(),
@@ -206,7 +207,7 @@ describe('SelectionTools', () => {
             y: 200,
             width: 300,
             height: 400,
-            fontName: 'Arial',
+            fontName: Fonts[0],
             fontSize: 14,
             textFormat: [TextFormat.None],
             textAlign: TextAlign.Center,
@@ -283,7 +284,7 @@ describe('SelectionTools', () => {
             y: 0,
             width: 100,
             height: 100,
-            fontName: 'Arial',
+            fontName: Fonts[1],
             fontSize: 14,
             textFormat: [TextFormat.Strike],
             textAlign: TextAlign.Left,
@@ -364,7 +365,7 @@ describe('SelectionTools', () => {
             width: 100,
             height: 100,
             fill: { r: 255, g: 255, b: 255 },
-            fontName: 'Arial',
+            fontName: Fonts[0],
             fontSize: 12,
             textAlign: TextAlign.Left,
             textFormat: [TextFormat.None],
@@ -434,7 +435,7 @@ describe('SelectionTools', () => {
             y: 60,
             width: 150,
             height: 160,
-            fontName: 'Arial',
+            fontName: Fonts[0],
             fontSize: 12,
             textAlign: TextAlign.Left,
             textFormat: [TextFormat.None],

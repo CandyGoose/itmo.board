@@ -1,5 +1,19 @@
 import { SignIn } from '@clerk/nextjs';
 import Image from 'next/legacy/image';
+import { getTranslations } from 'next-intl/server';
+
+type metaProps = {
+    params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: metaProps) {
+    const locale = (await params).locale;
+    const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+    return {
+        title: t('sign-in'),
+    };
+}
 
 export default function Page() {
     return (

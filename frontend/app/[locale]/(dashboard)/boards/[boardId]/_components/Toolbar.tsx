@@ -15,6 +15,7 @@ import {
     StickyNote,
     Undo2,
     Redo2,
+    Image,
     Type,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -179,6 +180,21 @@ export const ToolBar = ({
                     isDisabled={!editable}
                 />
                 <ToolButton
+                    label={t('image')}
+                    icon={Image}
+                    onClick={() =>
+                        setCanvasState({
+                            mode: CanvasMode.Inserting,
+                            layerType: LayerType.Image,
+                        })
+                    }
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting &&
+                        canvasState.layerType === LayerType.Image
+                    }
+                    isDisabled={!editable}
+                />
+                <ToolButton
                     label={t('undo')}
                     icon={Undo2}
                     onClick={undo}
@@ -210,6 +226,6 @@ export const ToolBar = ({
 
 export const ToolBarSkeleton = () => {
     return (
-        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-white" />
+        <div className="absolute bottom-2 left-[50%] -translate-x-[50%] h-[52px] w-[300px] rounded-md shadow-md bg-[var(--background-color)]" />
     );
 };
