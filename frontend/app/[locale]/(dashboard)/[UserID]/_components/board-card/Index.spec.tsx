@@ -84,6 +84,8 @@ describe('BoardCard Component', () => {
 
         const skeleton = screen.getByTestId('board-card-skeleton');
         expect(skeleton).toBeInTheDocument();
-        expect(skeleton).toHaveClass('aspect-[100/127] rounded-lg overflow-hidden');
+        expect(skeleton).toHaveClass(
+            'aspect-[100/127] rounded-lg overflow-hidden',
+        );
     });
 });
