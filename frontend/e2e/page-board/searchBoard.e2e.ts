@@ -15,7 +15,7 @@ test.describe('Create Board', () => {
         await expect(board2).not.toBeVisible();
     });
 
-    test('should found one board', async ({ page }) => {
+    test('should found two board', async ({ page }) => {
         await page.getByPlaceholder('search boards').fill('untitle-');
         const board1 = page.getByText('Untitle-0');
         const board2 = page.getByText('Untitle-1');
@@ -23,5 +23,11 @@ test.describe('Create Board', () => {
         await expect(board2).toBeVisible();
     });
 
-    test('should show message if nothing found', async ({ page }) => {});
+    test('should show message if nothing found', async ({ page }) => {
+        await page.getByPlaceholder('search boards').fill('untitleeee');
+        const board1 = page.getByText('Untitle-0');
+        const board2 = page.getByText('Untitle-1');
+        await expect(board1).not.toBeVisible();
+        await expect(board2).not.toBeVisible();
+    });
 });
