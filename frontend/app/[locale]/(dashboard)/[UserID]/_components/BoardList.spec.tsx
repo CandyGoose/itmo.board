@@ -41,7 +41,7 @@ function renderBoardList(orgId: string, query?: { search?: string }) {
     return render(
         <TestProviders>
             <BoardList orgId={orgId} query={query || {}} />
-        </TestProviders>
+        </TestProviders>,
     );
 }
 

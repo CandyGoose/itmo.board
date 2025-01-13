@@ -915,9 +915,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 />
             </div>
 
-            <Info
-                boardId={boardId}
-            />
+            <Info boardId={boardId} />
             <ToolBar
                 canvasState={canvasState}
                 setCanvasState={setCanvasState}

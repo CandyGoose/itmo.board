@@ -1,17 +1,17 @@
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { mutation, query } from './_generated/server';
+import { v } from 'convex/values';
 
 const images = [
-    "/placeholders/1.svg",
-    "/placeholders/2.svg",
-    "/placeholders/3.svg",
-    "/placeholders/4.svg",
-    "/placeholders/5.svg",
-    "/placeholders/6.svg",
-    "/placeholders/7.svg",
-    "/placeholders/8.svg",
-    "/placeholders/9.svg",
-    "/placeholders/10.svg",
+    '/placeholders/1.svg',
+    '/placeholders/2.svg',
+    '/placeholders/3.svg',
+    '/placeholders/4.svg',
+    '/placeholders/5.svg',
+    '/placeholders/6.svg',
+    '/placeholders/7.svg',
+    '/placeholders/8.svg',
+    '/placeholders/9.svg',
+    '/placeholders/10.svg',
 ];
 
 // Create a new board with the given data
@@ -24,13 +24,13 @@ export const createBoard = mutation({
         const identity = await ctx.auth.getUserIdentity();
 
         if (!identity) {
-            throw new Error("Unauthorized");
+            throw new Error('Unauthorized');
         }
 
         const randomIndex = Math.floor(Math.random() * images.length);
         const randomImage = images[randomIndex];
 
-        const board = await ctx.db.insert("boards", {
+        const board = await ctx.db.insert('boards', {
             title: args.title,
             orgId: args.orgId,
             authorId: identity.subject,
@@ -45,21 +45,21 @@ export const createBoard = mutation({
 // Delete a board by id
 export const deleteById = mutation({
     args: {
-        id: v.id("boards"),
+        id: v.id('boards'),
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
 
         if (!identity) {
-            throw new Error("Unauthorized");
+            throw new Error('Unauthorized');
         }
 
         const userId = identity.subject;
 
         const existingRelation = await ctx.db
-            .query("userBoards")
-            .withIndex("by_user_board", (q) => {
-                return q.eq("userId", userId).eq("boardId", args.id);
+            .query('userBoards')
+            .withIndex('by_user_board', (q) => {
+                return q.eq('userId', userId).eq('boardId', args.id);
             })
             .unique();
 
@@ -73,7 +73,7 @@ export const deleteById = mutation({
 
 export const updateById = mutation({
     args: {
-        id: v.id("boards"),
+        id: v.id('boards'),
         title: v.string(),
     },
     handler: async (ctx, args) => {
@@ -81,15 +81,15 @@ export const updateById = mutation({
         const title = args.title.trim();
 
         if (!identity) {
-            throw new Error("Unauthorized!");
+            throw new Error('Unauthorized!');
         }
 
         if (!title) {
-            throw new Error("Title is required");
+            throw new Error('Title is required');
         }
 
         if (title.length > 60) {
-            throw new Error("Title cannot be longer than 60 characters");
+            throw new Error('Title cannot be longer than 60 characters');
         }
 
         const board = await ctx.db.patch(args.id, {
@@ -101,7 +101,7 @@ export const updateById = mutation({
 });
 
 export const get = query({
-    args: { id: v.id("boards") },
+    args: { id: v.id('boards') },
     handler: async (ctx, args) => {
         const board = await ctx.db.get(args.id);
 
