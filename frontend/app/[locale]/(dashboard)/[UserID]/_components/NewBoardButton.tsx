@@ -1,50 +1,53 @@
 'use client';
 
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { Board, createBoard } from '@/actions/Board';
-import { Plus } from 'lucide-react';
-import { useParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { api } from "@/convex/_generated/api";
+import { useApiMutation } from "@/hooks/useApiMutation";
+import { cn } from "@/lib/utils";
+import { Loader2Icon, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface NewBoardButtonProps {
     orgId: string;
-    onBoardCreated: (newBoard: Board) => void;
     disabled?: boolean;
 }
 
-export const NewBoardButton = ({
-    orgId,
-    onBoardCreated,
-    disabled,
-}: NewBoardButtonProps) => {
-    const t = useTranslations('utils');
-    const params = useParams();
-    const onClick = async () => {
-        try {
-            const response = await createBoard(params.UserID as string, orgId);
-            const newBoard: Board = response.data;
+export const NewBoardButton = ({ orgId, disabled }: NewBoardButtonProps) => {
+    const router = useRouter()
+    const { mutate, pending } = useApiMutation(api.Board.createBoard);
 
-            toast.success('Created successfully.');
-
-            // Call the callback to update the board list
-            onBoardCreated(newBoard);
-        } catch {
-            toast.error('Failed to create.');
-        }
+    const handleAdd = () => {
+        mutate({ orgId, title: "Untitled" })
+            .then(() => {
+                toast.success("Board Created");
+            })
+            .catch(() => {
+                toast.error("Failed to create board");
+            });
     };
 
     return (
         <button
-            disabled={disabled}
-            onClick={onClick}
+            onClick={handleAdd}
+            disabled={pending || disabled}
             className={cn(
-                'col-span-1 aspect-[100/127] bg-blue-500 rounded-lg hover:bg-blue-600 flex flex-col items-center justify-center py-6',
-                disabled && 'opacity-75 hover:bg-blue-500 cursor-not-allowed',
+                "bg-blue-600 group aspect-[100/120] border rounded-lg flex flex-col justify-center items-center gap-3",
+                (pending || disabled) && "opacity-70 cursor-not-allowed",
+                "border-none"
             )}
         >
-            <Plus className="h-12 w-12 text-white stroke-2" />
-            <p className="text-sm text-white font-medium">{t('newBoard')}</p>
+            {pending ? (
+                <Loader2Icon className={"text-white h-10 w-10 stroke-1 animate-spin"} />
+            ) : (
+                <Plus
+                    className={cn(
+                        "text-white h-10 w-10 stroke-1",
+                        !disabled &&
+                        "group-hover:rotate-90 group-hover:scale-150 duration-500"
+                    )}
+                />
+            )}
+            <p className="text-white text-sm font-light">New Board</p>
         </button>
     );
 };
