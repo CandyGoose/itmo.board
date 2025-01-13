@@ -19,7 +19,9 @@ export async function getAllBoards(
     return res.data ? res.data : undefined;
 }
 
-export async function getBoardById(boardId: string): Promise<Board|undefined> {
+export async function getBoardById(
+    boardId: string,
+): Promise<Board | undefined> {
     try {
         const res = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/boards/${boardId}`,
