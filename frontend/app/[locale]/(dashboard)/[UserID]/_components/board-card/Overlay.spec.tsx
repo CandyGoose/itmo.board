@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom'; // Для matcher'ов, таких как toHaveClass
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { Overlay } from './Overlay';
 
@@ -20,11 +20,7 @@ describe('Overlay component', () => {
             </div>,
         );
         const overlayElement = screen.getByTestId('overlay');
-
-        // Simулируем наведение мыши на элемент
         await userEvent.hover(overlayElement);
-
-        // Проверяем наличие класса
         expect(overlayElement).toHaveClass('group-hover:opacity-30');
     });
 });
