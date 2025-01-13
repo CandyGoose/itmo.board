@@ -15,9 +15,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
     title: {
         template: 'itmo.board | %s',
-        default: 'itmo.board'
-    }
-}
+        default: 'itmo.board',
+    },
+};
 
 const rollbarConfig = {
     accessToken: process.env.NEXT_PUBLIC_ROLLBAR_ACCESS_TOKEN,
