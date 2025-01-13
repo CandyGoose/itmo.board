@@ -51,8 +51,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
 
     useEffect(() => {
         if (containerRef.current) {
-            const contentWidth =
-                containerRef.current.offsetWidth - padding * 2; // Учитываем горизонтальные отступы
+            const contentWidth = containerRef.current.offsetWidth - padding * 2; // Учитываем горизонтальные отступы
             const contentHeight =
                 containerRef.current.offsetHeight - padding * 2; // Учитываем вертикальные отступы
 
@@ -121,6 +120,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{ backgroundColor: 'transparent' }}
             className="shadow-md drop-shadow-xl"
+            data-testid="text-foreign-object"
         >
             <div
                 ref={containerRef}
