@@ -917,8 +917,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
             <Info
                 boardId={boardId}
-                editable={editable}
-                setEditable={setEditable}
             />
             <ToolBar
                 canvasState={canvasState}
