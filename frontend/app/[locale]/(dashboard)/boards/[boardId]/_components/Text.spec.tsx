@@ -3,12 +3,7 @@ import { LayerType, TextAlign, TextFormat, TextLayer } from '@/types/canvas';
 import '@testing-library/jest-dom';
 import { useMutation } from '@/liveblocks.config';
 import * as TextModule from './Text';
-
-jest.mock('next/font/google', () => ({
-    Kalam: () => ({
-        className: 'kalam-font',
-    }),
-}));
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 jest.mock('@/liveblocks.config', () => ({
     useMutation: jest.fn(),
@@ -27,7 +22,7 @@ const mockLayer: TextLayer = {
     height: 100,
     fill: { r: 255, g: 0, b: 0 },
     value: 'Initial note text',
-    fontName: 'Kalam',
+    fontName: Fonts[0],
     fontSize: 24,
     textAlign: TextAlign.Center,
     textFormat: [TextFormat.Bold, TextFormat.Italic],
@@ -66,16 +61,6 @@ describe('Text component', () => {
         );
     };
 
-    it('should apply the correct color based on fill', async () => {
-        renderComponent(mockLayer);
-
-        const foreignObjectElement = await screen.findByTestId(
-            'text-foreign-object',
-        );
-
-        expect(foreignObjectElement).toHaveStyle('color: 255 0 0');
-    });
-
     it('should have transparent background', async () => {
         renderComponent(mockLayer);
 
@@ -91,9 +76,7 @@ describe('Text component', () => {
     it('should apply the correct text color based on fill', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('color: rgb(255, 0, 0)');
     });
@@ -101,9 +84,7 @@ describe('Text component', () => {
     it('should render initial text correctly', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv?.textContent).toBe(mockLayer.value);
     });
@@ -111,9 +92,7 @@ describe('Text component', () => {
     it('should update the text when edited', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         // Simulate text input
         fireEvent.input(editableDiv!, {
@@ -138,11 +117,9 @@ describe('Text component', () => {
     it('should apply correct font family when fontName is specified', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
-        expect(editableDiv).toHaveClass('kalam-font');
+        expect(editableDiv).toHaveStyle(`font-family: ${Fonts[0]}`);
     });
 
     it('should not apply font class when fontName is not specified', () => {
@@ -167,9 +144,7 @@ describe('Text component', () => {
 
         renderComponent(leftAlignedLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('text-align: start');
     });
@@ -177,9 +152,7 @@ describe('Text component', () => {
     it('should apply text alignment correctly for center alignment', () => {
         renderComponent(mockLayer); // Center alignment is default in mockLayer
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('text-align: center');
     });
@@ -192,9 +165,7 @@ describe('Text component', () => {
 
         renderComponent(rightAlignedLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('text-align: end');
     });
@@ -202,9 +173,7 @@ describe('Text component', () => {
     it('should apply bold and italic text formatting', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('font-weight: bold');
         expect(editableDiv).toHaveStyle('font-style: italic');
@@ -218,9 +187,7 @@ describe('Text component', () => {
 
         renderComponent(strikeLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('text-decoration: line-through');
     });
@@ -233,9 +200,7 @@ describe('Text component', () => {
 
         renderComponent(multiFormatLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('font-weight: bold');
         expect(editableDiv).toHaveStyle('font-style: italic');
@@ -245,9 +210,7 @@ describe('Text component', () => {
     it('should apply whiteSpace and wordBreak styles correctly', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).toHaveStyle('white-space: pre-wrap');
         expect(editableDiv).toHaveStyle('word-break: break-word');
@@ -257,12 +220,11 @@ describe('Text component', () => {
         renderComponent(mockLayer);
 
         const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
-        expect(editableDiv).toHaveClass('kalam-font');
+        expect(editableDiv).toHaveStyle(`font-family: ${Fonts[0]}`);
     });
 
     it('should handle absence of text format gracefully', () => {
@@ -273,9 +235,7 @@ describe('Text component', () => {
 
         renderComponent(noFormatLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         expect(editableDiv).not.toHaveStyle('font-weight: bold');
         expect(editableDiv).not.toHaveStyle('font-style: italic');
@@ -290,9 +250,7 @@ describe('Text component', () => {
 
         renderComponent(invalidAlignLayer);
 
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
 
         // Default alignment is center
         expect(editableDiv).toHaveStyle('text-align: start');
@@ -336,8 +294,7 @@ describe('Text component', () => {
             'background-color: transparent;',
         );
 
-        const editableDiv =
-            foreignObjectElement.querySelector('div.kalam-font');
+        const editableDiv = screen.getByTestId('text-content-editable');
         expect(editableDiv).toHaveStyle('color: rgb(0, 255, 0);');
         expect(editableDiv).toHaveStyle('font-weight: bold');
         expect(editableDiv).toHaveStyle('text-align: end');
