@@ -7,6 +7,7 @@ import {
     MAX_FONT_SIZE,
     MIN_FONT_SIZE,
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
+import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => {
@@ -16,12 +17,6 @@ jest.mock('next-intl', () => ({
         };
         return messages[key];
     },
-}));
-
-jest.mock('next/font/google', () => ({
-    Kalam: () => ({
-        className: 'mock-kalam-class',
-    }),
 }));
 
 jest.mock('@/liveblocks.config', () => ({
@@ -34,7 +29,7 @@ const FontPickerWrapper: React.FC<{
     onFontChange?: jest.Mock;
     onFontSizeChange?: jest.Mock;
 }> = ({
-    initialFontName = 'Kalam',
+    initialFontName = Fonts[0],
     initialFontSize = 12,
     onFontChange = jest.fn(),
     onFontSizeChange = jest.fn(),
@@ -98,18 +93,11 @@ describe('FontPicker', () => {
         const select = screen.getByLabelText('Font');
         expect(select).toBeInTheDocument();
 
-        expect(
-            screen.getByRole('option', { name: 'Kalam' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Arial' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Times New Roman' }),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('option', { name: 'Courier New' }),
-        ).toBeInTheDocument();
+        Fonts.forEach((font) => {
+            expect(
+                screen.getByRole('option', { name: font }),
+            ).toBeInTheDocument();
+        });
     });
 
     it('select shows the correct initial font', () => {
