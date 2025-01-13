@@ -30,6 +30,39 @@ const upload = multer({
 
 exports.uploadMiddleware = upload.single('file');
 
+function getFileHash(buffer) {
+    return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+async function storeImageIfNotExists(buffer, originalName, mimeType) {
+    const hash = getFileHash(buffer);
+
+    let imageDoc = await Image.findOne({ hash });
+    if (imageDoc) {
+        return { imageDoc, deduplicated: true };
+    }
+
+    const extension = path.extname(originalName) || mimeToExtension(mimeType);
+    const filename = `${uuidv4()}${extension}`;
+    const uploadDir = 'uploads';
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fullPath = path.join(uploadDir, filename);
+    fs.writeFileSync(fullPath, buffer);
+
+    imageDoc = await Image.create({
+        filename,
+        path: path.join('uploads', filename),
+        originalName,
+        mimeType,
+        hash,
+    });
+
+    return { imageDoc, deduplicated: false };
+}
+
 exports.uploadFile = async (req, res) => {
     try {
         if (req.fileValidationError || !req.file) {
@@ -38,41 +71,16 @@ exports.uploadFile = async (req, res) => {
                 .json({ error: 'No file uploaded or invalid file type.' });
         }
 
-        const fileBuffer = req.file.buffer;
-        const hash = crypto
-            .createHash('sha256')
-            .update(fileBuffer)
-            .digest('hex');
-        let imageDoc = await Image.findOne({ hash });
-
-        if (imageDoc) {
-            return res.status(200).json({
-                url: `${req.protocol}://${req.get('host')}/${imageDoc.path}`,
-                deduplicated: true,
-            });
-        }
-
-        const ext = path.extname(req.file.originalname);
-        const filename = `${uuidv4()}${ext}`;
-        const uploadDir = 'uploads';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const fullPath = path.join(uploadDir, filename);
-        fs.writeFileSync(fullPath, fileBuffer);
-
-        imageDoc = await Image.create({
-            filename,
-            path: `uploads/${filename}`,
-            originalName: req.file.originalname,
-            mimeType: req.file.mimetype,
-            hash,
-        });
+        const { file } = req;
+        const { imageDoc, deduplicated } = await storeImageIfNotExists(
+            file.buffer,
+            file.originalname,
+            file.mimetype,
+        );
 
         return res.status(200).json({
             url: `${req.protocol}://${req.get('host')}/${imageDoc.path}`,
-            deduplicated: false,
+            deduplicated,
         });
     } catch (err) {
         console.error(err);
@@ -100,41 +108,15 @@ exports.uploadFileByUrl = async (req, res) => {
         }
 
         const fileBuffer = Buffer.from(await remoteRes.arrayBuffer());
-
-        const hash = crypto
-            .createHash('sha256')
-            .update(fileBuffer)
-            .digest('hex');
-        let imageDoc = await Image.findOne({ hash });
-        if (imageDoc) {
-            return res.status(200).json({
-                url: `${req.protocol}://${req.get('host')}/${imageDoc.path}`,
-                deduplicated: true,
-            });
-        }
-
-        const extension = mimeToExtension(contentType);
-        const filename = `${uuidv4()}${extension}`;
-        const uploadDir = 'uploads';
-
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const fullPath = path.join(uploadDir, filename);
-        fs.writeFileSync(fullPath, fileBuffer);
-
-        imageDoc = await Image.create({
-            filename,
-            path: `uploads/${filename}`,
-            originalName: 'downloaded-from-url',
-            mimeType: contentType,
-            hash,
-        });
+        const { imageDoc, deduplicated } = await storeImageIfNotExists(
+            fileBuffer,
+            'downloaded-from-url',
+            contentType,
+        );
 
         return res.status(200).json({
             url: `${req.protocol}://${req.get('host')}/${imageDoc.path}`,
-            deduplicated: false,
+            deduplicated,
         });
     } catch (err) {
         console.error(err);
