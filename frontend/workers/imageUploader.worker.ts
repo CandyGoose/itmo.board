@@ -32,27 +32,21 @@ self.onmessage = async (e) => {
         } else if (action === 'uploadByUrl') {
             if (!url) throw new Error('No URL');
 
-            const response = await fetch(url, { mode: 'cors' });
-            if (!response.ok) throw new Error('Failed to fetch image from URL');
-
-            const blob = await response.blob();
-            const fileFromUrl = new File([blob], 'downloaded-image', {
-                type: blob.type,
-            });
-
-            const arrayBuffer = await fileFromUrl.arrayBuffer();
-            const blobFromUrl = new Blob([arrayBuffer]);
-            const bitmap = await createImageBitmap(blobFromUrl);
-
-            const formData = new FormData();
-            formData.append('file', fileFromUrl);
-            const res = await fetch(`${serverUrl}/uploads`, {
+            const res = await fetch(`${serverUrl}/uploads-by-url`, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url }),
             });
-            if (!res.ok) throw new Error('Upload failed');
+
+            if (!res.ok) throw new Error(`Server error while uploading by URL`);
 
             const data = await res.json();
+
+            const imgBlob = await fetch(data.url).then((r) => r.blob());
+            const bitmap = await createImageBitmap(imgBlob);
+
             self.postMessage({
                 success: true,
                 url: data.url,
