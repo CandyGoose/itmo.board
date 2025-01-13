@@ -2,19 +2,20 @@
 
 import { useAuth } from '@clerk/nextjs';
 import { Loader } from 'lucide-react';
-import { redirect } from '@/i18n/routing';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
     const { userId } = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
         if (userId) {
-            redirect({ href: `/${userId}`, locale: 'en' });
+            router.replace(`/${userId}`);
         } else {
-            redirect({ href: '/sign-in', locale: 'en' });
+            router.replace('/sign-in');
         }
-    }, [userId]);
+    }, [userId, router]);
 
     return (
         <div className="w-full h-full flex items-center justify-center">
