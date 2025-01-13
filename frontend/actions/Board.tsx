@@ -19,11 +19,17 @@ export async function getAllBoards(
     return res.data ? res.data : undefined;
 }
 
-export async function getBoardById(boardId: string): Promise<Board> {
-    const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/boards/${boardId}`,
-    );
-    return res.data ? res.data : undefined;
+export async function getBoardById(
+    boardId: string,
+): Promise<Board | undefined> {
+    try {
+        const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/boards/${boardId}`,
+        );
+        if (res.status === 200) return res.data ? res.data : undefined;
+    } catch {
+        return undefined;
+    }
 }
 
 export async function createBoard(userId: string, orgId: string) {
