@@ -26,7 +26,6 @@ afterAll(async () => {
 });
 
 describe('Board Controller Tests', () => {
-
     it('should create a new board', async () => {
         const newBoard = {
             title: 'Test Board',
