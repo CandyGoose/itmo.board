@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import Script from 'next/script';
 
 interface ImageUploadProps {
     onClose: () => void;
@@ -97,6 +98,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = memo(
                 onClick={onClose}
                 data-testid="backdrop"
             >
+                <Script
+                    src="/workers/imageUploader.worker.js"
+                    strategy="worker"
+                />
                 <div
                     className="relative bg-white rounded-lg p-6 w-96"
                     onClick={(e) => e.stopPropagation()}
