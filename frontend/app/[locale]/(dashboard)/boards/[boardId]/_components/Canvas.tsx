@@ -92,9 +92,9 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const canRedo = useCanRedo();
 
     const [lastUsedColor, setLastUsedColor] = useState<Color>({
-        r: 0,
-        g: 0,
-        b: 0,
+        r: 33,
+        g: 150,
+        b: 243,
     });
     const [transparentFill, setTransparentFill] = useState(false);
     const [lineWidth, setLineWidth] = useState<number>(2);

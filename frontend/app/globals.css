@@ -11,7 +11,8 @@ body,
 @layer base {
     :root {
         --text-color: black;
-        --background-color:white;
+        --background-color: white;
+        --background-canvas-color: white;
 
         --background: 0 0% 100%;
         --foreground: 222.2 84% 4.9%;
@@ -47,6 +48,7 @@ body,
     .dark {
         --text-color: white;
         --background-color: black;
+        --background-canvas-color: #666;
 
         --background: 222.2 84% 4.9%;
         --foreground: 210 40% 98%;
