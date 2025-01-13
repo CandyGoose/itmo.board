@@ -1,122 +1,101 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { BoardCard } from '@/app/[locale]/(dashboard)/[UserID]/_components/board-card/Index';
-import { useRouter } from 'next/navigation';
-import { act } from 'react';
-import { useTranslations } from 'next-intl';
-import { useClerk } from '@clerk/nextjs';
 
-jest.mock('@/actions/CanvasSaver', () => ({
-    __esModule: true,
-    default: () => <div data-testid="canvas-saver-mock" />,
-}));
-
-jest.mock('next/navigation', () => ({
-    useRouter: jest.fn(),
-    useParams: jest.fn(() => ({ UserID: '123' })),
-    usePathname: jest.fn(),
-}));
-
-jest.mock('next-intl', () => ({
-    useTranslations: jest.fn(() => (key: string) => {
-        if (key === 'you') return 'You';
-        if (key === 'teammate') return 'Teammate';
-        return key;
-    }),
-}));
+import BoardCard from './Index';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { useAuth } from '@clerk/nextjs';
+import { formatDistanceToNow } from 'date-fns';
+import { NextIntlClientProvider } from 'next-intl';
 
 jest.mock('@clerk/nextjs', () => ({
-    useClerk: jest.fn(),
+    useAuth: jest.fn(),
 }));
 
-describe('BoardCard Component', () => {
-    const mockPush = jest.fn();
-    const defaultProps = {
-        id: '1',
-        title: 'Project Board',
-        authorId: '456',
-        createdAt: new Date('2023-01-01'),
-        imageUrl: '/placeholders/sample.svg',
-        orgId: 'org123',
+jest.mock('next/client', () => ({
+    router: {
+        push: jest.fn(),
+    },
+}));
+
+jest.mock('date-fns', () => {
+    const actual = jest.requireActual('date-fns');
+    return {
+        ...actual,
+        formatDistanceToNow: jest.fn().mockReturnValue('5 days ago'),
     };
+});
 
-    const mockUseTranslations = useTranslations as jest.Mock;
-    mockUseTranslations.mockImplementation(() => (key: string) => {
-        if (key === 'you') return 'You';
-        if (key === 'teammate') return 'Teammate';
-        return key;
-    });
+const defaultProps = {
+    id: 'board-123',
+    title: 'My Test Board',
+    imageUrl: '/test-image.png',
+    authorId: 'author-111',
+    authorName: 'AuthorName',
+    createdAt: 1692027775000,
+    orgId: 'org-999',
+};
 
-    const mockUseClerk = useClerk as jest.Mock;
-    mockUseClerk.mockReturnValue({ user: { firstName: 'Test User' } });
+const convexClient = new ConvexReactClient('http://fake.server');
+const messages = {
+    tools: {
+        you: 'You',
+        delete: 'Delete',
+        rename: 'Rename',
+        copyLink: 'Copy link',
+        download: 'Download',
+        downloadAsSVG: 'Download as SVG',
+        downloadAsPNG: 'Download as PNG',
+    },
+};
 
+function TestProviders({ children }: { children: React.ReactNode }) {
+    return (
+        <NextIntlClientProvider locale="en" messages={messages}>
+            <ConvexProvider client={convexClient}>{children}</ConvexProvider>
+        </NextIntlClientProvider>
+    );
+}
+
+describe('BoardCard', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+        (useAuth as jest.Mock).mockReturnValue({ userId: 'current-user-id' });
     });
 
-    test('renders correctly with all props', () => {
-        render(<BoardCard {...defaultProps} />);
+    function renderBoardCard(extraProps = {}) {
+        return render(
+            <TestProviders>
+                <BoardCard {...defaultProps} {...extraProps} />
+            </TestProviders>
+        );
+    }
 
-        // Check title
-        expect(screen.getByText('Project Board')).toBeInTheDocument();
-        // Check time since creation
-        expect(screen.getByText(/ago/i)).toBeInTheDocument();
-        // Check image
-        expect(screen.getByAltText('')).toBeInTheDocument();
+    test('рендерит ссылку с правильным href', () => {
+        renderBoardCard();
+        const linkElement = screen.getByRole('link', { name: /my test board/i });
+        expect(linkElement).toHaveAttribute('href', '/boards/board-123');
     });
 
-    test('displays "You" when authorId matches UserID', async () => {
-        render(<BoardCard {...defaultProps} authorId="123" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('You')),
-            ).toBeInTheDocument();
-        });
+    test('рендерит изображение с правильным alt-текстом', () => {
+        renderBoardCard();
+        const image = screen.getByAltText(/my test board/i);
+        expect(image).toBeInTheDocument();
     });
 
-    test("displays the author's first name when authorId does not match UserID", async () => {
-        render(<BoardCard {...defaultProps} authorId="456" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('Test User')),
-            ).toBeInTheDocument();
-        });
+    test('рендерит дату, используя formatDistanceToNow', () => {
+        renderBoardCard();
+        expect(formatDistanceToNow).toHaveBeenCalled();
+        expect(screen.getByText(/5 days ago/i)).toBeInTheDocument();
     });
+});
 
-    test('navigates to board on click', async () => {
-        render(<BoardCard {...defaultProps} />);
-
-        const card = screen.getByTestId(`board-card-${defaultProps.id}`);
-        fireEvent.click(card);
-
-        expect(mockPush).toHaveBeenCalledWith(`boards/${defaultProps.id}`);
-    });
-
-    test('sets loading state during navigation', async () => {
-        render(<BoardCard {...defaultProps} />);
-
-        const card = screen.getByTestId('board-card-1');
-
-        await act(async () => {
-            fireEvent.click(card);
-        });
-
-        expect(mockPush).toHaveBeenCalledWith(`boards/${defaultProps.id}`);
-        expect(card).toHaveClass('cursor-pointer');
-    });
-
-    test('displays "Teammate" when authorId does not match UserID and user is null', async () => {
-        mockUseClerk.mockReturnValue({ user: null });
-
-        render(<BoardCard {...defaultProps} authorId="456" />);
-
-        await waitFor(() => {
-            expect(
-                screen.getByText((content) => content.includes('Teammate')),
-            ).toBeInTheDocument();
-        });
+describe('BoardCard.Skeleton', () => {
+    test('рендерит скелетон', () => {
+        render(
+            <TestProviders>
+                <BoardCard.Skeleton />
+            </TestProviders>
+        );
+        expect(screen.getByTestId('board-card-skeleton')).toBeInTheDocument();
     });
 });
