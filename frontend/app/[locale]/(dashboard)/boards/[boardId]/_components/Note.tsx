@@ -13,6 +13,8 @@ const PLACEHOLDER_COLOR = {
     dark: '#555',
 };
 
+export const padding = 5;
+
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
     text: string,
@@ -149,8 +151,8 @@ export const Note = ({
             const contentHeight = containerRef.current.offsetHeight || height;
 
             const newFontSize = calculateFontSize(
-                contentWidth,
-                contentHeight,
+                contentWidth - padding * 2,
+                contentHeight - padding * 2,
                 value,
                 fontSize,
                 fontName,
@@ -196,7 +198,7 @@ export const Note = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            padding: '0.5rem',
+            padding: `${padding}px`,
         }),
         [
             currFontSize,
@@ -221,6 +223,7 @@ export const Note = ({
                 color: textColor,
                 width: width,
                 height: height,
+                padding: `${padding}px`,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
@@ -237,7 +240,7 @@ export const Note = ({
                 xmlns="http://www.w3.org/1999/xhtml"
             >
                 <ContentEditable
-                    html={value || 'Text' || ''}
+                    html={value || 'Text'}
                     style={textStyle}
                     onChange={handleContentChange}
                     data-placeholder="Text"
