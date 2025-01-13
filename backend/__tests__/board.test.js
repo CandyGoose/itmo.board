@@ -7,6 +7,8 @@ const app = express();
 const Board = require('../models/Board.model');
 
 let mongoServer;
+let boardId;
+
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
@@ -24,7 +26,6 @@ afterAll(async () => {
 });
 
 describe('Board Controller Tests', () => {
-    let boardId;
 
     it('should create a new board', async () => {
         const newBoard = {
@@ -146,5 +147,24 @@ describe('Board Controller Tests', () => {
             .expect(500);
 
         expect(response.body.error).toBe('Database error');
+    });
+
+    it('should get boards by orgId', async () => {
+        const response = await request(app)
+            .get(`/boards/org/org123`)
+            .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBe(1);
+        expect(response.body[0].orgId).toBe('org123');
+    });
+
+    it('should return an empty array if no boards are found for a given orgId', async () => {
+        const response = await request(app)
+            .get(`/boards/org/unknownOrg`)
+            .expect(200);
+
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBe(0);
     });
 });
