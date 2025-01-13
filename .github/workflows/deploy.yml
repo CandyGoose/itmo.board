@@ -9,6 +9,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    timeout-minutes: 15
+
     steps:
       # Step 1: Checkout the latest code from the repository
       - name: Checkout code
