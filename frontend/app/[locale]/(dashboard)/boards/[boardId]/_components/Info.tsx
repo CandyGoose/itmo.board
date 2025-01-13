@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { Poppins } from 'next/font/google';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { Id } from '@/convex/_generated/dataModel';

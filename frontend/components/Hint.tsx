@@ -25,8 +25,6 @@ const Hint = ({
     align,
     sideOffset,
     alignOffset,
-    tooltipArrow,
-    deleyDuration,
 }: HintProps) => {
     return (
         <TooltipProvider>

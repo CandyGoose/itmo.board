@@ -25,7 +25,7 @@ jest.mock('@/hooks/useApiMutation', () => ({
 
 global.navigator.clipboard = {
     writeText: jest.fn(),
-} as any;
+} as never;
 
 const messages = {
     tools: {
@@ -82,7 +82,7 @@ describe('Actions component', () => {
         const triggerButton = screen.getByRole('button', { name: 'Trigger' });
 
         await act(async () => {
-            userEvent.click(triggerButton);
+            await userEvent.click(triggerButton);
         });
 
         const copyLinkItem = await screen.findByText('Copy link');
@@ -97,13 +97,15 @@ describe('Actions component', () => {
         );
 
         await act(async () => {
-            userEvent.click(screen.getByRole('button', { name: 'Trigger' }));
+            await userEvent.click(
+                screen.getByRole('button', { name: 'Trigger' }),
+            );
         });
 
         const renameItem = await screen.findByText('Rename');
 
         await act(async () => {
-            userEvent.click(renameItem);
+            await userEvent.click(renameItem);
         });
 
         await waitFor(() => {
