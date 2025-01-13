@@ -24,8 +24,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { Button } from '@/components/ui/Button';
 import { useRenameModal } from '@/store/useRenameModal';
-import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 import { useApiMutation } from '@/hooks/useApiMutation';
 import { api } from '@/convex/_generated/api';
 import { useTranslations } from 'next-intl';

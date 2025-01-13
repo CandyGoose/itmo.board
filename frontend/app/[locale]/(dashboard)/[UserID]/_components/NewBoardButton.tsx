@@ -4,7 +4,6 @@ import { api } from '@/convex/_generated/api';
 import { useApiMutation } from '@/hooks/useApiMutation';
 import { cn } from '@/lib/utils';
 import { Loader2Icon, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface NewBoardButtonProps {
@@ -13,7 +12,6 @@ interface NewBoardButtonProps {
 }
 
 export const NewBoardButton = ({ orgId, disabled }: NewBoardButtonProps) => {
-    const router = useRouter();
     const { mutate, pending } = useApiMutation(api.Board.createBoard);
 
     const handleAdd = () => {

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Room } from './Room';
 import { RoomProvider } from '@/liveblocks.config';
 import { LiveblocksProvider } from '@liveblocks/react/suspense';

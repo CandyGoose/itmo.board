@@ -30,7 +30,6 @@ const BoardCard = ({
     authorId,
     authorName,
     createdAt,
-    orgId,
 }: BoardCardProps) => {
     const { userId } = useAuth();
     const authorLabel = userId === authorId ? 'You' : authorName;
