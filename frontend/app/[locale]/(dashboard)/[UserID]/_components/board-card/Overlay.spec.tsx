@@ -9,7 +9,7 @@ describe('Overlay component', () => {
         const overlayElement = screen.getByTestId('overlay');
         expect(overlayElement).toBeInTheDocument();
         expect(overlayElement).toHaveClass(
-            'opacity-0 group-hover:opacity-30 transition-opacity h-full w-full bg-black'
+            'opacity-0 group-hover:opacity-30 transition-opacity h-full w-full bg-black',
         );
     });
 
@@ -17,7 +17,7 @@ describe('Overlay component', () => {
         render(
             <div className="group">
                 <Overlay />
-            </div>
+            </div>,
         );
         const overlayElement = screen.getByTestId('overlay');
 
