@@ -156,7 +156,7 @@ describe('Note component', () => {
 
         const editableDiv = screen.getByTestId('note-content-editable');
 
-        expect(editableDiv).toHaveStyle('font-family: Arial');
+        expect(editableDiv).toHaveStyle(`font-family: ${Fonts[0]}`);
     });
 
     it('should not apply font class when fontName is not specified', () => {
@@ -260,7 +260,7 @@ describe('Note component', () => {
 
         expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
-        expect(editableDiv).toHaveStyle('font-family: Arial');
+        expect(editableDiv).toHaveStyle(`font-family: ${Fonts[0]}`);
     });
 
     it('should handle absence of text format gracefully', () => {
@@ -364,7 +364,7 @@ describe('doesTextFit', () => {
             200,
             100,
             20,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(true);
@@ -380,7 +380,7 @@ describe('doesTextFit', () => {
             200,
             100,
             20,
-            'Arial',
+            Fonts[2],
         );
 
         expect(result).toBe(false);
@@ -395,7 +395,7 @@ describe('doesTextFit', () => {
             200,
             100,
             20,
-            'Arial',
+            Fonts[1],
         );
 
         expect(result).toBe(true);
@@ -410,7 +410,7 @@ describe('doesTextFit', () => {
             200,
             100,
             20,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(false);
@@ -430,7 +430,7 @@ describe('doesTextFit', () => {
             200,
             height,
             fontSize,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(true);
@@ -468,7 +468,7 @@ describe('calculateFontSize', () => {
             100,
             'This text does not fit',
             72,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(NoteModule.MIN_FONT_SIZE);
@@ -482,7 +482,7 @@ describe('calculateFontSize', () => {
             200,
             'This text fits',
             72,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(72);
@@ -499,7 +499,7 @@ describe('calculateFontSize', () => {
             100,
             'Some text',
             initialFontSize,
-            'Arial',
+            Fonts[0],
         );
 
         expect(result).toBe(initialFontSize);
