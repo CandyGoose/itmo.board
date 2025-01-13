@@ -6,16 +6,21 @@ describe('Footer Component', () => {
     const defaultProps = {
         title: 'Sample Title',
         authorLabel: 'John Doe',
-        createdAtLabel: '2023-01-01',
+        createdLabel: '2023-01-01',
         disabled: false,
     };
 
     test('renders title, author label, and created at label', () => {
         render(<Footer {...defaultProps} />);
 
+        // Проверяем, что заголовок отображается
         expect(screen.getByText('Sample Title')).toBeInTheDocument();
 
-        expect(screen.getByText('John Doe, 2023-01-01')).toBeInTheDocument();
+        // Проверяем текст для автора и даты
+        const authorAndDateMatcher = (_content, element) =>
+            element.textContent === `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
+
+        expect(screen.getByText(authorAndDateMatcher)).toBeInTheDocument();
     });
 
     test('button should be enabled when `disabled` prop is false', () => {
@@ -37,7 +42,10 @@ describe('Footer Component', () => {
     test('hover effects for author and created at labels are applied', () => {
         render(<Footer {...defaultProps} />);
 
-        const authorInfo = screen.getByText('John Doe, 2023-01-01');
+        const authorAndDateMatcher = (_content, element) =>
+            element.textContent === `${defaultProps.authorLabel}, ${defaultProps.createdLabel}`;
+
+        const authorInfo = screen.getByText(authorAndDateMatcher);
         expect(authorInfo).toHaveClass(
             'opacity-0 group-hover:opacity-100 transition-opacity',
         );
