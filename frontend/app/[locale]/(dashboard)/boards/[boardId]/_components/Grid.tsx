@@ -34,10 +34,8 @@ export const Grid: React.FC<GridProps> = memo(
 
         useEffect(() => {
             const canvas = canvasRef.current;
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
+            const ctx = canvas?.getContext('2d');
+            if (!canvas || !ctx) return;
 
             // Device Pixel Ratio for crisp rendering
             const dpr = window.devicePixelRatio || 1;

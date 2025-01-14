@@ -14,9 +14,9 @@ import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/F
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
-const PLACEHOLDER_TEXT = 'Text';
+export const PLACEHOLDER_TEXT = 'Text';
 
-const PLACEHOLDER_COLOR = {
+export const PLACEHOLDER_COLOR = {
     light: '#aaa',
     dark: '#555',
 };
@@ -98,7 +98,7 @@ export const calculateFontSize = (
     return bestFit;
 };
 
-function adjustElementSize(el: HTMLTextAreaElement, height: number) {
+export function adjustElementSize(el: HTMLTextAreaElement, height: number) {
     el.style.height = 'auto';
     const style = window.getComputedStyle(el);
     if (isTextSingleLine(el, style)) {
