@@ -209,7 +209,9 @@ describe('boardService', () => {
         });
 
         it('should return undefined if the board does not exist', async () => {
-            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(404);
+            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                404,
+            );
 
             const board = await getBoardById('1');
 
@@ -217,12 +219,13 @@ describe('boardService', () => {
         });
 
         it('should handle errors gracefully', async () => {
-            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(500);
+            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                500,
+            );
 
             const board = await getBoardById('1');
 
             expect(board).toBeUndefined();
         });
     });
-
 });
