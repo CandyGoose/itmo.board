@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useOthers, useSelf } from '@/liveblocks.config';
 import { connectionIdToColor } from '@/lib/utils';
 import { UserAvatar } from './UserAvatar';
+import { useTranslations } from 'next-intl';
 
 const MAX_SHOWN_USERS = 10;
 const AVATAR_SIZE = 35;
@@ -13,6 +14,7 @@ export const Participants = ({ className = '' }) => {
     const users = useOthers();
     const currentUser = useSelf();
     const hasMoreUsers = users.length > MAX_SHOWN_USERS;
+    const t = useTranslations('tools');
 
     const totalParticipants =
         users.length + (currentUser ? 1 : 0) + (hasMoreUsers ? 1 : 0);
@@ -39,7 +41,7 @@ export const Participants = ({ className = '' }) => {
                             key={connectionId}
                             src={info?.picture}
                             name={info?.name}
-                            fallback={info?.name?.[0] || 'Teammate'}
+                            fallback={info?.name?.[0] || `${t('teammate')}`}
                             borderColor={connectionIdToColor(connectionId)}
                             style={{
                                 width: `${AVATAR_SIZE}px`,
@@ -51,7 +53,7 @@ export const Participants = ({ className = '' }) => {
                 {currentUser && (
                     <UserAvatar
                         src={currentUser.info?.picture}
-                        name={`${currentUser.info?.name} (You)`}
+                        name={`${currentUser.info?.name} (${t('you')})`}
                         fallback={currentUser.info?.name?.[0]}
                         borderColor={connectionIdToColor(
                             currentUser.connectionId,
@@ -65,7 +67,7 @@ export const Participants = ({ className = '' }) => {
 
                 {hasMoreUsers && (
                     <UserAvatar
-                        name={`${users.length - MAX_SHOWN_USERS} more`}
+                        name={`${users.length - MAX_SHOWN_USERS} ${t('further')}`}
                         fallback={`+${users.length - MAX_SHOWN_USERS}`}
                         style={{
                             width: `${AVATAR_SIZE}px`,
