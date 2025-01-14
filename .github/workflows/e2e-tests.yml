@@ -14,9 +14,13 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install dependencies for frontend
+        working-directory: frontend
+        run: npm install @playwright/test --save-dev
+
       - name: Install Playwright
         working-directory: frontend
-        run: npx playwright install 
+        run: npx playwright install
 
       - name: Run Playwright tests
         working-directory: frontend
