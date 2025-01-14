@@ -21,7 +21,7 @@ export const PLACEHOLDER_COLOR = {
     dark: '#555',
 };
 
-export const padding = 1;
+export const padding = 0;
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
