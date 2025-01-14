@@ -1,8 +1,7 @@
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
+import { useState, useRef, useEffect, CSSProperties, useMemo, ChangeEvent } from 'react';
 import { useMutation } from '@/liveblocks.config';
-import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_FONT_SIZE = 7;
@@ -30,6 +29,8 @@ export function doesTextFit(
     let currentLine = '';
     let lines = 1;
     let maxLineWidth = 0;
+    const endOfLines = (text.match(/\n/g) || []).length;
+    lines += endOfLines;
 
     for (let i = 0; i < words.length; i++) {
         const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
@@ -88,6 +89,11 @@ export const calculateFontSize = (
     return bestFit;
 };
 
+function adjustElementSize(el: HTMLTextAreaElement, height: number) {
+    el.style.height = 'auto';
+    el.style.height = `${height}px`;
+}
+
 interface NoteProps {
     id: string;
     layer: NoteLayer;
@@ -116,6 +122,7 @@ export const Note = ({
 
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -124,7 +131,7 @@ export const Note = ({
         },
         [id],
     );
-    const handleContentChange = (e: ContentEditableEvent) => {
+    const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         updateValue(e.target.value);
     };
 
@@ -161,6 +168,7 @@ export const Note = ({
             if (newFontSize !== currFontSize) {
                 setCurrFontSize(newFontSize);
             }
+            adjustElementSize(textAreaRef.current!, height);
         }
     }, [width, height, currFontSize, fontSize, fontName, value]);
 
@@ -198,12 +206,13 @@ export const Note = ({
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'keep-all',
-            padding: `${padding}px`,
+            minHeight: '1.5rem',
             resize: 'none',
             backgroundColor: 'transparent',
             overflow: 'hidden',
-            width: '100%',
-            height: '100%',
+            minWidth: '100%',
+            boxSizing: 'border-box',
+            verticalAlign: 'middle',
         }),
         [
             currFontSize,
@@ -247,12 +256,22 @@ export const Note = ({
                 <textarea
                     value={value || 'Text'}
                     style={textStyle}
-                    onChange={handleContentChange}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Delete' || e.key === 'Backspace') {
-                            e.stopPropagation();
+                    onChange={(e) => {
+                        if (e.target) {
+                            const target = e.target as HTMLTextAreaElement;
+
+                            const newValue = target.value;
+                            const currentHeight = target.scrollHeight;
+
+                            // Value comparison allows deleting but not writing more text
+                            if (newValue.length >= value.length && currentHeight > height) {
+                                e.preventDefault();
+                                return;
+                            }
                         }
+                        handleContentChange(e);
                     }}
+                    ref={textAreaRef}
                     data-placeholder="Text"
                     data-testid="note-content-editable"
                 />
