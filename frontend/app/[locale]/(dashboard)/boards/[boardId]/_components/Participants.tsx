@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useOthers, useSelf } from '@/liveblocks.config';
 import { connectionIdToColor } from '@/lib/utils';
 import { UserAvatar } from './UserAvatar';
-import {useTranslations} from "next-intl";
+import { useTranslations } from 'next-intl';
 
 const MAX_SHOWN_USERS = 10;
 const AVATAR_SIZE = 35;
