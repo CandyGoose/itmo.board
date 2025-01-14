@@ -45,4 +45,10 @@ jobs:
         env:
           TEST_USERNAME: ${{ vars.TEST_USERNAME }}
           TEST_PASSWORD: ${{ vars.TEST_PASSWORD }}
-        run: npm run test:e2e
+        run: npx playwright test --trace on
+
+      - name: Upload traces
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-traces
+          path: playwright-report/traces
