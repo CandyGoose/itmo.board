@@ -65,7 +65,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                     </label>
                     <input
                         id="font-size-input"
-                        type="number"
+                        type="text"
                         value={isNaN(fontSize) ? '' : fontSize}
                         onChange={(e) =>
                             onFontSizeChange(parseInt(e.target.value, 10))
