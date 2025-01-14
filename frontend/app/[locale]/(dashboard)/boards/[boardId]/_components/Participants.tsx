@@ -67,7 +67,7 @@ export const Participants = ({ className = '' }) => {
 
                 {hasMoreUsers && (
                     <UserAvatar
-                        name={`${users.length - MAX_SHOWN_USERS} more`}
+                        name={`${users.length - MAX_SHOWN_USERS} ${t('further')}`}
                         fallback={`+${users.length - MAX_SHOWN_USERS}`}
                         style={{
                             width: `${AVATAR_SIZE}px`,
