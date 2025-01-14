@@ -3,6 +3,13 @@ import { test, expect } from '@playwright/test';
 test.use({ storageState: 'storageState.json' });
 
 test.describe('Create Board', () => {
+    test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status === 'failed') {
+        const screenshotPath = `screenshots/${testInfo.title}.png`;
+        await page.screenshot({ path: screenshotPath });
+        console.log(`Saved screenshot: ${screenshotPath}`);
+    }
+    });
     test('should create a new board from the page-board page', async ({
         page,
     }) => {
