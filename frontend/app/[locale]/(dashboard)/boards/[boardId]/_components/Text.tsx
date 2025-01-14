@@ -113,6 +113,8 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 ? textAreaRef.current.style.height
                 : 'auto',
             width: `${width - padding * 2}px`,
+            border: 'none',
+            outline: 'none',
         }),
         [
             currFontSize,
