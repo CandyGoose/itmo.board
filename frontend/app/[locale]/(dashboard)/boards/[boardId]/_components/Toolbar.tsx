@@ -150,7 +150,7 @@ export const ToolBar = ({
                     isDisabled={!editable}
                 />
                 <ToolButton
-                    label="Text"
+                    label={t('text')}
                     icon={Type}
                     onClick={() =>
                         setCanvasState({
