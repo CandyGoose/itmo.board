@@ -85,7 +85,7 @@ export const Info = ({
                     </Button>
                 </Hint>
                 <TabSeparator />
-                <Hint label="Rename" side="bottom" sideOffset={10}>
+                <Hint label={t('rename')} side="bottom" sideOffset={10}>
                     <Button
                         variant="board"
                         className="text-base font-normal px-2"
