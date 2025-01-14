@@ -300,7 +300,6 @@ export const Note = ({
                 color: textColor,
                 width: width,
                 height: height,
-                padding: `${padding}px`,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
