@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { useMutation } from '@/liveblocks.config';
 import * as TextModule from './Text';
 import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
+import { PLACEHOLDER_TEXT } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 jest.mock('@/liveblocks.config', () => ({
     useMutation: jest.fn(),
@@ -291,5 +292,37 @@ describe('Text component', () => {
         expect(editableDiv).toHaveStyle('color: rgb(0, 255, 0);');
         expect(editableDiv).toHaveStyle('font-weight: bold');
         expect(editableDiv).toHaveStyle('text-align: end');
+    });
+
+    it('should reset text area to its original value on blur if text changes are invalid', () => {
+        renderComponent(mockLayer);
+
+        const editableDiv = screen.getByTestId('text-content-editable') as HTMLTextAreaElement;
+
+        fireEvent.input(editableDiv, { target: { value: '' } });
+        fireEvent.blur(editableDiv);
+
+        expect(editableDiv.value).toBe(mockLayer.value);
+    });
+
+    it('should set isInUse state to true on focus', () => {
+        renderComponent(mockLayer);
+
+        const editableDiv = screen.getByTestId('text-content-editable');
+        fireEvent.focus(editableDiv);
+
+        expect(editableDiv).not.toHaveAttribute('readonly');
+    });
+
+    it('should render placeholder text if value is empty', () => {
+        const emptyLayer: TextLayer = {
+            ...mockLayer,
+            value: '',
+        };
+
+        renderComponent(emptyLayer);
+
+        const editableDiv = screen.getByTestId('text-content-editable');
+        expect(editableDiv?.textContent).toBe(PLACEHOLDER_TEXT);
     });
 });
