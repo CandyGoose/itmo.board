@@ -8,7 +8,7 @@ test.describe('Create Board', () => {
     }) => {
         await page.goto('/');
 
-        await page.getByRole('button', { name: 'new board' }).click();
+        await page.getByRole('button', { name: 'new board' }).dblclick();
         const firstBoard = page.getByText('Untitle-0');
         await expect(firstBoard).toBeVisible();
     });
