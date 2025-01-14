@@ -218,11 +218,7 @@ describe('Text component', () => {
 
     it('should apply additional classes correctly', () => {
         renderComponent(mockLayer);
-
-        const foreignObjectElement = screen.getByTestId('text-foreign-object');
         const editableDiv = screen.getByTestId('text-content-editable');
-
-        expect(foreignObjectElement).toHaveClass('shadow-md', 'drop-shadow-xl');
 
         expect(editableDiv).toHaveStyle(`font-family: ${Fonts[0]}`);
     });

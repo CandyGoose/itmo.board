@@ -21,6 +21,7 @@ interface TextProps {
 }
 
 const PLACEHOLDER_COLOR = '#aaa';
+const PLACEHOLDER_TEXT = 'Text';
 
 export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const {
@@ -29,13 +30,15 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         width,
         height,
         fill,
-        value = 'Text',
+        value = '',
         fontName,
         fontSize,
         textAlign,
         textFormat,
     } = layer;
 
+    const [textValue, setTextValue] = useState(value || '');
+    const [isEditing, setIsEditing] = useState(false);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +51,19 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     );
 
     const handleContentChange = (e: ContentEditableEvent) => {
-        updateValue(e.target.value);
+        const newValue = e.target.value;
+        setTextValue(newValue);
+        updateValue(newValue);
+    };
+
+    const handleFocus = () => {
+        setIsEditing(true);
+    };
+
+    const handleBlur = () => {
+        if (textValue.trim() === '') {
+            setIsEditing(false);
+        }
     };
 
     useEffect(() => {
@@ -63,7 +78,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             const newFontSize = calculateFontSize(
                 contentWidth - padding * 2,
                 contentHeight - padding * 2,
-                value,
+                textValue || PLACEHOLDER_TEXT,
                 fontSize,
                 fontName,
             );
@@ -72,7 +87,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 setCurrFontSize(newFontSize);
             }
         }
-    }, [width, height, currFontSize, fontSize, fontName, value]);
+    }, [width, height, currFontSize, fontSize, fontName, textValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -95,17 +110,30 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: fill && value ? colorToCss(fill) : PLACEHOLDER_COLOR,
+            color:
+                fill && (textValue || isEditing)
+                    ? colorToCss(fill)
+                    : PLACEHOLDER_COLOR,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            backgroundColor: 'transparent',
             padding: `${padding}px`,
             boxSizing: 'border-box',
+            outline: 'none',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
         }),
-        [currFontSize, fill, value, fontName, applyTextAlign, applyTextFormat],
+        [
+            currFontSize,
+            fill,
+            textValue,
+            isEditing,
+            fontName,
+            applyTextAlign,
+            applyTextFormat,
+        ],
     );
 
     return (
@@ -117,29 +145,20 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 backgroundColor: 'transparent',
                 transform: `translate(${x}px, ${y}px) `,
                 color: colorToCss(fill!),
-                width: width,
-                height: height,
-                padding: `${padding}px`,
             }}
-            className="shadow-md drop-shadow-xl"
             data-testid="text-foreign-object"
         >
             <div
                 ref={containerRef}
-                className=" flex flex-col justify-center"
-                style={{
-                    backgroundColor: 'transparent',
-                    height: height,
-                    width: width,
-                }}
-                // @ts-expect-error: The xmlns will be added regardless of the type
-                xmlns="http://www.w3.org/1999/xhtml"
+                className="h-full w-full flex flex-col items-center justify-center text-center"
             >
                 <ContentEditable
-                    html={value || 'Text'}
+                    html={textValue || (!isEditing ? PLACEHOLDER_TEXT : '')}
                     style={textStyle}
                     onChange={handleContentChange}
-                    data-placeholder="Text"
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="text-content-editable"
                 />
             </div>
