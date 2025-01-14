@@ -275,6 +275,7 @@ export const Note = ({
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
+            padding: '0.5rem',
         }),
         [
             currFontSize,
