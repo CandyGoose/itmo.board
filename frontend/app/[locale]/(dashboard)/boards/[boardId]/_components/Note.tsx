@@ -14,6 +14,8 @@ import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/F
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
+const PLACEHOLDER_TEXT = 'Text';
+
 const PLACEHOLDER_COLOR = {
     light: '#aaa',
     dark: '#555',
@@ -77,7 +79,7 @@ export const calculateFontSize = (
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return initialFontSize; // fallback
+    if (!ctx) return initialFontSize;
 
     let low = MIN_FONT_SIZE;
     let high = Math.min(initialFontSize, MAX_FONT_SIZE);
@@ -131,19 +133,23 @@ function getOffscreenScrollHeight(
     offscreenDiv.style.left = '-9999px';
     offscreenDiv.style.visibility = 'hidden';
     offscreenDiv.style.whiteSpace = 'pre-wrap';
-    offscreenDiv.style.wordBreak = 'keep-all';
+    offscreenDiv.style.wordBreak = 'break-word';
     offscreenDiv.style.font = style.font;
     offscreenDiv.style.lineHeight = style.lineHeight;
     offscreenDiv.style.width = style.width;
-    offscreenDiv.textContent = element.value;
 
-    document.body.appendChild(offscreenDiv);
+    const lines = element.value.split('\n');
+    let totalHeight = 0;
 
-    const scrollHeight = offscreenDiv.offsetHeight;
+    lines.forEach((line) => {
+        offscreenDiv.textContent = line || 'M'; // Handle empty lines
+        document.body.appendChild(offscreenDiv);
 
-    document.body.removeChild(offscreenDiv);
+        totalHeight += offscreenDiv.offsetHeight;
 
-    return scrollHeight;
+        document.body.removeChild(offscreenDiv);
+    });
+    return totalHeight;
 }
 
 interface NoteProps {
@@ -165,7 +171,7 @@ export const Note = ({
         width,
         height,
         fill,
-        value = 'Text',
+        value = PLACEHOLDER_TEXT,
         fontName,
         fontSize,
         textAlign,
@@ -262,11 +268,11 @@ export const Note = ({
             resize: 'none',
             backgroundColor: 'transparent',
             overflow: 'hidden',
-            minWidth: '100%',
             boxSizing: 'border-box',
             height: textAreaRef.current
                 ? textAreaRef.current.style.height
                 : 'auto',
+            width: `${width - padding * 2}px`,
         }),
         [
             currFontSize,
@@ -276,6 +282,7 @@ export const Note = ({
             applyTextFormat,
             placeholderTextColor,
             value,
+            width,
         ],
     );
 
@@ -309,7 +316,7 @@ export const Note = ({
                 xmlns="http://www.w3.org/1999/xhtml"
             >
                 <textarea
-                    value={value || 'Text'}
+                    value={value || PLACEHOLDER_TEXT}
                     style={textStyle}
                     onChange={(e) => {
                         if (e.target) {
@@ -330,7 +337,7 @@ export const Note = ({
                         handleContentChange(e);
                     }}
                     ref={textAreaRef}
-                    data-placeholder="Text"
+                    data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="note-content-editable"
                 />
             </div>
