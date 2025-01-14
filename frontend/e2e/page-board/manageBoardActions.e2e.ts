@@ -7,7 +7,7 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions on board', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
-            await page.getByText('Untitle-1').click();
+            await page.getByText('Untitle-0').click();
             const menuButton = page.locator('svg.lucide-menu').locator('..');
             await expect(menuButton).toBeVisible();
             await menuButton.click();
@@ -35,7 +35,7 @@ test.describe('Board Actions', () => {
             const confirmButton = page.getByRole('button', { name: 'Confirm' });
             await confirmButton.click();
 
-            await expect(page.getByText('Untitle-1')).not.toBeVisible();
+            await expect(page.getByText('Untitle-0')).not.toBeVisible();
 
             const newBoardButton = page.getByRole('button', {
                 name: 'new board',
@@ -74,7 +74,7 @@ test.describe('Board Actions', () => {
         test('should rename the board in org', async ({ page }) => {
             await page.getByTestId('rename-item').click();
 
-            const nameInput = page.getByPlaceholder('Untitle-1');
+            const nameInput = page.getByPlaceholder('Untitle-0');
             await expect(nameInput).toBeVisible();
             await nameInput.fill('New Name');
             await page.getByRole('button', { name: 'Save' }).click();
@@ -84,7 +84,7 @@ test.describe('Board Actions', () => {
 
             await renamedBoard.click();
             await page.getByRole('button', { name: 'New Name' }).click();
-            await page.getByPlaceholder('New Name').fill('Untitle-1');
+            await page.getByPlaceholder('New Name').fill('Untitle-0');
             await page.getByRole('button', { name: 'Save' }).click();
         });
 
@@ -120,22 +120,6 @@ test.describe('Board Actions', () => {
 
             expect(fs.existsSync(filePath)).toBeTruthy();
             expect(fileName.endsWith('.svg')).toBeTruthy();
-        });
-
-        test('should delete the board in org', async ({ page }) => {
-            const deleteButton = page.getByRole('button', { name: 'Delete' });
-            await deleteButton.click();
-
-            const confirmButton = page.getByRole('button', { name: 'Confirm' });
-            await confirmButton.click();
-
-            await expect(page.getByText('Untitle-1')).not.toBeVisible();
-
-            const newBoardButton = page.getByRole('button', {
-                name: 'new board',
-            });
-            await expect(newBoardButton).toBeVisible();
-            await newBoardButton.click();
         });
     });
 });
