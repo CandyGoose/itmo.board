@@ -273,6 +273,8 @@ export const Note = ({
                 ? textAreaRef.current.style.height
                 : 'auto',
             width: `${width - padding * 2}px`,
+            border: 'none',
+            outline: 'none',
         }),
         [
             currFontSize,
