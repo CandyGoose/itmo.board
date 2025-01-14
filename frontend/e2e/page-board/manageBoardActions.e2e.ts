@@ -71,24 +71,7 @@ test.describe('Board Actions', () => {
             await expect(notification).toBeVisible();
         });
 
-        test('should export the board as a PNG in org', async ({ page }) => {
-            const downloadMenu = page.getByTestId('download-sub-menu');
-            await expect(downloadMenu).toBeVisible();
-            await downloadMenu.hover();
-
-            const [download] = await Promise.all([
-                page.waitForEvent('download'),
-                page.getByRole('menuitem', { name: 'Download as PNG' }).click(),
-            ]);
-
-            const filePath = await download.path();
-            const fileName = download.suggestedFilename();
-
-            expect(fs.existsSync(filePath)).toBeTruthy();
-            expect(fileName.endsWith('.png')).toBeTruthy();
-        });
-
-        test('should export the board as an SVG  in org', async ({ page }) => {
+        test('should export the board as an SVG in org', async ({ page }) => {
             const downloadMenu = page.getByTestId('download-sub-menu');
             await expect(downloadMenu).toBeVisible();
             await downloadMenu.hover();

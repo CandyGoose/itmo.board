@@ -21,7 +21,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "6531:3000"
-    env_file: itmoboard.env
     networks:
       - app-network
 
