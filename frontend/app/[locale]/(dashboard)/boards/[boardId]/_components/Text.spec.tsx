@@ -297,7 +297,9 @@ describe('Text component', () => {
     it('should reset text area to its original value on blur if text changes are invalid', () => {
         renderComponent(mockLayer);
 
-        const editableDiv = screen.getByTestId('text-content-editable') as HTMLTextAreaElement;
+        const editableDiv = screen.getByTestId(
+            'text-content-editable',
+        ) as HTMLTextAreaElement;
 
         fireEvent.input(editableDiv, { target: { value: '' } });
         fireEvent.blur(editableDiv);
