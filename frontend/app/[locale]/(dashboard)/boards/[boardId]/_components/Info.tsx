@@ -79,7 +79,7 @@ export const Info = ({
                                     font.className,
                                 )}
                             >
-                                {t('board')}
+                                Board
                             </span>
                         </Link>
                     </Button>
