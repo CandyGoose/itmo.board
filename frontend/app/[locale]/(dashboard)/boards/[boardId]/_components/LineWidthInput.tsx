@@ -27,7 +27,7 @@ export const LineWidthInput: React.FC<LineWidthInputProps> = memo(
                 <div className="flex items-center">
                     <input
                         id="line-width-input"
-                        type="text"
+                        type="number"
                         value={lineWidth}
                         onChange={handleChange}
                         className="border rounded p-1 text-sm mr-1 w-2/3
