@@ -2,68 +2,74 @@ name: Frontend e2e
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
   e2e-frontend:
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        image: docker:20.10.16
-        options: --privileged
-        ports:
-          - 27017:27017
-          - 8080:8080
-          - 3000:3000
-        env:
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - ${{ github.workspace }}:/workspace
-        working-directory: /workspace
-
     steps:
+      # 1. Клонирование репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Compose
+      # 2. Установка Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Используйте корректную версию Node.js
+
+      # 3. Установка зависимостей для frontend
+      - name: Install dependencies for frontend
+        run: npm ci
+        working-directory: frontend
+
+      # 4. Установка Playwright
+      - name: Install Playwright browsers
+        run: npx playwright install
+        working-directory: frontend
+
+      # 5. Установка Docker Compose
+      - name: Install Docker Compose
         run: |
           sudo apt-get update
-          sudo apt-get install docker-compose -y
+          sudo apt-get install -y docker-compose
 
+      # 6. Запуск сервисов с помощью Docker Compose
       - name: Build and start services
-        run: |
-          docker-compose up -d --build
+        run: docker-compose up -d --build
         working-directory: .
 
+      # 7. Ожидание запуска сервисов
       - name: Wait for services to be ready
         run: |
+          # Ожидание запуска MongoDB
           for i in {1..30}; do
             nc -z localhost 27017 && echo "MongoDB is up" && break
             echo "Waiting for MongoDB..."
             sleep 2
           done
 
+          # Ожидание запуска Backend
           for i in {1..30}; do
             nc -z localhost 8080 && echo "Backend is up" && break
             echo "Waiting for Backend..."
             sleep 2
           done
 
+          # Ожидание запуска Frontend
           for i in {1..30}; do
             curl -s http://localhost:3000 && echo "Frontend is up" && break
             echo "Waiting for Frontend..."
             sleep 2
           done
 
-      - name: Install dependencies for frontend
-        run: npm ci
-        working-directory: frontend
+      # 8. Установка зависимостей для Playwright (если необходимо)
+      # Обычно уже установлено на шаге 3 и 4
 
-      - name: Install Playwright
-        run: npx playwright install
-        working-directory: frontend
-
+      # 9. Запуск Playwright тестов
       - name: Run Playwright tests
         env:
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
@@ -72,3 +78,17 @@ jobs:
         run: npx playwright test --trace on
         working-directory: frontend
 
+      # 10. Загрузка трассировок Playwright
+      - name: Upload Playwright traces
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-traces
+          path: frontend/playwright-report/traces
+
+      # 11. Загрузка скриншотов (всегда, независимо от результата)
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: frontend/screenshots
