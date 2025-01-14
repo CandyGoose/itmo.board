@@ -2,89 +2,95 @@ name: Frontend e2e
 
 on:
   push:
-    branches:
-      - main
   pull_request:
 
 jobs:
   e2e-frontend:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:20.10.7
+        options: --privileged # Необходимо для использования docker-in-docker
+        ports:
+          - 6530:27017
+          - 6531:3000
+          - 6532:8080
+        # Дополнительные настройки при необходимости
+
     steps:
-      # 1. Клонирование репозитория
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      # 2. Установка Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20' # Используйте актуальную версию Node.js
-
-      # 3. Установка Docker Compose
-      - name: Install Docker Compose
+      - name: Set up Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      # 4. Сборка и запуск сервисов с помощью Docker Compose
       - name: Build and start services
-        run: docker-compose up -d --build
+        run: |
+          docker-compose up -d --build
 
-      # 5. Ожидание запуска сервисов
       - name: Wait for services to be ready
         run: |
-          # Ожидание запуска MongoDB
-          for i in {1..30}; do
-            nc -z localhost 27017 && echo "MongoDB is up" && break
+          # Функция ожидания доступности сервиса
+          function wait_for_service() {
+            local url=$1
+            local retries=30
+            until curl -s "$url" >/dev/null; do
+              retries=$((retries-1))
+              if [ $retries -le 0 ]; then
+                echo "Service at $url not available after multiple attempts."
+                exit 1
+              fi
+              echo "Waiting for $url..."
+              sleep 5
+            done
+            echo "Service at $url is up."
+          }
+
+          # Ожидание готовности backend
+          wait_for_service http://localhost:8080/health
+
+          # Ожидание готовности frontend
+          wait_for_service http://localhost:3000/health
+
+          # Ожидание готовности MongoDB (можно использовать mongo CLI или другие методы)
+          # Например, попытка подключения к MongoDB
+          until mongo --host localhost --port 27017 --eval "print(\"MongoDB is up\")"; do
             echo "Waiting for MongoDB..."
-            sleep 2
+            sleep 5
           done
 
-          # Ожидание запуска Backend
-          for i in {1..30}; do
-            nc -z localhost 8080 && echo "Backend is up" && break
-            echo "Waiting for Backend..."
-            sleep 2
-          done
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
 
-          # Ожидание запуска Frontend
-          for i in {1..30}; do
-            curl -s http://localhost:3000 && echo "Frontend is up" && break
-            echo "Waiting for Frontend..."
-            sleep 2
-          done
-
-      # 6. Установка зависимостей для frontend
       - name: Install dependencies for frontend
+        working-directory: frontend
         run: npm ci
-        working-directory: frontend
 
-      # 7. Установка Playwright браузеров
-      - name: Install Playwright browsers
+      - name: Install Playwright
+        working-directory: frontend
         run: npx playwright install
-        working-directory: frontend
 
-      # 8. Запуск Playwright тестов
       - name: Run Playwright tests
-        env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          BASE_URL: http://localhost:3000
-        run: npx playwright test --trace on
         working-directory: frontend
+        env:
+          TEST_USERNAME: ${{ vars.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ vars.TEST_PASSWORD }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ vars.CLERK_SECRET_KEY }}
+          LIVEBLOCKS_SECRET: ${{ vars.LIVEBLOCKS_SECRET }}
+          NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
+          NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
+          NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL }}
+          NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          PORT: ${{ vars.PORT }}
+        run: npm run test:e2e
 
-      # 9. Загрузка трассировок Playwright
-      - name: Upload Playwright traces
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-traces
-          path: frontend/playwright-report/traces
-
-      # 10. Загрузка скриншотов (всегда, независимо от результата)
-      - name: Upload screenshots
+      - name: Tear down services
         if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: screenshots
-          path: frontend/screenshots
+        run: docker-compose down
