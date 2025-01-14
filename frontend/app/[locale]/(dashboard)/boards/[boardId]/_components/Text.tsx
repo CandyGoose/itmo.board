@@ -138,9 +138,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 color: colorToCss(fill!),
                 width: width,
                 height: height,
-                padding: `${padding}px`,
             }}
-            className="shadow-md drop-shadow-xl"
             data-testid="text-foreign-object"
         >
             <div
