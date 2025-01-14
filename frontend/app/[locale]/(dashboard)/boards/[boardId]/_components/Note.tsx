@@ -357,6 +357,12 @@ export const Note = ({
                     ref={textAreaRef}
                     data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="note-content-editable"
+                    onCopy={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onPaste={(e) => {
+                        e.stopPropagation();
+                    }}
                 />
             </div>
         </foreignObject>
