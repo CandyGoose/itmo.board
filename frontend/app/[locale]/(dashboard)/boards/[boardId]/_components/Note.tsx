@@ -21,7 +21,7 @@ export const PLACEHOLDER_COLOR = {
     dark: '#555',
 };
 
-export const padding = 5;
+export const padding = 0;
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
@@ -275,6 +275,7 @@ export const Note = ({
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
+            padding: '0.5rem',
         }),
         [
             currFontSize,
@@ -300,6 +301,7 @@ export const Note = ({
                 color: textColor,
                 width: width,
                 height: height,
+                padding: `${padding}px`,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
