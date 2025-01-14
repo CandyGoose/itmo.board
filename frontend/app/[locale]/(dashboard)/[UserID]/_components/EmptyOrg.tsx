@@ -1,6 +1,13 @@
 import { CreateOrganization } from '@clerk/nextjs';
 import { Button } from '@/components/ui/Button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/Dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/Dialog';
 import { useTranslations } from 'next-intl';
 
 export const EmptyOrg = () => {
@@ -16,11 +23,18 @@ export const EmptyOrg = () => {
             <div className="mt-6 ">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button size="lg">
+                        <Button size="lg" className="alert-dialog-action">
                             {t('createOrganizationButton')}
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="p-0 bg-transparent border-none max-w-[480px]">
+                        <DialogHeader>
+                            <DialogTitle>Create Organization</DialogTitle>
+                        </DialogHeader>
+
+                        <DialogDescription>
+                            Create Organization
+                        </DialogDescription>
                         <CreateOrganization />
                     </DialogContent>
                 </Dialog>

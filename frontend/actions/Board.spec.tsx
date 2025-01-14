@@ -6,6 +6,7 @@ import {
     deleteBoard,
     getAllBoards,
     renameBoard,
+    getBoardById,
 } from './Board';
 
 describe('boardService', () => {
@@ -184,6 +185,47 @@ describe('boardService', () => {
                 const axiosError = error as AxiosError;
                 expect(axiosError.response?.status).toBe(500);
             }
+        });
+    });
+
+    describe('getBoardById', () => {
+        it('should return the board data when the board exists', async () => {
+            const mockBoard: Board = {
+                _id: '1',
+                title: 'Board 1',
+                orgId: 'org1',
+                authorId: 'user1',
+                imageUrl: '/img1.svg',
+            };
+
+            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                200,
+                mockBoard,
+            );
+
+            const board = await getBoardById('1');
+
+            expect(board).toEqual(mockBoard);
+        });
+
+        it('should return undefined if the board does not exist', async () => {
+            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                404,
+            );
+
+            const board = await getBoardById('1');
+
+            expect(board).toBeUndefined();
+        });
+
+        it('should handle errors gracefully', async () => {
+            mock.onGet(`${process.env.NEXT_PUBLIC_API_URL}/boards/1`).reply(
+                500,
+            );
+
+            const board = await getBoardById('1');
+
+            expect(board).toBeUndefined();
         });
     });
 });
