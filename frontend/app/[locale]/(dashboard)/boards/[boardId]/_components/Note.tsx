@@ -1,6 +1,13 @@
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect, CSSProperties, useMemo, ChangeEvent } from 'react';
+import {
+    useState,
+    useRef,
+    useEffect,
+    CSSProperties,
+    useMemo,
+    ChangeEvent,
+} from 'react';
 import { useMutation } from '@/liveblocks.config';
 import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
@@ -264,7 +271,10 @@ export const Note = ({
                             const currentHeight = target.scrollHeight;
 
                             // Value comparison allows deleting but not writing more text
-                            if (newValue.length >= value.length && currentHeight > height) {
+                            if (
+                                newValue.length >= value.length &&
+                                currentHeight > height
+                            ) {
                                 e.preventDefault();
                                 return;
                             }
