@@ -110,7 +110,10 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: fill && (textValue || isEditing) ? colorToCss(fill) : PLACEHOLDER_COLOR,
+            color:
+                fill && (textValue || isEditing)
+                    ? colorToCss(fill)
+                    : PLACEHOLDER_COLOR,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
@@ -122,7 +125,15 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             backgroundColor: 'transparent',
             boxShadow: 'none',
         }),
-        [currFontSize, fill, textValue, isEditing, fontName, applyTextAlign, applyTextFormat],
+        [
+            currFontSize,
+            fill,
+            textValue,
+            isEditing,
+            fontName,
+            applyTextAlign,
+            applyTextFormat,
+        ],
     );
 
     return (
