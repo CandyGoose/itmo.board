@@ -19,30 +19,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20' # Используйте корректную версию Node.js
+          node-version: '20' # Используйте актуальную версию Node.js
 
-      # 3. Установка зависимостей для frontend
-      - name: Install dependencies for frontend
-        run: npm ci
-        working-directory: frontend
-
-      # 4. Установка Playwright
-      - name: Install Playwright browsers
-        run: npx playwright install
-        working-directory: frontend
-
-      # 5. Установка Docker Compose
+      # 3. Установка Docker Compose
       - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      # 6. Запуск сервисов с помощью Docker Compose
+      # 4. Сборка и запуск сервисов с помощью Docker Compose
       - name: Build and start services
         run: docker-compose up -d --build
-        working-directory: .
 
-      # 7. Ожидание запуска сервисов
+      # 5. Ожидание запуска сервисов
       - name: Wait for services to be ready
         run: |
           # Ожидание запуска MongoDB
@@ -66,10 +55,17 @@ jobs:
             sleep 2
           done
 
-      # 8. Установка зависимостей для Playwright (если необходимо)
-      # Обычно уже установлено на шаге 3 и 4
+      # 6. Установка зависимостей для frontend
+      - name: Install dependencies for frontend
+        run: npm ci
+        working-directory: frontend
 
-      # 9. Запуск Playwright тестов
+      # 7. Установка Playwright браузеров
+      - name: Install Playwright browsers
+        run: npx playwright install
+        working-directory: frontend
+
+      # 8. Запуск Playwright тестов
       - name: Run Playwright tests
         env:
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
@@ -78,14 +74,14 @@ jobs:
         run: npx playwright test --trace on
         working-directory: frontend
 
-      # 10. Загрузка трассировок Playwright
+      # 9. Загрузка трассировок Playwright
       - name: Upload Playwright traces
         uses: actions/upload-artifact@v3
         with:
           name: playwright-traces
           path: frontend/playwright-report/traces
 
-      # 11. Загрузка скриншотов (всегда, независимо от результата)
+      # 10. Загрузка скриншотов (всегда, независимо от результата)
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v3
