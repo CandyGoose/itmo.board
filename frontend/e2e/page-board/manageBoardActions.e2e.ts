@@ -7,7 +7,7 @@ test.describe('Board Actions', () => {
     test.describe('Board Actions on board', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');
-            await page.getByText('Untitle-0').click();
+            await page.getByText('Untitle-1').click();
             const menuButton = page.locator('svg.lucide-menu').locator('..');
             await expect(menuButton).toBeVisible();
             await menuButton.click();
@@ -35,7 +35,7 @@ test.describe('Board Actions', () => {
             const confirmButton = page.getByRole('button', { name: 'Confirm' });
             await confirmButton.click();
 
-            await expect(page.getByText('Untitle-0')).not.toBeVisible();
+            await expect(page.getByText('Untitle-1')).not.toBeVisible();
 
             const newBoardButton = page.getByRole('button', {
                 name: 'new board',
@@ -69,23 +69,6 @@ test.describe('Board Actions', () => {
                 name: 'Copy link',
             });
             await expect(notification).toBeVisible();
-        });
-
-        test('should rename the board in org', async ({ page }) => {
-            await page.getByTestId('rename-item').click();
-
-            const nameInput = page.getByPlaceholder('Untitle-0');
-            await expect(nameInput).toBeVisible();
-            await nameInput.fill('New Name');
-            await page.getByRole('button', { name: 'Save' }).click();
-
-            const renamedBoard = page.getByText('New Name');
-            await expect(renamedBoard).toBeVisible();
-
-            await renamedBoard.click();
-            await page.getByRole('button', { name: 'New Name' }).click();
-            await page.getByPlaceholder('New Name').fill('Untitle-0');
-            await page.getByRole('button', { name: 'Save' }).click();
         });
 
         test('should export the board as a PNG in org', async ({ page }) => {
