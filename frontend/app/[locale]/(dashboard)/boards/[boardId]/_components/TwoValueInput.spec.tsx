@@ -22,7 +22,7 @@ describe('TwoValueInput Component', () => {
         render(<TwoValueInput {...defaultProps} />);
         expect(screen.getByText('First Label')).toBeInTheDocument();
         expect(screen.getByText('Second Label')).toBeInTheDocument();
-        const inputs = screen.getAllByRole('spinbutton');
+        const inputs = screen.getAllByRole('textbox');
         expect(inputs).toHaveLength(2);
     });
 
@@ -40,9 +40,9 @@ describe('TwoValueInput Component', () => {
 
     test('displays the correct initial values', () => {
         render(<TwoValueInput {...defaultProps} />);
-        const inputs = screen.getAllByRole('spinbutton') as HTMLInputElement[];
-        expect(inputs[0]).toHaveValue(defaultProps.value1);
-        expect(inputs[1]).toHaveValue(defaultProps.value2);
+        const inputs = screen.getAllByRole('textbox') as HTMLInputElement[];
+        expect(inputs[0]).toHaveValue(defaultProps.value1.toString());
+        expect(inputs[1]).toHaveValue(defaultProps.value2.toString());
     });
 
     test('calls onChange1 when the first input value changes', () => {
