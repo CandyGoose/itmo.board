@@ -41,7 +41,7 @@ export const Participants = ({ className = '' }) => {
                             key={connectionId}
                             src={info?.picture}
                             name={info?.name}
-                            fallback={info?.name?.[0] || 'Teammate'}
+                            fallback={info?.name?.[0] || `${t('teammate')}`}
                             borderColor={connectionIdToColor(connectionId)}
                             style={{
                                 width: `${AVATAR_SIZE}px`,
