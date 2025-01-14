@@ -50,7 +50,8 @@
     "downloadAsPNG": "Скачать как PNG",
     "viewOnly": "Только просмотр",
     "editMode": "Режим редактирования",
-    "boards": "На главную"
+    "boards": "На главную",
+    "menu": "Меню"
   },
   "Metadata": {
     "sign-in": "Вход",
