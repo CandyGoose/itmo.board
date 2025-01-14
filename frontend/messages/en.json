@@ -50,7 +50,8 @@
     "downloadAsPNG": "Download as PNG",
     "viewOnly": "View only",
     "editMode": "Edit mode",
-    "boards": "Go To Boards"
+    "boards": "Go To Boards",
+    "menu": "Menu"
   },
   "Metadata": {
     "sign-in": "Sign in",

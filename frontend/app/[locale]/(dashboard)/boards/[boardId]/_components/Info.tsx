@@ -104,7 +104,7 @@ export const Info = ({
                     sideOffset={10}
                 >
                     <div>
-                        <Hint label="Main menu" side="bottom" sideOffset={10}>
+                        <Hint label={t('menu')} side="bottom" sideOffset={10}>
                             <Button size="icon" variant="board">
                                 <Menu />
                             </Button>
