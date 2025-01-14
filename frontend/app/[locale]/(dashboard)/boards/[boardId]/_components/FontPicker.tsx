@@ -19,16 +19,18 @@ interface FontPickerProps {
 
 export const FontPicker: React.FC<FontPickerProps> = memo(
     ({
-         fontName,
-         onFontChange,
-         fontSize,
-         onFontSizeChange,
-         noteWidth,
-         noteHeight,
-         noteText,
-     }) => {
+        fontName,
+        onFontChange,
+        fontSize,
+        onFontSizeChange,
+        noteWidth,
+        noteHeight,
+        noteText,
+    }) => {
         const t = useTranslations('tools');
-        const [inputValue, setInputValue] = useState<string>(fontSize.toString());
+        const [inputValue, setInputValue] = useState<string>(
+            fontSize.toString(),
+        );
 
         const applyFontSize = (value: string) => {
             const numericValue = Math.max(

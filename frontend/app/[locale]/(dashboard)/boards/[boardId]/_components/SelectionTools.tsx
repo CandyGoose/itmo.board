@@ -142,7 +142,9 @@ export const SelectionTools = memo(
                 {(isNote || isText) && (
                     <>
                         <FontPicker
-                            fontName={selectedLayer.fontName ?? fontName ?? Fonts[0]}
+                            fontName={
+                                selectedLayer.fontName ?? fontName ?? Fonts[0]
+                            }
                             onFontChange={onFontChange}
                             fontSize={selectedLayer.fontSize ?? fontSize ?? 14}
                             onFontSizeChange={onFontSizeChange}
@@ -152,10 +154,13 @@ export const SelectionTools = memo(
                         />
                         <TextFormatPicker
                             textFormat={
-                                selectedLayer?.textFormat ?? fontFormat ?? [TextFormat.None]
+                                selectedLayer?.textFormat ??
+                                fontFormat ?? [TextFormat.None]
                             }
                             textAlign={
-                                selectedLayer?.textAlign ?? fontAlign ?? TextAlign.Center
+                                selectedLayer?.textAlign ??
+                                fontAlign ??
+                                TextAlign.Center
                             }
                             onFormatChange={handleFormatChange}
                         />
