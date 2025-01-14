@@ -17,7 +17,7 @@ test.describe('Organization Management', () => {
         await page.getByRole('button', { name: 'Delete organization' }).click();
 
         const noOrganizationText = page.getByText(
-            'create an organization to get',
+            'Create or select an organization to get started',
         );
         await expect(noOrganizationText).toBeVisible();
     });
