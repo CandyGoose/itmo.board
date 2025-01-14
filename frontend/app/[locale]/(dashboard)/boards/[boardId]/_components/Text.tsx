@@ -122,7 +122,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
-            padding: `${padding}px`,
+            padding: '0.5rem',
             ...currSelectionCss,
         }),
         [

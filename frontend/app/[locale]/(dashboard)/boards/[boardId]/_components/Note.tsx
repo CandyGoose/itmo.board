@@ -286,7 +286,7 @@ export const Note = ({
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
-            padding: `${padding}px`,
+            padding: '0.5rem',
             ...currSelectionCss,
         }),
         [
