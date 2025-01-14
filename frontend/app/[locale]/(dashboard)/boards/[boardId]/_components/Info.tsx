@@ -64,7 +64,7 @@ export const Info = ({
     return (
         <div className="flex flex-row gap-x-2 absolute top-2 left-2 items-center">
             <div className="rounded-md px-1.5 h-12 flex items-center shadow-md bg-[var(--background-color)]">
-                <Hint label="Go to boards" side="bottom" sideOffset={10}>
+                <Hint label={t('boards')} side="bottom" sideOffset={10}>
                     <Button asChild className="px-2" variant="board">
                         <Link href="/">
                             <Image

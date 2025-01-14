@@ -49,7 +49,8 @@
     "downloadAsSVG": "Скачать как SVG",
     "downloadAsPNG": "Скачать как PNG",
     "viewOnly": "Только просмотр",
-    "editMode": "Режим редактирования"
+    "editMode": "Режим редактирования",
+    "boards": "На главную"
   },
   "Metadata": {
     "sign-in": "Вход",

@@ -49,7 +49,8 @@
     "downloadAsSVG": "Download as SVG",
     "downloadAsPNG": "Download as PNG",
     "viewOnly": "View only",
-    "editMode": "Edit mode"
+    "editMode": "Edit mode",
+    "boards": "Go To Boards"
   },
   "Metadata": {
     "sign-in": "Sign in",
