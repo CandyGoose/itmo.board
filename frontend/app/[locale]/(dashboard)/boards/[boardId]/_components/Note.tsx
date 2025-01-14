@@ -110,7 +110,6 @@ function isTextSingleLine(
     textarea: HTMLTextAreaElement,
     style: CSSStyleDeclaration,
 ) {
-    // Create an offscreen div to measure the text
     const offscreenDiv = document.createElement('div');
     offscreenDiv.style.position = 'absolute';
     offscreenDiv.style.top = '-9999px';
@@ -120,21 +119,17 @@ function isTextSingleLine(
     offscreenDiv.style.wordBreak = 'keep-all';
     offscreenDiv.style.font = style.font;
     offscreenDiv.style.lineHeight = style.lineHeight;
-    offscreenDiv.style.width = style.width; // Match textarea width
+    offscreenDiv.style.width = style.width;
     offscreenDiv.textContent = textarea.value;
 
     document.body.appendChild(offscreenDiv);
 
-    // Get the height of the offscreen div
     const divHeight = offscreenDiv.offsetHeight;
 
-    // Get the line height of the text
     const lineHeight = parseFloat(style.lineHeight);
 
-    // Clean up
     document.body.removeChild(offscreenDiv);
 
-    // Compare heights
     return divHeight <= lineHeight;
 }
 
@@ -256,7 +251,7 @@ export const Note = ({
             overflow: 'hidden',
             minWidth: '100%',
             boxSizing: 'border-box',
-            verticalAlign: 'middle',
+            height: textAreaRef.current ? textAreaRef.current.style.height : 'auto',
         }),
         [
             currFontSize,
