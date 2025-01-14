@@ -16,6 +16,7 @@ import {
     Side,
     TextAlign,
     TextFormat,
+    TextLayer,
     XYWH,
 } from '@/types/canvas';
 import {
@@ -199,6 +200,18 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                         type: LayerType.Ellipse,
                     } as EllipseLayer;
                     break;
+                case LayerType.Text:
+                    layerData = {
+                        ...baseProps,
+                        type: LayerType.Text,
+                        value: '',
+                        fontName,
+                        fontSize,
+                        textAlign,
+                        textFormat,
+                    } as TextLayer;
+                    break;
+
                 case LayerType.Note:
                     layerData = {
                         ...baseProps,
@@ -943,11 +956,12 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                                 .map((id) => layersMap.get(id))
                                 .filter(Boolean) as Layer[]
                         }
-                        onColorChange={
-                            selection.length === 1
-                                ? setLayerColor
-                                : setLastUsedColor
-                        }
+                        onColorChange={(color) => {
+                            setLastUsedColor(color);
+                            if (selection.length === 1) {
+                                setLayerColor(color);
+                            }
+                        }}
                         lineWidth={lineWidth}
                         onLineWidthChange={
                             selection.length === 1
