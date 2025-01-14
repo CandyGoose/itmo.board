@@ -1,14 +1,22 @@
 import { NoteLayer, TextAlign, TextFormat } from '@/types/canvas';
 import { colorToCss, getContrastingTextColor } from '@/lib/utils';
-import { useState, useRef, useEffect, CSSProperties, useMemo } from 'react';
+import {
+    useState,
+    useRef,
+    useEffect,
+    CSSProperties,
+    useMemo,
+    ChangeEvent,
+} from 'react';
 import { useMutation } from '@/liveblocks.config';
-import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
-const PLACEHOLDER_COLOR = {
+export const PLACEHOLDER_TEXT = 'Text';
+
+export const PLACEHOLDER_COLOR = {
     light: '#aaa',
     dark: '#555',
 };
@@ -30,6 +38,8 @@ export function doesTextFit(
     let currentLine = '';
     let lines = 1;
     let maxLineWidth = 0;
+    const endOfLines = (text.match(/\n/g) || []).length;
+    lines += endOfLines;
 
     for (let i = 0; i < words.length; i++) {
         const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
@@ -69,7 +79,7 @@ export const calculateFontSize = (
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return initialFontSize; // fallback
+    if (!ctx) return initialFontSize;
 
     let low = MIN_FONT_SIZE;
     let high = Math.min(initialFontSize, MAX_FONT_SIZE);
@@ -87,6 +97,60 @@ export const calculateFontSize = (
 
     return bestFit;
 };
+
+export function adjustElementSize(el: HTMLTextAreaElement, height: number) {
+    el.style.height = 'auto';
+    const style = window.getComputedStyle(el);
+    if (isTextSingleLine(el, style)) {
+        const lineHeight = parseFloat(style.lineHeight);
+        el.style.height = `${Math.min(lineHeight, height)}px`;
+    }
+
+    let scrollHeight = el.scrollHeight;
+    if (scrollHeight === 0) {
+        scrollHeight = getOffscreenScrollHeight(el, style);
+    }
+
+    el.style.height = `${Math.min(scrollHeight, height)}px`;
+}
+
+function isTextSingleLine(
+    textarea: HTMLTextAreaElement,
+    style: CSSStyleDeclaration,
+): boolean {
+    const divHeight = getOffscreenScrollHeight(textarea, style);
+    const lineHeight = parseFloat(style.lineHeight);
+    return divHeight <= lineHeight;
+}
+
+function getOffscreenScrollHeight(
+    element: HTMLTextAreaElement,
+    style: CSSStyleDeclaration,
+): number {
+    const offscreenDiv = document.createElement('div');
+    offscreenDiv.style.position = 'absolute';
+    offscreenDiv.style.top = '-9999px';
+    offscreenDiv.style.left = '-9999px';
+    offscreenDiv.style.visibility = 'hidden';
+    offscreenDiv.style.whiteSpace = 'pre-wrap';
+    offscreenDiv.style.wordBreak = 'break-word';
+    offscreenDiv.style.font = style.font;
+    offscreenDiv.style.lineHeight = style.lineHeight;
+    offscreenDiv.style.width = style.width;
+
+    const lines = element.value.split('\n');
+    let totalHeight = 0;
+
+    lines.forEach((line) => {
+        offscreenDiv.textContent = line || 'M'; // Handle empty lines
+        document.body.appendChild(offscreenDiv);
+
+        totalHeight += offscreenDiv.offsetHeight;
+
+        document.body.removeChild(offscreenDiv);
+    });
+    return totalHeight;
+}
 
 interface NoteProps {
     id: string;
@@ -107,7 +171,7 @@ export const Note = ({
         width,
         height,
         fill,
-        value = 'Text',
+        value = PLACEHOLDER_TEXT,
         fontName,
         fontSize,
         textAlign,
@@ -116,6 +180,7 @@ export const Note = ({
 
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -124,7 +189,7 @@ export const Note = ({
         },
         [id],
     );
-    const handleContentChange = (e: ContentEditableEvent) => {
+    const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         updateValue(e.target.value);
     };
 
@@ -161,6 +226,7 @@ export const Note = ({
             if (newFontSize !== currFontSize) {
                 setCurrFontSize(newFontSize);
             }
+            adjustElementSize(textAreaRef.current!, height);
         }
     }, [width, height, currFontSize, fontSize, fontName, value]);
 
@@ -197,8 +263,18 @@ export const Note = ({
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            padding: `${padding}px`,
+            wordBreak: 'keep-all',
+            minHeight: '1.5rem',
+            resize: 'none',
+            backgroundColor: 'transparent',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+            height: textAreaRef.current
+                ? textAreaRef.current.style.height
+                : 'auto',
+            width: `${width - padding * 2}px`,
+            border: 'none',
+            outline: 'none',
         }),
         [
             currFontSize,
@@ -208,6 +284,7 @@ export const Note = ({
             applyTextFormat,
             placeholderTextColor,
             value,
+            width,
         ],
     );
 
@@ -235,15 +312,34 @@ export const Note = ({
                     backgroundColor: backgroundColor,
                     height: height,
                     width: width,
+                    padding: `${padding}px`,
                 }}
                 // @ts-expect-error: The xmlns will be added regardless of the type
                 xmlns="http://www.w3.org/1999/xhtml"
             >
-                <ContentEditable
-                    html={value || 'Text'}
+                <textarea
+                    value={value || PLACEHOLDER_TEXT}
                     style={textStyle}
-                    onChange={handleContentChange}
-                    data-placeholder="Text"
+                    onChange={(e) => {
+                        if (e.target) {
+                            const target = e.target as HTMLTextAreaElement;
+
+                            const newValue = target.value;
+                            const currentHeight = target.scrollHeight;
+
+                            // Value comparison allows deleting but not writing more text
+                            if (
+                                newValue.length >= value.length &&
+                                currentHeight > height
+                            ) {
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                        handleContentChange(e);
+                    }}
+                    ref={textAreaRef}
+                    data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="note-content-editable"
                 />
             </div>
