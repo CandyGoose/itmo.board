@@ -10,7 +10,7 @@ const cors = require('cors');
 
 const port = process.env.PORT || 4000;
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = ['http://5.255.100.205:6531'];
 
 app.use(
     cors({
@@ -21,7 +21,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', 'http://5.255.100.205:6531');
     res.setHeader(
         'Access-Control-Allow-Methods',
         'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE',
@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 });
 
 mongoose
-    .connect('mongodb://127.0.0.1:27017/mango')
+    .connect('mongodb://mongo:27017/mango')
     .then(() => {
         console.log('Database connected');
     })
