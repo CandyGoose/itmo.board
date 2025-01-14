@@ -138,6 +138,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 color: colorToCss(fill!),
                 width: width,
                 height: height,
+                padding: `${padding}px`,
             }}
             data-testid="text-foreign-object"
         >
