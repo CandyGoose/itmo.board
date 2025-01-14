@@ -62,7 +62,6 @@ export const SelectionTools = memo(
             [onTextFormatChange, fontFormat, onTextAlignChange, fontAlign],
         );
 
-        // If multiple selected, show nothing
         if (selectedLayers.length > 1) {
             return null;
         }
@@ -149,6 +148,9 @@ export const SelectionTools = memo(
                             onFontChange={onFontChange}
                             fontSize={selectedLayer.fontSize ?? fontSize ?? 14}
                             onFontSizeChange={onFontSizeChange}
+                            noteWidth={selectedLayer.width}
+                            noteHeight={selectedLayer.height}
+                            noteText={selectedLayer.value || ''}
                         />
                         <TextFormatPicker
                             textFormat={
