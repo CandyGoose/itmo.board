@@ -39,7 +39,6 @@ export function doesTextFit(
         const testWidth = metrics.width;
 
         if (testWidth > width) {
-            // Break line
             currentLine = words[i];
             lines++;
             const newMetrics = ctx.measureText(currentLine);
@@ -57,7 +56,6 @@ export function doesTextFit(
         }
     }
 
-    // Final check of total height
     const totalHeight = lines * lineHeight;
     return totalHeight <= height;
 }
@@ -71,7 +69,7 @@ export const calculateFontSize = (
 ) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return initialFontSize; // fallback
+    if (!ctx) return initialFontSize;
 
     let low = MIN_FONT_SIZE;
     let high = Math.min(initialFontSize, MAX_FONT_SIZE);
