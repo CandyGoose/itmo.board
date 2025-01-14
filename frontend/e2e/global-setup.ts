@@ -16,7 +16,7 @@ async function globalSetup() {
         );
     }
 
-    await page.goto(process.env.BASE_URL || 'http://localhost:3000');
+    await page.goto(process.env.BASE_URL || 'http://5.255.100.205:6531');
 
     await page.getByPlaceholder('Enter your email address').fill(username);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
