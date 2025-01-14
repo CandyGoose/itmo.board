@@ -197,8 +197,13 @@ export const Note = ({
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
+            wordBreak: 'keep-all',
             padding: `${padding}px`,
+            resize: 'none',
+            backgroundColor: 'transparent',
+            overflow: 'hidden',
+            width: '100%',
+            height: '100%',
         }),
         [
             currFontSize,
@@ -239,10 +244,15 @@ export const Note = ({
                 // @ts-expect-error: The xmlns will be added regardless of the type
                 xmlns="http://www.w3.org/1999/xhtml"
             >
-                <ContentEditable
-                    html={value || 'Text'}
+                <textarea
+                    value={value || 'Text'}
                     style={textStyle}
                     onChange={handleContentChange}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Delete' || e.key === 'Backspace') {
+                            e.stopPropagation();
+                        }
+                    }}
                     data-placeholder="Text"
                     data-testid="note-content-editable"
                 />
