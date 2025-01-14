@@ -51,7 +51,9 @@
     "viewOnly": "View only",
     "editMode": "Edit mode",
     "boards": "Go To Boards",
-    "menu": "Menu"
+    "menu": "Menu",
+    "you": "You",
+    "teammate": "Teammate"
   },
   "Metadata": {
     "sign-in": "Sign in",
