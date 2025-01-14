@@ -103,13 +103,28 @@ function adjustElementSize(el: HTMLTextAreaElement, height: number) {
         const lineHeight = parseFloat(style.lineHeight);
         el.style.height = `${Math.min(lineHeight, height)}px`;
     }
-    el.style.height = `${Math.min(el.scrollHeight, height)}px`;
+
+    let scrollHeight = el.scrollHeight;
+    if (scrollHeight === 0) {
+        scrollHeight = getOffscreenScrollHeight(el, style);
+    }
+
+    el.style.height = `${Math.min(scrollHeight, height)}px`;
 }
 
 function isTextSingleLine(
     textarea: HTMLTextAreaElement,
     style: CSSStyleDeclaration,
-) {
+): boolean {
+    const divHeight = getOffscreenScrollHeight(textarea, style);
+    const lineHeight = parseFloat(style.lineHeight);
+    return divHeight <= lineHeight;
+}
+
+function getOffscreenScrollHeight(
+    element: HTMLTextAreaElement,
+    style: CSSStyleDeclaration,
+): number {
     const offscreenDiv = document.createElement('div');
     offscreenDiv.style.position = 'absolute';
     offscreenDiv.style.top = '-9999px';
@@ -120,17 +135,15 @@ function isTextSingleLine(
     offscreenDiv.style.font = style.font;
     offscreenDiv.style.lineHeight = style.lineHeight;
     offscreenDiv.style.width = style.width;
-    offscreenDiv.textContent = textarea.value;
+    offscreenDiv.textContent = element.value;
 
     document.body.appendChild(offscreenDiv);
 
-    const divHeight = offscreenDiv.offsetHeight;
-
-    const lineHeight = parseFloat(style.lineHeight);
+    const scrollHeight = offscreenDiv.offsetHeight;
 
     document.body.removeChild(offscreenDiv);
 
-    return divHeight <= lineHeight;
+    return scrollHeight;
 }
 
 interface NoteProps {
@@ -251,7 +264,9 @@ export const Note = ({
             overflow: 'hidden',
             minWidth: '100%',
             boxSizing: 'border-box',
-            height: textAreaRef.current ? textAreaRef.current.style.height : 'auto',
+            height: textAreaRef.current
+                ? textAreaRef.current.style.height
+                : 'auto',
         }),
         [
             currFontSize,
