@@ -1,10 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { Participants, ParticipantsSkeleton } from './Participants';
+import { Participants } from './Participants';
 import { useOthers, useSelf } from '@/liveblocks.config';
-import { UserAvatar } from './UserAvatar';
 
-// Mocking dependencies
 jest.mock('@/liveblocks.config', () => ({
     useOthers: jest.fn(),
     useSelf: jest.fn(),
@@ -54,7 +52,6 @@ describe('Participants', () => {
         render(<Participants />);
 
         expect(screen.getAllByTestId('user-avatar')).toHaveLength(11);
-        // Используем функцию вместо точного текста
         expect(
             screen.getByText((content, element) => {
                 const hasText = (node: Element) =>
@@ -88,7 +85,7 @@ describe('Participants', () => {
         (useOthers as jest.Mock).mockReturnValue(mockUsers);
         (useSelf as jest.Mock).mockReturnValue(currentUser);
 
-        const totalParticipants = mockUsers.length + 1; // 1 для currentUser
+        const totalParticipants = mockUsers.length + 1;
         const PADDING = 8;
         const AVATAR_SIZE = 35;
         const expectedWidth =
