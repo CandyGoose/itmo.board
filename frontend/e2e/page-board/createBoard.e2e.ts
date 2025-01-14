@@ -1,31 +1,21 @@
-import fs from 'fs';
-import path from 'path';
 import { test, expect } from '@playwright/test';
 
 test.use({ storageState: 'storageState.json' });
 
 test.describe('Create Board', () => {
-    test.afterEach(async ({ page }, testInfo) => {
-        if (testInfo.status === 'failed') {
-            const screenshotsDir = 'screenshots';
-            if (!fs.existsSync(screenshotsDir)) {
-                fs.mkdirSync(screenshotsDir, { recursive: true });
-            }
-            const screenshotPath = path.join(screenshotsDir, `${testInfo.title}.png`);
-            await page.screenshot({ path: screenshotPath });
-            console.log(`Saved screenshot: ${screenshotPath}`);
-        }
-    });
-
-    test('should create a new board from the page-board page', async ({ page }) => {
+    test('should create a new board from the page-board page', async ({
+        page,
+    }) => {
         await page.goto('/');
 
-        await page.getByRole('button', { name: 'new board' }).dblclick();
+        await page.getByRole('button', { name: 'new board' }).click();
         const firstBoard = page.getByText('Untitle-0');
         await expect(firstBoard).toBeVisible();
     });
 
-    test('should create a second board with a different name', async ({ page }) => {
+    test('should create a second board with a different name', async ({
+        page,
+    }) => {
         await page.goto('/');
 
         const firstBoard = page.getByText('Untitle-0');
