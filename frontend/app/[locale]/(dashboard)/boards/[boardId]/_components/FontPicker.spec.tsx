@@ -30,8 +30,8 @@ jest.mock('@/liveblocks.config', () => ({
 function FontPickerWrapper(props: {
     initialFontName?: string;
     initialFontSize?: number;
-    onFontChange: jest.Mock<any, any, any>;
-    onFontSizeChange: jest.Mock<any, any, any>;
+    onFontChange: jest.Mock;
+    onFontSizeChange: jest.Mock;
 }) {
     const {
         initialFontName = Fonts[0],
