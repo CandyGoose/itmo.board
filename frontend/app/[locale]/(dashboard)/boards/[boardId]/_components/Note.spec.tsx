@@ -249,7 +249,7 @@ describe('Note component', () => {
         const editableDiv = screen.getByTestId('note-content-editable');
 
         expect(editableDiv).toHaveStyle('white-space: pre-wrap');
-        expect(editableDiv).toHaveStyle('word-break: break-word');
+        expect(editableDiv).toHaveStyle('word-break: keep-all');
     });
 
     it('should apply additional classes correctly', () => {
@@ -295,10 +295,7 @@ describe('Note component', () => {
     it('should handle rapid text changes without errors', () => {
         renderComponent(mockLayer);
 
-        const foreignObjectElement = screen.getByTestId('note-foreign-object');
-        const editableDiv = foreignObjectElement.querySelector(
-            'div[contenteditable=true]',
-        );
+        const editableDiv = screen.getByTestId('note-content-editable');
 
         // Simulate rapid input changes
         fireEvent.input(editableDiv!, {
