@@ -1,5 +1,4 @@
 name: Frontend e2e
-
 on:
   push:
   pull_request:
@@ -7,60 +6,8 @@ on:
 jobs:
   e2e-frontend:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:20.10.7
-        options: --privileged # Необходимо для использования docker-in-docker
-        ports:
-          - 6530:27017
-          - 6531:3000
-          - 6532:8080
-        # Дополнительные настройки при необходимости
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
-      - name: Build and start services
-        run: |
-          docker-compose up -d --build
-
-      - name: Wait for services to be ready
-        run: |
-          # Функция ожидания доступности сервиса
-          function wait_for_service() {
-            local url=$1
-            local retries=30
-            until curl -s "$url" >/dev/null; do
-              retries=$((retries-1))
-              if [ $retries -le 0 ]; then
-                echo "Service at $url not available after multiple attempts."
-                exit 1
-              fi
-              echo "Waiting for $url..."
-              sleep 5
-            done
-            echo "Service at $url is up."
-          }
-
-          # Ожидание готовности backend
-          wait_for_service http://localhost:8080/health
-
-          # Ожидание готовности frontend
-          wait_for_service http://localhost:3000/health
-
-          # Ожидание готовности MongoDB (можно использовать mongo CLI или другие методы)
-          # Например, попытка подключения к MongoDB
-          until mongo --host localhost --port 27017 --eval "print(\"MongoDB is up\")"; do
-            echo "Waiting for MongoDB..."
-            sleep 5
-          done
+      - uses: actions/checkout@v2
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -80,17 +27,4 @@ jobs:
         env:
           TEST_USERNAME: ${{ vars.TEST_USERNAME }}
           TEST_PASSWORD: ${{ vars.TEST_PASSWORD }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ vars.CLERK_SECRET_KEY }}
-          LIVEBLOCKS_SECRET: ${{ vars.LIVEBLOCKS_SECRET }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL }}
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL }}
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          PORT: ${{ vars.PORT }}
-        run: npm run test:e2e
-
-      - name: Tear down services
-        if: always()
-        run: docker-compose down
+        run: playwright test
