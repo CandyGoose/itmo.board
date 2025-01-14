@@ -13,7 +13,6 @@ module.exports = {
     setupFilesAfterEnv: ['./jest.setup.js'],
 };
 
-
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => {
         const messages: { [key: string]: string } = {
@@ -72,31 +71,33 @@ describe('FontPicker', () => {
     const mockOnFontSizeChange = jest.fn();
 
     beforeAll(() => {
-        HTMLCanvasElement.prototype.getContext = jest.fn((contextId: string) => {
-            if (contextId === '2d') {
-                return {
-                    measureText: jest.fn(() => ({ width: 50 })),
-                    fillText: jest.fn(),
-                    strokeText: jest.fn(),
-                    beginPath: jest.fn(),
-                    closePath: jest.fn(),
-                    clearRect: jest.fn(),
-                    save: jest.fn(),
-                    restore: jest.fn(),
-                    moveTo: jest.fn(),
-                    lineTo: jest.fn(),
-                    rect: jest.fn(),
-                    stroke: jest.fn(),
-                    fill: jest.fn(),
-                    arc: jest.fn(),
-                    fillStyle: '',
-                    strokeStyle: '',
-                    font: '',
-                    canvas: document.createElement('canvas'),
-                } as unknown as CanvasRenderingContext2D;
-            }
-            return null;
-        }) as unknown as jest.Mock;
+        HTMLCanvasElement.prototype.getContext = jest.fn(
+            (contextId: string) => {
+                if (contextId === '2d') {
+                    return {
+                        measureText: jest.fn(() => ({ width: 50 })),
+                        fillText: jest.fn(),
+                        strokeText: jest.fn(),
+                        beginPath: jest.fn(),
+                        closePath: jest.fn(),
+                        clearRect: jest.fn(),
+                        save: jest.fn(),
+                        restore: jest.fn(),
+                        moveTo: jest.fn(),
+                        lineTo: jest.fn(),
+                        rect: jest.fn(),
+                        stroke: jest.fn(),
+                        fill: jest.fn(),
+                        arc: jest.fn(),
+                        fillStyle: '',
+                        strokeStyle: '',
+                        font: '',
+                        canvas: document.createElement('canvas'),
+                    } as unknown as CanvasRenderingContext2D;
+                }
+                return null;
+            },
+        ) as unknown as jest.Mock;
     });
 
     const renderComponent = (props: {
@@ -130,7 +131,9 @@ describe('FontPicker', () => {
         expect(select).toBeInTheDocument();
 
         Fonts.forEach((font) => {
-            expect(screen.getByRole('option', { name: font })).toBeInTheDocument();
+            expect(
+                screen.getByRole('option', { name: font }),
+            ).toBeInTheDocument();
         });
     });
 
