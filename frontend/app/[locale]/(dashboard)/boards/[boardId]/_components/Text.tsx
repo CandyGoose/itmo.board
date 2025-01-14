@@ -1,8 +1,8 @@
-import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { TextAlign, TextFormat, TextLayer } from '@/types/canvas';
 import { colorToCss } from '@/lib/utils';
 import { useMutation } from '@/liveblocks.config';
 import React, {
+    ChangeEvent,
     CSSProperties,
     useEffect,
     useMemo,
@@ -10,8 +10,11 @@ import React, {
     useState,
 } from 'react';
 import {
+    adjustElementSize,
     calculateFontSize,
     padding,
+    PLACEHOLDER_COLOR,
+    PLACEHOLDER_TEXT,
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 
 interface TextProps {
@@ -20,9 +23,6 @@ interface TextProps {
     onPointerDown: (e: React.PointerEvent, id: string) => void;
 }
 
-const PLACEHOLDER_COLOR = '#aaa';
-const PLACEHOLDER_TEXT = 'Text';
-
 export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const {
         x,
@@ -30,17 +30,16 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         width,
         height,
         fill,
-        value = '',
+        value = PLACEHOLDER_TEXT,
         fontName,
         fontSize,
         textAlign,
         textFormat,
     } = layer;
 
-    const [textValue, setTextValue] = useState(value || '');
-    const [isEditing, setIsEditing] = useState(false);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -50,20 +49,8 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         [id],
     );
 
-    const handleContentChange = (e: ContentEditableEvent) => {
-        const newValue = e.target.value;
-        setTextValue(newValue);
-        updateValue(newValue);
-    };
-
-    const handleFocus = () => {
-        setIsEditing(true);
-    };
-
-    const handleBlur = () => {
-        if (textValue.trim() === '') {
-            setIsEditing(false);
-        }
+    const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        updateValue(e.target.value);
     };
 
     useEffect(() => {
@@ -78,7 +65,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             const newFontSize = calculateFontSize(
                 contentWidth - padding * 2,
                 contentHeight - padding * 2,
-                textValue || PLACEHOLDER_TEXT,
+                value,
                 fontSize,
                 fontName,
             );
@@ -86,8 +73,9 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             if (newFontSize !== currFontSize) {
                 setCurrFontSize(newFontSize);
             }
+            adjustElementSize(textAreaRef.current!, height);
         }
-    }, [width, height, currFontSize, fontSize, fontName, textValue]);
+    }, [width, height, currFontSize, fontSize, fontName, value]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -110,29 +98,32 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color:
-                fill && (textValue || isEditing)
-                    ? colorToCss(fill)
-                    : PLACEHOLDER_COLOR,
+            color: fill && value ? colorToCss(fill) : PLACEHOLDER_COLOR.light,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            padding: `${padding}px`,
-            boxSizing: 'border-box',
-            outline: 'none',
+            wordBreak: 'keep-all',
+            minHeight: '1.5rem',
+            resize: 'none',
             backgroundColor: 'transparent',
-            boxShadow: 'none',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+            height: textAreaRef.current
+                ? textAreaRef.current.style.height
+                : 'auto',
+            width: `${width - padding * 2}px`,
+            border: 'none',
+            outline: 'none',
         }),
         [
             currFontSize,
             fill,
-            textValue,
-            isEditing,
+            value,
             fontName,
             applyTextAlign,
             applyTextFormat,
+            width,
         ],
     );
 
@@ -145,19 +136,47 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 backgroundColor: 'transparent',
                 transform: `translate(${x}px, ${y}px) `,
                 color: colorToCss(fill!),
+                width: width,
+                height: height,
+                padding: `${padding}px`,
             }}
+            className="shadow-md drop-shadow-xl"
             data-testid="text-foreign-object"
         >
             <div
                 ref={containerRef}
-                className="h-full w-full flex flex-col items-center justify-center text-center"
+                className=" flex flex-col justify-center"
+                style={{
+                    backgroundColor: 'transparent',
+                    height: height,
+                    width: width,
+                    padding: `${padding}px`,
+                }}
+                // @ts-expect-error: The xmlns will be added regardless of the type
+                xmlns="http://www.w3.org/1999/xhtml"
             >
-                <ContentEditable
-                    html={textValue || (!isEditing ? PLACEHOLDER_TEXT : '')}
+                <textarea
+                    value={value || PLACEHOLDER_TEXT}
                     style={textStyle}
-                    onChange={handleContentChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
+                    onChange={(e) => {
+                        if (e.target) {
+                            const target = e.target as HTMLTextAreaElement;
+
+                            const newValue = target.value;
+                            const currentHeight = target.scrollHeight;
+
+                            // Value comparison allows deleting but not writing more text
+                            if (
+                                newValue.length >= value.length &&
+                                currentHeight > height
+                            ) {
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                        handleContentChange(e);
+                    }}
+                    ref={textAreaRef}
                     data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="text-content-editable"
                 />
