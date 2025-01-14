@@ -190,6 +190,12 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                     ref={textAreaRef}
                     data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="text-content-editable"
+                    onCopy={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onPaste={(e) => {
+                        e.stopPropagation();
+                    }}
                 />
             </div>
         </foreignObject>

@@ -840,6 +840,17 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     // Keyboard Actions
     useEffect(() => {
         function onKeyDown(e: KeyboardEvent) {
+            const target = e.target as HTMLElement;
+            const disabledTargets = [
+                'text-content-editable',
+                'note-content-editable',
+            ];
+            if (
+                disabledTargets.includes(
+                    target.getAttribute('data-testid') ?? '',
+                )
+            )
+                return;
             if (!editable) {
                 e.preventDefault();
                 return;
