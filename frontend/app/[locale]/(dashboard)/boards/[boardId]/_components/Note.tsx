@@ -8,6 +8,8 @@ import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/F
 export const MIN_FONT_SIZE = 7;
 export const MAX_FONT_SIZE = 72;
 
+const PLACEHOLDER_TEXT = 'Text';
+
 const PLACEHOLDER_COLOR = {
     light: '#aaa',
     dark: '#555',
@@ -107,13 +109,15 @@ export const Note = ({
         width,
         height,
         fill,
-        value = 'Text',
+        value = '',
         fontName,
         fontSize,
         textAlign,
         textFormat,
     } = layer;
 
+    const [noteValue, setNoteValue] = useState(value || '');
+    const [isEditing, setIsEditing] = useState(false);
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +129,19 @@ export const Note = ({
         [id],
     );
     const handleContentChange = (e: ContentEditableEvent) => {
-        updateValue(e.target.value);
+        const newValue = e.target.value;
+        setNoteValue(newValue);
+        updateValue(newValue);
+    };
+
+    const handleFocus = () => {
+        setIsEditing(true);
+    };
+
+    const handleBlur = () => {
+        if (noteValue.trim() === '') {
+            setIsEditing(false);
+        }
     };
 
     const textColor = useMemo(
@@ -153,7 +169,7 @@ export const Note = ({
             const newFontSize = calculateFontSize(
                 contentWidth - padding * 2,
                 contentHeight - padding * 2,
-                value,
+                noteValue || PLACEHOLDER_TEXT,
                 fontSize,
                 fontName,
             );
@@ -162,7 +178,7 @@ export const Note = ({
                 setCurrFontSize(newFontSize);
             }
         }
-    }, [width, height, currFontSize, fontSize, fontName, value]);
+    }, [width, height, currFontSize, fontSize, fontName, noteValue]);
 
     const applyTextFormat = useMemo<CSSProperties>(() => {
         const styles: CSSProperties = {};
@@ -192,13 +208,16 @@ export const Note = ({
     const textStyle = useMemo<CSSProperties>(
         () => ({
             fontSize: `${currFontSize}px`,
-            color: value ? textColor : placeholderTextColor,
+            color: noteValue || isEditing ? textColor : placeholderTextColor,
             fontFamily: fontName,
             ...applyTextAlign,
             ...applyTextFormat,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             padding: `${padding}px`,
+            outline: 'none',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
         }),
         [
             currFontSize,
@@ -206,8 +225,9 @@ export const Note = ({
             fontName,
             applyTextAlign,
             applyTextFormat,
+            noteValue,
+            isEditing,
             placeholderTextColor,
-            value,
         ],
     );
 
@@ -221,29 +241,21 @@ export const Note = ({
                 backgroundColor: backgroundColor,
                 transform: `translate(${x}px, ${y}px) `,
                 color: textColor,
-                width: width,
-                height: height,
-                padding: `${padding}px`,
             }}
             className="shadow-md drop-shadow-xl"
             data-testid="note-foreign-object"
         >
             <div
                 ref={containerRef}
-                className="flex flex-col justify-center"
-                style={{
-                    backgroundColor: backgroundColor,
-                    height: height,
-                    width: width,
-                }}
-                // @ts-expect-error: The xmlns will be added regardless of the type
-                xmlns="http://www.w3.org/1999/xhtml"
+                className="h-full w-full flex flex-col items-center justify-center text-center"
             >
                 <ContentEditable
-                    html={value || 'Text'}
+                    html={noteValue || (!isEditing ? PLACEHOLDER_TEXT : '')}
                     style={textStyle}
                     onChange={handleContentChange}
-                    data-placeholder="Text"
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    data-placeholder={PLACEHOLDER_TEXT}
                     data-testid="note-content-editable"
                 />
             </div>
