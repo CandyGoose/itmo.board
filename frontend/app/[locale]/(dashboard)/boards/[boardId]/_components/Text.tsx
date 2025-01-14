@@ -12,6 +12,7 @@ import React, {
 import {
     adjustElementSize,
     calculateFontSize,
+    noSelect,
     padding,
     PLACEHOLDER_COLOR,
     PLACEHOLDER_TEXT,
@@ -40,6 +41,8 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
     const [currFontSize, setCurrFontSize] = useState(fontSize);
     const containerRef = useRef<HTMLDivElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+    const [isInUse, setIsInUse] = useState(false);
 
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
@@ -86,6 +89,10 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
         return styles;
     }, [textFormat]);
 
+    const currSelectionCss = useMemo<CSSProperties>(() => {
+        return isInUse ? noSelect : {};
+    }, [isInUse]);
+
     const applyTextAlign = useMemo<CSSProperties>(() => {
         const alignmentMap: Record<TextAlign, CSSProperties['textAlign']> = {
             [TextAlign.Left]: 'start',
@@ -115,7 +122,8 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
-            padding: '0.5rem',
+            padding: `${padding}px`,
+            ...currSelectionCss,
         }),
         [
             currFontSize,
@@ -125,6 +133,7 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
             applyTextAlign,
             applyTextFormat,
             width,
+            currSelectionCss,
         ],
     );
 
@@ -139,7 +148,6 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 color: colorToCss(fill!),
                 width: width,
                 height: height,
-                padding: `${padding}px`,
             }}
             data-testid="text-foreign-object"
         >
@@ -158,6 +166,9 @@ export const Text = ({ layer, onPointerDown, id }: TextProps) => {
                 <textarea
                     value={value || PLACEHOLDER_TEXT}
                     style={textStyle}
+                    onFocus={() => setIsInUse(true)}
+                    onBlur={() => setIsInUse(false)}
+                    readOnly={!isInUse}
                     onChange={(e) => {
                         if (e.target) {
                             const target = e.target as HTMLTextAreaElement;
