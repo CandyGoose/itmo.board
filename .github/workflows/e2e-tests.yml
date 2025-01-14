@@ -35,8 +35,8 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           PORT: ${{ vars.PORT }}
         run: |
-          npm build:workers
-          nohup npm watch:workers &
+          npm run build:workers
+          nohup npm run watch:workers &
           npm run build
           nohup npm start &      
 
