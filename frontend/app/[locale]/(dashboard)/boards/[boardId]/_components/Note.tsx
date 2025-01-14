@@ -98,7 +98,44 @@ export const calculateFontSize = (
 
 function adjustElementSize(el: HTMLTextAreaElement, height: number) {
     el.style.height = 'auto';
-    el.style.height = `${height}px`;
+    const style = window.getComputedStyle(el);
+    if (isTextSingleLine(el, style)) {
+        const lineHeight = parseFloat(style.lineHeight);
+        el.style.height = `${Math.min(lineHeight, height)}px`;
+    }
+    el.style.height = `${Math.min(el.scrollHeight, height)}px`;
+}
+
+function isTextSingleLine(
+    textarea: HTMLTextAreaElement,
+    style: CSSStyleDeclaration,
+) {
+    // Create an offscreen div to measure the text
+    const offscreenDiv = document.createElement('div');
+    offscreenDiv.style.position = 'absolute';
+    offscreenDiv.style.top = '-9999px';
+    offscreenDiv.style.left = '-9999px';
+    offscreenDiv.style.visibility = 'hidden';
+    offscreenDiv.style.whiteSpace = 'pre-wrap';
+    offscreenDiv.style.wordBreak = 'keep-all';
+    offscreenDiv.style.font = style.font;
+    offscreenDiv.style.lineHeight = style.lineHeight;
+    offscreenDiv.style.width = style.width; // Match textarea width
+    offscreenDiv.textContent = textarea.value;
+
+    document.body.appendChild(offscreenDiv);
+
+    // Get the height of the offscreen div
+    const divHeight = offscreenDiv.offsetHeight;
+
+    // Get the line height of the text
+    const lineHeight = parseFloat(style.lineHeight);
+
+    // Clean up
+    document.body.removeChild(offscreenDiv);
+
+    // Compare heights
+    return divHeight <= lineHeight;
 }
 
 interface NoteProps {
@@ -256,6 +293,7 @@ export const Note = ({
                     backgroundColor: backgroundColor,
                     height: height,
                     width: width,
+                    padding: `${padding}px`,
                 }}
                 // @ts-expect-error: The xmlns will be added regardless of the type
                 xmlns="http://www.w3.org/1999/xhtml"
