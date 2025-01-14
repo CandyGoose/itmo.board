@@ -457,6 +457,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     const onPointerDown = useCallback(
         (e: React.PointerEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
             if (canvasState.mode === CanvasMode.Inserting) return;
 
             const point = pointerEventToCanvasPoint(e, camera, scale, svgRect);
