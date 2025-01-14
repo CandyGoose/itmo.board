@@ -21,7 +21,12 @@ export const PLACEHOLDER_COLOR = {
     dark: '#555',
 };
 
-export const padding = 5;
+export const padding = 0;
+
+export const noSelect = {
+    userSelect: 'none',
+    cursor: 'default',
+};
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
@@ -182,6 +187,8 @@ export const Note = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
+    const [isInUse, setIsInUse] = useState(false);
+
     const updateValue = useMutation(
         ({ storage }, newValue: string) => {
             const liveLayers = storage.get('layers');
@@ -239,6 +246,10 @@ export const Note = ({
         return styles;
     }, [textFormat]);
 
+    const currSelectionCss = useMemo<CSSProperties>(() => {
+        return isInUse ? noSelect : {};
+    }, [isInUse]);
+
     const applyTextAlign = useMemo<CSSProperties>(() => {
         const alignmentMap: Record<TextAlign, CSSProperties['textAlign']> = {
             [TextAlign.Left]: 'start',
@@ -275,16 +286,19 @@ export const Note = ({
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
+            padding: `${padding}px`,
+            ...currSelectionCss,
         }),
         [
             currFontSize,
+            value,
             textColor,
+            placeholderTextColor,
             fontName,
             applyTextAlign,
             applyTextFormat,
-            placeholderTextColor,
-            value,
             width,
+            currSelectionCss,
         ],
     );
 
@@ -319,6 +333,9 @@ export const Note = ({
                 <textarea
                     value={value || PLACEHOLDER_TEXT}
                     style={textStyle}
+                    onFocus={() => setIsInUse(true)}
+                    onBlur={() => setIsInUse(false)}
+                    readOnly={!isInUse}
                     onChange={(e) => {
                         if (e.target) {
                             const target = e.target as HTMLTextAreaElement;
