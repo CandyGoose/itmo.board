@@ -30,12 +30,16 @@ export const noSelect = {
 
 export function doesTextFit(
     ctx: CanvasRenderingContext2D,
-    text: string,
+    text: string | undefined,
     width: number,
     height: number,
     fontSize: number,
     fontName: string,
 ) {
+    if (!text) {
+        text = '';
+    }
+
     ctx.font = `${fontSize}px ${fontName}`;
     const lineHeight = fontSize * 1.5;
 
@@ -286,7 +290,7 @@ export const Note = ({
             width: `${width - padding * 2}px`,
             border: 'none',
             outline: 'none',
-            padding: `${padding}px`,
+            padding: '0.5rem',
             ...currSelectionCss,
         }),
         [

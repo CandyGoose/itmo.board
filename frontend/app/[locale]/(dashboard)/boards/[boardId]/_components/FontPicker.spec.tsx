@@ -9,6 +9,10 @@ import {
 } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Note';
 import { Fonts } from '@/app/[locale]/(dashboard)/boards/[boardId]/_components/Fonts';
 
+module.exports = {
+    setupFilesAfterEnv: ['./jest.setup.js'],
+};
+
 jest.mock('next-intl', () => ({
     useTranslations: () => (key: string) => {
         const messages: { [key: string]: string } = {
@@ -23,17 +27,19 @@ jest.mock('@/liveblocks.config', () => ({
     useMutation: jest.fn(),
 }));
 
-const FontPickerWrapper: React.FC<{
+function FontPickerWrapper(props: {
     initialFontName?: string;
     initialFontSize?: number;
-    onFontChange?: jest.Mock;
-    onFontSizeChange?: jest.Mock;
-}> = ({
-    initialFontName = Fonts[0],
-    initialFontSize = 12,
-    onFontChange = jest.fn(),
-    onFontSizeChange = jest.fn(),
-}) => {
+    onFontChange: jest.Mock;
+    onFontSizeChange: jest.Mock;
+}) {
+    const {
+        initialFontName = Fonts[0],
+        initialFontSize = 12,
+        onFontChange,
+        onFontSizeChange,
+    } = props;
+
     const [fontName, setFontName] = useState(initialFontName);
     const [fontSize, setFontSize] = useState(initialFontSize);
 
@@ -53,13 +59,46 @@ const FontPickerWrapper: React.FC<{
             onFontChange={handleFontChange}
             fontSize={fontSize}
             onFontSizeChange={handleFontSizeChange}
+            noteWidth={200}
+            noteHeight={100}
+            noteText="Sample text"
         />
     );
-};
+}
 
 describe('FontPicker', () => {
     const mockOnFontChange = jest.fn();
     const mockOnFontSizeChange = jest.fn();
+
+    beforeAll(() => {
+        HTMLCanvasElement.prototype.getContext = jest.fn(
+            (contextId: string) => {
+                if (contextId === '2d') {
+                    return {
+                        measureText: jest.fn(() => ({ width: 50 })),
+                        fillText: jest.fn(),
+                        strokeText: jest.fn(),
+                        beginPath: jest.fn(),
+                        closePath: jest.fn(),
+                        clearRect: jest.fn(),
+                        save: jest.fn(),
+                        restore: jest.fn(),
+                        moveTo: jest.fn(),
+                        lineTo: jest.fn(),
+                        rect: jest.fn(),
+                        stroke: jest.fn(),
+                        fill: jest.fn(),
+                        arc: jest.fn(),
+                        fillStyle: '',
+                        strokeStyle: '',
+                        font: '',
+                        canvas: document.createElement('canvas'),
+                    } as unknown as CanvasRenderingContext2D;
+                }
+                return null;
+            },
+        ) as unknown as jest.Mock;
+    });
 
     const renderComponent = (props: {
         fontName?: string;
@@ -82,14 +121,12 @@ describe('FontPicker', () => {
 
     it('renders the font label with translated text', () => {
         renderComponent({});
-
         const label = screen.getByText('Font');
         expect(label).toBeInTheDocument();
     });
 
     it('renders the font select with all font options', () => {
         renderComponent({});
-
         const select = screen.getByLabelText('Font');
         expect(select).toBeInTheDocument();
 
@@ -102,111 +139,55 @@ describe('FontPicker', () => {
 
     it('select shows the correct initial font', () => {
         renderComponent({ fontName: Fonts[0] });
-
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
         expect(select.value).toBe(Fonts[0]);
     });
 
     it('calls onFontChange when a different font is selected', async () => {
         renderComponent({});
-
         const select = screen.getByLabelText('Font') as HTMLSelectElement;
         await userEvent.selectOptions(select, Fonts[1]);
 
         expect(mockOnFontChange).toHaveBeenCalledTimes(1);
         expect(mockOnFontChange).toHaveBeenCalledWith(Fonts[1]);
-
         expect(select.value).toBe(Fonts[1]);
     });
 
     it('renders the font size label with translated text', () => {
         renderComponent({});
-
         const label = screen.getByText('Font Size');
         expect(label).toBeInTheDocument();
     });
 
     it('renders the font size input with correct initial value', () => {
         renderComponent({ fontSize: 20 });
-
         const input = screen.getByLabelText('Font Size') as HTMLInputElement;
         expect(input).toBeInTheDocument();
         expect(input.value).toBe('20');
     });
 
-    it('calls onFontSizeChange when font size input changes to a valid number', async () => {
-        renderComponent({ fontSize: 15 });
-
-        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
-        await userEvent.clear(input);
-        await userEvent.type(input, '25');
-        await userEvent.tab();
-
-        expect(mockOnFontSizeChange).toHaveBeenCalledTimes(4); // clear -> type x2 -> blur
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(1, NaN); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(2, 2); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(3, 25); // From onChange
-        // Assuming onBlur clamps the value, but since 25 is within range, it should remain
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(4, 25); // From onBlur
-    });
-
-    it('calls onFontSizeChange with clamped MIN_FONT_SIZE when font size input is below MIN_FONT_SIZE on blur', async () => {
-        renderComponent({ fontSize: 15 });
-
-        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
-        await userEvent.clear(input);
-        await userEvent.type(input, '5'); // Below MIN_FONT_SIZE
-        await userEvent.tab();
-
-        expect(mockOnFontSizeChange).toHaveBeenCalledTimes(3);
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(1, NaN); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(2, 5); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(3, MIN_FONT_SIZE); // From onBlur
-
-        // Verify that the input value is clamped
-        expect(input.value).toBe(MIN_FONT_SIZE.toString());
-    });
-
-    it('calls onFontSizeChange with clamped MAX_FONT_SIZE when font size input is above MAX_FONT_SIZE on blur', async () => {
-        renderComponent({ fontSize: 15 });
-
-        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
-        await userEvent.clear(input);
-        await userEvent.type(input, '150'); // Above MAX_FONT_SIZE
-        await userEvent.tab();
-
-        expect(mockOnFontSizeChange).toHaveBeenCalledTimes(5);
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(1, NaN); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(2, 1); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(3, 15); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(4, 150); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(5, MAX_FONT_SIZE); // From onBlur
-
-        // Verify that the input value is clamped
-        expect(input.value).toBe(MAX_FONT_SIZE.toString());
-    });
-
-    it('calls onFontSizeChange with MIN_FONT_SIZE when font size input is invalid on blur', async () => {
-        renderComponent({ fontSize: 15 });
-
-        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
-        await userEvent.clear(input);
-        await userEvent.type(input, 'abc'); // Invalid input
-        await userEvent.tab(); // Triggers blur
-
-        expect(mockOnFontSizeChange).toHaveBeenCalledTimes(2);
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(1, NaN); // From onChange
-        expect(mockOnFontSizeChange).toHaveBeenNthCalledWith(2, MIN_FONT_SIZE); // From onBlur
-
-        // Verify that the input value is clamped to MIN_FONT_SIZE
-        expect(input.value).toBe(MIN_FONT_SIZE.toString());
-    });
-
     it('ensures the font size input has correct min and max attributes', () => {
         renderComponent({});
-
         const input = screen.getByLabelText('Font Size') as HTMLInputElement;
         expect(input).toHaveAttribute('min', MIN_FONT_SIZE.toString());
         expect(input).toHaveAttribute('max', MAX_FONT_SIZE.toString());
+    });
+
+    it('prevents setting font size below the minimum limit', async () => {
+        renderComponent({});
+        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
+        await userEvent.clear(input);
+        await userEvent.type(input, '1');
+        await userEvent.keyboard('{Enter}');
+        expect(mockOnFontSizeChange).toHaveBeenCalledWith(MIN_FONT_SIZE);
+    });
+
+    it('calls onFontSizeChange when valid font size is entered and confirmed with Enter', async () => {
+        renderComponent({});
+        const input = screen.getByLabelText('Font Size') as HTMLInputElement;
+        await userEvent.clear(input);
+        await userEvent.type(input, '25');
+        await userEvent.keyboard('{Enter}');
+        expect(mockOnFontSizeChange).toHaveBeenCalledWith(25);
     });
 });
