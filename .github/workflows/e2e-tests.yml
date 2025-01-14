@@ -54,7 +54,7 @@ jobs:
           path: playwright-report/traces
 
       - name: Upload screenshots
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: screenshots
