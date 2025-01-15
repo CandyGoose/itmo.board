@@ -12,10 +12,25 @@ interface TwoValueInputProps {
 
 export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
     ({ label1, label2, value1, value2, onChange1, onChange2, className }) => {
+        const validateInput = (value: string) => {
+            const regex = /^-?\d*\.?\d*$/;
+            return regex.test(value);
+        };
+
         const parseAndRound = (value: string) => {
             const parsed = parseFloat(value);
             return isNaN(parsed) ? 0 : Math.round(parsed * 100) / 100;
         };
+
+        const handleInputChange = (
+            value: string,
+            onChange: (value: number) => void,
+        ) => {
+            if (validateInput(value)) {
+                onChange(parseAndRound(value));
+            }
+        };
+
         return (
             <div className={`flex gap-4 items-center ${className || ''}`}>
                 <div className="flex flex-col w-1/2">
@@ -27,7 +42,7 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         type="text"
                         value={value1}
                         onChange={(e) =>
-                            onChange1(parseAndRound(e.target.value))
+                            handleInputChange(e.target.value, onChange1)
                         }
                         className="border rounded p-1 text-sm w-full
                             bg-[var(--background-color)]
@@ -44,7 +59,7 @@ export const TwoValueInput: React.FC<TwoValueInputProps> = memo(
                         type="text"
                         value={value2}
                         onChange={(e) =>
-                            onChange2(parseAndRound(e.target.value))
+                            handleInputChange(e.target.value, onChange2)
                         }
                         className="border rounded p-1 text-sm w-full
                             bg-[var(--background-color)]
