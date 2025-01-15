@@ -33,9 +33,12 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
         );
 
         const applyFontSize = (value: string) => {
-            const numericValue = Math.max(
+            let numericValue = parseInt(value, 10) || MIN_FONT_SIZE;
+
+            // Ограничиваем значение диапазоном
+            numericValue = Math.max(
                 MIN_FONT_SIZE,
-                Math.min(MAX_FONT_SIZE, parseInt(value, 10) || MIN_FONT_SIZE),
+                Math.min(MAX_FONT_SIZE, numericValue),
             );
 
             const canvas = document.createElement('canvas');
@@ -61,9 +64,31 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
         };
 
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            const invalidKeys = ['e', 'E', '+', '-', '.', ','];
+            if (
+                invalidKeys.includes(e.key) ||
+                (!/\d/.test(e.key) &&
+                    e.key !== 'Backspace' &&
+                    e.key !== 'Enter')
+            ) {
+                e.preventDefault();
+            }
+
             if (e.key === 'Enter') {
                 applyFontSize(inputValue);
             }
+        };
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            let sanitizedValue = e.target.value.replace(/[^\d]/g, '');
+            const numericValue = parseInt(sanitizedValue, 10);
+
+            // Ограничиваем вводимое значение до 72
+            if (numericValue > MAX_FONT_SIZE) {
+                sanitizedValue = MAX_FONT_SIZE.toString();
+            }
+
+            setInputValue(sanitizedValue);
         };
 
         return (
@@ -108,7 +133,7 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
                         id="font-size-input"
                         type="text"
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
+                        onChange={handleChange}
                         onKeyDown={handleKeyDown}
                         onBlur={() => applyFontSize(inputValue)}
                         className="border rounded p-1 text-sm w-full
