@@ -19,14 +19,14 @@ interface FontPickerProps {
 
 export const FontPicker: React.FC<FontPickerProps> = memo(
     ({
-         fontName,
-         onFontChange,
-         fontSize,
-         onFontSizeChange,
-         noteWidth,
-         noteHeight,
-         noteText,
-     }) => {
+        fontName,
+        onFontChange,
+        fontSize,
+        onFontSizeChange,
+        noteWidth,
+        noteHeight,
+        noteText,
+    }) => {
         const t = useTranslations('tools');
         const [inputValue, setInputValue] = useState<string>(
             fontSize.toString(),
@@ -67,7 +67,9 @@ export const FontPicker: React.FC<FontPickerProps> = memo(
             const invalidKeys = ['e', 'E', '+', '-', '.', ','];
             if (
                 invalidKeys.includes(e.key) ||
-                (!/\d/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Enter')
+                (!/\d/.test(e.key) &&
+                    e.key !== 'Backspace' &&
+                    e.key !== 'Enter')
             ) {
                 e.preventDefault();
             }
