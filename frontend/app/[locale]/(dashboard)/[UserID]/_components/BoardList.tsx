@@ -6,6 +6,7 @@ import { NewBoardButton } from './NewBoardButton';
 import { useParams, useSearchParams } from 'next/navigation';
 import { BoardCard } from './board-card/Index';
 import { Board, getAllBoards } from '@/actions/Board';
+import useFcmToken, { subscribeToTopic } from '@/hooks/useFcmToken';
 
 interface BoardListProps {
     orgId: string;
@@ -20,6 +21,7 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
     const [loading, setLoading] = useState(true);
     const params = useParams();
     const searchParams = useSearchParams();
+    const { token } = useFcmToken(null);
 
     const fetchBoards = useCallback(async (userId: string, orgId: string) => {
         try {
@@ -46,6 +48,12 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
         );
         setFilteredData(filteredBoards);
     }, [data, searchParams]);
+
+    useEffect(() => {
+        filteredData.map((board) => {
+            subscribeToTopic(token!, board._id);
+        });
+    }, [token, filteredData]);
 
     const handleBoardCreated = (newBoard: Board) => {
         setData((prevData) => [newBoard, ...prevData]);

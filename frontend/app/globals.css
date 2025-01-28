@@ -60,7 +60,7 @@ body,
         --popover-foreground: 210 40% 98%;
 
         --primary: 210 40% 98%;
-        --primary-foreground: hsl(210,40%,98%);
+        --primary-foreground: hsl(210, 40%, 98%);
 
         --secondary: 217.2 32.6% 17.5%;
         --secondary-foreground: 210 40% 98%;
@@ -91,12 +91,12 @@ body,
 
 @layer utilities {
     .no-scrollbar {
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        scrollbar-width: none;     /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
     }
 
     .no-scrollbar::-webkit-scrollbar {
-        display: none;             /* WebKit-based browsers (Chrome, Safari) */
+        display: none; /* WebKit-based browsers (Chrome, Safari) */
     }
 }
 /* Ensure smooth scrolling for a better user experience */
@@ -119,7 +119,7 @@ html {
     /* Удаление скроллбара */
     .no-scrollbar {
         -ms-overflow-style: none; /* Internet Explorer 10+ */
-        scrollbar-width: none;    /* Firefox */
+        scrollbar-width: none; /* Firefox */
     }
 
     .no-scrollbar::-webkit-scrollbar {

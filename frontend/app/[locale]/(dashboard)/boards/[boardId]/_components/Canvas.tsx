@@ -64,6 +64,33 @@ interface CanvasProps {
 }
 
 const Canvas: FC<CanvasProps> = ({ boardId }) => {
+    const [notificationSent, setNotificationSent] = useState(false);
+
+    const notifyBoardAuthor = async () => {
+        if (!notificationSent) {
+            setNotificationSent(true); // Блокируем дальнейшие отправки
+
+            const response = await fetch('/api/send-edit-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: `board_${boardId}`,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Ошибка отправки уведомления:', data.error);
+                setNotificationSent(false);
+            } else {
+                console.log('Уведомление успешно отправлено:', data.message);
+            }
+        }
+    };
+
     const svgRef = useRef<SVGSVGElement>(null);
     const [svgRect, setSvgRect] = useState<DOMRect | null>(null);
     const layerIds = useStorage((root) => root.layerIds);
@@ -74,7 +101,9 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
     const [editable, setEditable] = useState(false);
 
     useEffect(() => {
-        if (membership) setEditable(true);
+        if (membership) {
+            setEditable(true);
+        }
     }, [membership]);
 
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
@@ -371,6 +400,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 pencilDraft: [[point.x, point.y, pressure]],
                 penColor: lastUsedColor,
             });
+
+            notifyBoardAuthor();
         },
         [lastUsedColor],
     );
@@ -646,6 +677,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                 newLayerIds.map((id) => liveLayerIds.push(id));
                 setMyPresence({ selection: newLayerIds });
                 setPasteCount((prev) => prev + 1);
+
+                notifyBoardAuthor();
             }
         },
         [pasteCount, editable],
@@ -678,6 +711,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ fill: checked ? null : lastUsedColor });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection, lastUsedColor],
     );
@@ -690,6 +725,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ lineWidth: width });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -702,6 +739,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ fontName: name });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -714,6 +753,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ fontSize: size });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -726,6 +767,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ textAlign: align });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -738,6 +781,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ textFormat: format });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -751,6 +796,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ x, y });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -764,6 +811,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     layer.update({ width, height });
                 }
             });
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -786,6 +835,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     arr.length - 1 - (indices.length - 1 - i),
                 );
             }
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -805,6 +856,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             for (let i = 0; i < indices.length; i++) {
                 liveLayerIds.move(indices[i], i);
             }
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -819,6 +872,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     liveLayerIds.move(i - 1, i);
                 }
             }
+
+            notifyBoardAuthor();
         },
         [selection],
     );
@@ -833,6 +888,8 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     liveLayerIds.move(i + 1, i);
                 }
             }
+
+            notifyBoardAuthor();
         },
         [selection],
     );
