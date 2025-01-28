@@ -6,7 +6,7 @@ import { NewBoardButton } from './NewBoardButton';
 import { useParams, useSearchParams } from 'next/navigation';
 import { BoardCard } from './board-card/Index';
 import { Board, getAllBoards } from '@/actions/Board';
-import useFcmToken, { subscribeToTopic } from '@/components/useFcmToken';
+import useFcmToken, { subscribeToTopic } from '@/hooks/useFcmToken';
 
 interface BoardListProps {
     orgId: string;
