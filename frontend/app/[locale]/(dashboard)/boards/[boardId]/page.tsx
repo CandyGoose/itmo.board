@@ -3,7 +3,8 @@
 import { Room } from '@/components/Room';
 import Canvas from './_components/Canvas';
 import { CanvasLoading } from './_components/Loading';
-import { use } from 'react';
+import { use, useEffect } from 'react';
+import { getBoardById } from '@/actions/Board';
 
 interface PageProps {
     params: Promise<{
