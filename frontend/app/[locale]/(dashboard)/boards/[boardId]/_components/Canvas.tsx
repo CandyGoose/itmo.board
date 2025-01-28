@@ -70,10 +70,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
         if (!notificationSent) {
             setNotificationSent(true); // Блокируем дальнейшие отправки
 
-            const response = await fetch("/api/send-edit-notification", {
-                method: "POST",
+            const response = await fetch('/api/send-edit-notification', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     topic: `board_${boardId}`,
@@ -83,10 +83,10 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             const data = await response.json();
 
             if (!data.success) {
-                console.error("Ошибка отправки уведомления:", data.error);
+                console.error('Ошибка отправки уведомления:', data.error);
                 setNotificationSent(false);
             } else {
-                console.log("Уведомление успешно отправлено:", data.message);
+                console.log('Уведомление успешно отправлено:', data.message);
             }
         }
     };
@@ -102,7 +102,7 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
     useEffect(() => {
         if (membership) {
-            setEditable(true)
+            setEditable(true);
         }
     }, [membership]);
 
@@ -272,7 +272,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
 
             setMyPresence({ selection: [id] }, { addToHistory: true });
             setCanvasState({ mode: CanvasMode.None });
-
         },
         [
             fontName,
@@ -369,7 +368,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
                     pencilDraft: [roundedPoint],
                 });
             }
-
         },
         [canvasState.mode],
     );
@@ -392,7 +390,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             }
             setMyPresence({ pencilDraft: null });
             setCanvasState({ mode: CanvasMode.Pencil });
-
         },
         [lastUsedColor, lineWidth],
     );
@@ -423,7 +420,6 @@ const Canvas: FC<CanvasProps> = ({ boardId }) => {
             if (layer) {
                 layer.update(newBounds);
             }
-
         },
         [canvasState],
     );
