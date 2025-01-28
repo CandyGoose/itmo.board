@@ -1,16 +1,16 @@
-importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
 importScripts(
-    "https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"
+    'https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js',
 );
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA1GD4xECInr01gFPsayQ7Kb1uAmqU8y7I",
-    authDomain: "itmo-board.firebaseapp.com",
-    projectId: "itmo-board",
-    storageBucket: "itmo-board.firebasestorage.app",
-    messagingSenderId: "117334585829",
-    appId: "1:117334585829:web:e62f3f66f274b599037f0c",
-    measurementId: "G-XM9Z4BDK8L"
+    apiKey: 'AIzaSyA1GD4xECInr01gFPsayQ7Kb1uAmqU8y7I',
+    authDomain: 'itmo-board.firebaseapp.com',
+    projectId: 'itmo-board',
+    storageBucket: 'itmo-board.firebasestorage.app',
+    messagingSenderId: '117334585829',
+    appId: '1:117334585829:web:e62f3f66f274b599037f0c',
+    measurementId: 'G-XM9Z4BDK8L',
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -19,8 +19,8 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
     console.log(
-        "[firebase-messaging-sw.js] Received background message ",
-        payload
+        '[firebase-messaging-sw.js] Received background message ',
+        payload,
     );
 
     // payload.fcmOptions?.link comes from our backend API route handle
@@ -30,14 +30,14 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: "./logo.png",
+        icon: './logo.png',
         data: { url: link },
     };
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-self.addEventListener("notificationclick", function (event) {
-    console.log("[firebase-messaging-sw.js] Notification click received.");
+self.addEventListener('notificationclick', function (event) {
+    console.log('[firebase-messaging-sw.js] Notification click received.');
 
     event.notification.close();
 
@@ -45,7 +45,7 @@ self.addEventListener("notificationclick", function (event) {
     event.waitUntil(
         clients
             // https://developer.mozilla.org/en-US/docs/Web/API/Clients/matchAll
-            .matchAll({ type: "window", includeUncontrolled: true })
+            .matchAll({ type: 'window', includeUncontrolled: true })
             .then(function (clientList) {
                 const url = event.notification.data.url;
 
@@ -53,15 +53,15 @@ self.addEventListener("notificationclick", function (event) {
 
                 // If relative URL is passed in firebase console or API route handler, it may open a new window as the client.url is the full URL i.e. https://example.com/ and the url is /about whereas if we passed in the full URL, it will focus on the existing tab i.e. https://example.com/about
                 for (const client of clientList) {
-                    if (client.url === url && "focus" in client) {
+                    if (client.url === url && 'focus' in client) {
                         return client.focus();
                     }
                 }
 
                 if (clients.openWindow) {
-                    console.log("OPENWINDOW ON CLIENT");
+                    console.log('OPENWINDOW ON CLIENT');
                     return clients.openWindow(url);
                 }
-            })
+            }),
     );
 });
