@@ -16,10 +16,12 @@ export async function POST(request: NextRequest) {
     try {
         await admin.messaging().subscribeToTopic(token, topic);
 
-        return NextResponse.json({ success: true, message: 'Subscribed to topic successfully' });
+        return NextResponse.json({
+            success: true,
+            message: 'Subscribed to topic successfully',
+        });
     } catch (error) {
         console.error('Error subscribing to topic:', error);
         return NextResponse.json({ success: false, error });
     }
 }
-

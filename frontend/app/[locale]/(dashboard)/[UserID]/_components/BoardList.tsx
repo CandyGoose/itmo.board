@@ -21,7 +21,7 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
     const [loading, setLoading] = useState(true);
     const params = useParams();
     const searchParams = useSearchParams();
-    const { token } = useFcmToken(null)
+    const { token } = useFcmToken(null);
 
     const fetchBoards = useCallback(async (userId: string, orgId: string) => {
         try {
@@ -51,8 +51,8 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
 
     useEffect(() => {
         filteredData.map((board) => {
-            subscribeToTopic(token!, board._id)
-        })
+            subscribeToTopic(token!, board._id);
+        });
     }, [token, filteredData]);
 
     const handleBoardCreated = (newBoard: Board) => {
